@@ -405,10 +405,38 @@ function applyFilter() {
 
 async function init() {
   var s = await sb.auth.getSession();
-  if (s.data.session) { CU = s.data.session.user; updateNav(); loadProfile(); }
+  if (s.data.session) { CU = s.data.session.user; updateNav(); loadProfile(); startGlobalNotifications(); }
   loadListings();
   loadStats();
+  // Request notification permission
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
 }
+
+function sendNotification(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body: body, icon: '/favicon.ico' });
+  }
+}
+
+function startGlobalNotifications() {
+  if (!CU) return;
+  sb.channel('global_notifications_'+CU.id)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'receiver_id=eq.'+CU.id
+    }, function(payload) {
+      var msg = payload.new;
+      sendNotification('💬 Шинэ мессеж', msg.content || 'Шинэ мессеж ирлээ');
+      showToast('💬 Шинэ мессеж ирлээ!');
+    })
+    .subscribe();
+}
+
+
 
 async function loadStats() {
   var r1 = await sb.from('listings').select('*',{count:'exact',head:true}).eq('is_active',true);
