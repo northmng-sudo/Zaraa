@@ -1272,16 +1272,33 @@ async function loadDeliveriesPage() {
 async function loadMyDeliveries() {
   var box = document.getElementById('myDeliveries');
   if (!box || !CU) return;
-  var r = await sb.from('deliveries').select('*, listings(title)').eq('buyer_id', CU.id).order('created_at', {ascending:false});
+  var r = await sb.from('deliveries').select('*, listings(title, images), users!courier_id(name, phone)').eq('buyer_id', CU.id).order('created_at', {ascending:false});
   var ds = r.data || [];
-  var statusLabel = {pending:'⏳ Хүлээгдэж байна', accepted:'🚗 Замдаа', delivered:'✅ Хүргэгдсэн', cancelled:'❌ Цуцлагдсан'};
   if (!ds.length) { box.innerHTML = '<div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div>'; return; }
   box.innerHTML = ds.map(function(d) {
-    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:10px">'+
-      '<div style="font-weight:600;margin-bottom:4px">'+(d.listings&&d.listings.title||'Зар')+'</div>'+
-      '<div style="font-size:12px;color:var(--m);margin-bottom:6px">📍 '+d.address+'</div>'+
-      '<div style="font-size:13px;font-weight:600">'+(statusLabel[d.status]||d.status)+'</div>'+
-      (d.status==='delivered'?'<button class="btn btn-ghost" style="margin-top:8px;font-size:12px" onclick="confirmDelivery(\''+d.id+'\')">✅ Баталгаажуулах</button>':'')+
+    var steps = [
+      {key:'pending', label:'Захиалга өгсөн', icon:'📋'},
+      {key:'accepted', label:'Хүргэгч авсан', icon:'🚗'},
+      {key:'delivered', label:'Хүргэгдсэн', icon:'✅'},
+      {key:'confirmed', label:'Баталгаажсан', icon:'🎉'}
+    ];
+    var currentIdx = steps.findIndex(function(s){ return s.key === d.status; });
+    var progressBar = '<div style="display:flex;align-items:center;gap:4px;margin:12px 0">'+
+      steps.map(function(s, i) {
+        var active = i <= currentIdx;
+        return '<div style="display:flex;flex-direction:column;align-items:center;flex:1">'+
+          '<div style="width:28px;height:28px;border-radius:50%;background:'+(active?'var(--a)':'var(--b)')+';color:'+(active?'white':'var(--m)')+';display:flex;align-items:center;justify-content:center;font-size:14px">'+s.icon+'</div>'+
+          (i<steps.length-1?'<div style="height:2px;background:'+(i<currentIdx?'var(--a)':'var(--b)')+'"></div>':'')+
+          '<div style="font-size:9px;color:'+(active?'var(--a)':'var(--m)')+';margin-top:3px;text-align:center">'+s.label+'</div>'+
+          '</div>'+(i<steps.length-1?'<div style="flex:1;height:2px;background:'+(i<currentIdx?'var(--a)':'var(--b)')+'"></div>':'');
+      }).join('')+
+    '</div>';
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:12px">'+
+      '<div style="font-weight:700;font-size:15px;margin-bottom:4px">'+(d.listings&&d.listings.title||'Зар')+'</div>'+
+      '<div style="font-size:12px;color:var(--m);margin-bottom:4px">📍 '+d.address+'</div>'+
+      progressBar+
+      (d.status==='accepted'&&d.users?'<div style="background:var(--s2);border-radius:10px;padding:10px;font-size:13px">🚗 Хүргэгч: <b>'+(d.users.name||'?')+'</b> • 📞 '+(d.users.phone||'?')+'</div>':'')+
+      (d.status==='delivered'?'<button class="btn btn-primary btn-full" style="margin-top:10px" onclick="confirmDelivery(\''+d.id+'\')">✅ Хүлээн авсан баталгаажуулах</button>':'')+
       '</div>';
   }).join('');
 }
@@ -1320,8 +1337,9 @@ async function loadCourierOrders() {
 }
 
 async function acceptOrder(id) {
-  var r = await sb.from('deliveries').update({courier_id: CU.id, status: 'accepted', accepted_at: new Date().toISOString()}).eq('id', id);
+  var r = await sb.rpc('accept_delivery', {delivery_id: id, courier: CU.id});
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  if (!r.data) { showToast('Захиалга аль хэдийн авагдсан байна!', true); loadNewOrders(); return; }
   showToast('Захиалга хүлээн авлаа! 🚀');
   loadNewOrders();
   loadCourierOrders();
