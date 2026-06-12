@@ -977,6 +977,7 @@ async function loadAdmin() {
       '<div style="display:flex;gap:6px">'+
       '<button onclick="toggleVerified(\''+u.id+'\','+u.is_verified+')" style="background:'+(u.is_verified?'#00C96B':'var(--s2)')+';color:'+(u.is_verified?'white':'var(--t)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">'+(u.is_verified?'✓ Баталгаажсан':'Баталгаажуулах')+'</button>'+
       '<button onclick="toggleAdmin(\''+u.id+'\','+u.is_admin+')" style="background:'+(u.is_admin?'var(--a)':'var(--s2)')+';color:'+(u.is_admin?'white':'var(--t)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">'+(u.is_admin?'🛡️ Admin':'Admin болгох')+'</button>'+
+      '<button onclick="adminDeleteUser(\''+u.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
       '</div></div>';
   }).join('');
 }
@@ -984,6 +985,14 @@ async function loadAdmin() {
 async function toggleFeatured(id, current) {
   await sb.from('listings').update({is_featured: !current}).eq('id', id);
   loadAdmin(); loadListings();
+}
+
+async function adminDeleteUser(id) {
+  if (!confirm('Хэрэглэгчийг бүрмөсөн устгах уу? Түүний бүх зар, захиалга, мессеж устгагдана!')) return;
+  var r = await sb.rpc('admin_delete_user', {p_user_id: id});
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Хэрэглэгч устгагдлаа!');
+  loadAdmin();
 }
 
 async function toggleVerified(id, current) {
