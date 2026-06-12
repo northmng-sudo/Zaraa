@@ -978,9 +978,19 @@ async function toggleAdmin(id, current) {
 }
 
 async function adminDeleteListing(id) {
-  if (!confirm('Зарыг устгах уу?')) return;
-  await sb.from('listings').delete().eq('id', id);
+  if (!confirm('Зарыг бүрмөсөн устгах уу?')) return;
+  var r = await sb.rpc('admin_delete_listing', {listing_id: id});
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Зар устгагдлаа!');
   loadAdmin(); loadListings();
+}
+
+async function cancelDelivery(id) {
+  if (!confirm('Захиалгыг цуцлах уу?')) return;
+  var r = await sb.from('deliveries').update({status:'cancelled'}).eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Захиалга цуцлагдлаа!');
+  loadMyDeliveries();
 }
 
 async function deleteListing(id) {
