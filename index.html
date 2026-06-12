@@ -555,6 +555,18 @@ function openChat(listingId, sellerId) {
   window._chatSellerId = sellerId;
   loadChat(listingId, sellerId);
   openModal('chatModal');
+  // Realtime subscription
+  if (window._chatChannel) sb.removeChannel(window._chatChannel);
+  window._chatChannel = sb.channel('chat_'+listingId)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'listing_id=eq.'+listingId
+    }, function(payload) {
+      loadChat(listingId, sellerId);
+    })
+    .subscribe();
 }
 
 async function loadChat(listingId, sellerId) {
@@ -848,7 +860,13 @@ function showPage(name) {
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (id === 'chatModal' && window._chatChannel) {
+    sb.removeChannel(window._chatChannel);
+    window._chatChannel = null;
+  }
+}
 
 document.querySelectorAll('.modal-overlay').forEach(function(m){
   m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
