@@ -589,6 +589,7 @@ async function sendMessage() {
 }
 
 
+async function deleteListing(id) {
   if (!confirm('Зарыг устгах уу?')) return;
   var r = await sb.from('listings').delete().eq('id', id);
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
