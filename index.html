@@ -251,7 +251,9 @@ select.form-input{cursor:pointer}
 
   <!-- COURIER DASHBOARD -->
   <div id="courierDashboard" style="display:none">
-    <div style="padding:16px">
+    <div style="padding:0 16px;margin-bottom:8px">
+      <div style="border-top:2px solid var(--b);padding-top:16px;font-size:13px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:0.5px">🚚 Хүргэгчийн хэсэг</div>
+    </div>
       <!-- Header -->
       <div style="background:linear-gradient(135deg,var(--a),#FF8A3D);border-radius:16px;padding:20px;margin-bottom:16px;color:white">
         <div style="font-size:18px;font-weight:800;margin-bottom:4px">🚀 Хүргэгчийн хэсэг</div>
@@ -1262,8 +1264,12 @@ async function loadDeliveriesPage() {
   if (!CU) return;
   var u = await sb.from('users').select('is_courier, is_available, total_deliveries, total_earned').eq('id', CU.id).single();
   var user = u.data;
+  // Always show buyer deliveries first
+  document.getElementById('buyerDeliveries').style.display = 'block';
+  loadMyDeliveries();
+  startBuyerTracking();
+  // Show courier dashboard below if is_courier
   if (user && user.is_courier) {
-    document.getElementById('buyerDeliveries').style.display = 'none';
     document.getElementById('courierDashboard').style.display = 'block';
     document.getElementById('courierAvailable').checked = user.is_available || false;
     document.getElementById('courierStatus').textContent = user.is_available ? '🟢 Идэвхтэй' : '⏸ Идэвхгүй';
@@ -1273,10 +1279,7 @@ async function loadDeliveriesPage() {
     loadCourierOrders();
     startCourierNotifications();
   } else {
-    document.getElementById('buyerDeliveries').style.display = 'block';
     document.getElementById('courierDashboard').style.display = 'none';
-    loadMyDeliveries();
-    startBuyerTracking();
   }
 }
 
