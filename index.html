@@ -572,13 +572,12 @@ function openChat(listingId, sellerId) {
 async function loadChat(listingId, sellerId) {
   var box = document.getElementById('chatMessages');
   if (!box) return;
-  var r = await sb.from('messages').select('*, users(name)').eq('listing_id', listingId).order('created_at', {ascending:true});
+  var r = await sb.from('messages').select('*').eq('listing_id', listingId).order('created_at', {ascending:true});
   var msgs = r.data || [];
   box.innerHTML = msgs.length ? msgs.map(function(m){
     var isMine = m.sender_id === CU.id;
     return '<div style="display:flex;justify-content:'+(isMine?'flex-end':'flex-start')+';margin-bottom:8px">'+
       '<div style="max-width:75%;background:'+(isMine?'var(--a)':'var(--s2)')+';padding:8px 12px;border-radius:12px;font-size:13px">'+
-      (isMine?'':('<div style="font-size:10px;color:var(--m);margin-bottom:2px">'+(m.users&&m.users.name?m.users.name:'?')+'</div>'))+
       m.content+'</div></div>';
   }).join('') : '<div style="text-align:center;color:var(--m);font-size:13px;padding:20px">Чат эхлүүлэх</div>';
   box.scrollTop = box.scrollHeight;
