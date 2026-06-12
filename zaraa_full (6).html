@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Зараа</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+:root{--bg:#0A0A0F;--s:#13131A;--s2:#1C1C26;--b:#2A2A38;--a:#FF5C00;--a2:#FF8A3D;--t:#F0F0F5;--m:#8A8A9A;--g:#00C96B;--r:14px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
+nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:20px;font-weight:900;letter-spacing:-0.5px}
+.logo span{color:var(--a)}
+.nav-right{display:flex;gap:8px;align-items:center}
+.btn{padding:8px 16px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:'Inter',sans-serif}
+.btn-ghost{background:transparent;color:var(--m);border:1px solid var(--b)}
+.btn-ghost:hover{color:var(--t)}
+.btn-primary{background:var(--a);color:white}
+.btn-primary:hover{background:var(--a2)}
+.page{display:none;padding-bottom:80px}
+.page.active{display:block}
+.hero{padding:40px 16px 24px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--b);border-radius:50px;padding:5px 12px;font-size:11px;font-weight:600;color:var(--a);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.5px}
+.hero-badge::before{content:'';width:6px;height:6px;background:var(--a);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+.hero h1{font-size:clamp(32px,8vw,56px);font-weight:900;line-height:1.05;letter-spacing:-2px;margin-bottom:12px}
+.hero h1 .hl{color:var(--a)}
+.hero p{font-size:14px;color:var(--m);margin-bottom:24px;line-height:1.6}
+.hero-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn-lg{padding:12px 24px;font-size:15px}
+.search-wrap{padding:0 16px 24px}
+.search-bar{background:var(--s);border:1px solid var(--b);border-radius:var(--r);display:flex;align-items:center;padding:6px 6px 6px 14px;gap:8px;transition:border-color 0.2s}
+.search-bar:focus-within{border-color:var(--a)}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--t);font-size:14px;font-family:'Inter',sans-serif}
+.search-bar input::placeholder{color:var(--m)}
+.search-bar button{background:var(--a);color:white;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 24px}
+.stat{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px 10px;text-align:center}
+.stat-num{font-size:20px;font-weight:900;color:var(--a);letter-spacing:-0.5px}
+.stat-label{font-size:10px;color:var(--m);margin-top:3px}
+.section{padding:0 16px 24px}
+.section-title{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px}
+.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{flex-shrink:0;background:var(--s);border:1px solid var(--b);border-radius:50px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m)}
+.cat:hover,.cat.active{background:var(--a);border-color:var(--a);color:white}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform 0.2s,border-color 0.2s;position:relative}
+.card:hover{transform:translateY(-2px);border-color:var(--a)}
+.card-img{width:100%;aspect-ratio:1;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;overflow:hidden}
+.card-img img{width:100%;height:100%;object-fit:cover}
+.delivery-badge{position:absolute;top:7px;left:7px;background:var(--g);color:white;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:700}
+.video-badge{position:absolute;bottom:7px;right:7px;background:rgba(0,0,0,0.7);color:white;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:600}
+.card-body{padding:10px}
+.card-title{font-size:12px;font-weight:600;margin-bottom:4px;line-height:1.3}
+.card-price{font-size:14px;font-weight:800;color:var(--a)}
+.card-meta{font-size:10px;color:var(--m);margin-top:4px;display:flex;justify-content:space-between}
+.delivery-cta{margin:0 16px 24px;background:linear-gradient(135deg,var(--a),#FF8A3D);border-radius:18px;padding:24px 20px;position:relative;overflow:hidden}
+.delivery-cta::after{content:'🚀';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:56px;opacity:0.25}
+.delivery-cta h2{font-size:20px;font-weight:900;margin-bottom:6px}
+.delivery-cta p{font-size:12px;opacity:0.85;margin-bottom:16px;max-width:200px;line-height:1.5}
+.btn-white{background:white;color:var(--a);font-weight:700;padding:9px 20px;border-radius:50px;border:none;font-size:13px;cursor:pointer}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,15,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--b);display:flex;justify-content:space-around;padding:8px 0 18px;z-index:100}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--m);cursor:pointer;transition:color 0.2s;flex:1}
+.nav-item.active{color:var(--a)}
+.nav-item svg{width:20px;height:20px}
+.nav-item.post-btn{background:var(--a);border-radius:14px;margin:-12px 8px 0;padding:8px 0 5px;color:white}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--s);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:20px;letter-spacing:-0.3px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:600;color:var(--m);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.5px}
+.form-input{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px 14px;color:var(--t);font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color 0.2s}
+.form-input:focus{border-color:var(--a)}
+.form-input::placeholder{color:var(--m)}
+textarea.form-input{resize:vertical;min-height:80px}
+select.form-input{cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--s2);border:1px solid var(--b);border-radius:10px}
+.toggle-label{font-size:13px;font-weight:500}
+.toggle{position:relative;width:44px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--b);border-radius:12px;cursor:pointer;transition:0.3s}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:white;border-radius:50%;transition:0.3s}
+.toggle input:checked+.toggle-slider{background:var(--a)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px)}
+.btn-full{width:100%;padding:14px;font-size:15px;border-radius:12px;margin-top:8px}
+.close-btn{position:absolute;right:20px;top:20px;background:var(--s2);border:none;color:var(--m);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;background:var(--s2);border-radius:10px;padding:4px}
+.auth-tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border-radius:8px;color:var(--m);transition:all 0.2s;border:none;background:none;font-family:'Inter',sans-serif}
+.auth-tab.active{background:var(--a);color:white}
+.detail-img{width:100%;aspect-ratio:4/3;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:80px}
+.detail-img img{width:100%;height:100%;object-fit:cover}
+.detail-body{padding:16px}
+.detail-title{font-size:20px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+.detail-price{font-size:24px;font-weight:900;color:var(--a);margin-bottom:12px}
+.detail-desc{font-size:14px;color:var(--m);line-height:1.6;margin-bottom:16px}
+.detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tag{background:var(--s2);border:1px solid var(--b);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;color:var(--m)}
+.seller-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.seller-avatar{width:44px;height:44px;border-radius:50%;background:var(--a);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
+.seller-info{flex:1}
+.seller-name{font-size:14px;font-weight:600}
+.seller-rating{font-size:12px;color:var(--m)}
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.profile-header{padding:32px 16px 20px;text-align:center}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--a);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:0 auto 12px}
+.profile-name{font-size:20px;font-weight:800;margin-bottom:4px}
+.profile-email{font-size:13px;color:var(--m)}
+.menu-item{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--b);cursor:pointer}
+.menu-item:hover{background:var(--s)}
+.menu-left{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500}
+.menu-icon{width:36px;height:36px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:16px}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--g);color:white;padding:10px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:#e53e3e}
+.empty{text-align:center;padding:60px 20px;color:var(--m)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty p{font-size:14px;line-height:1.6}
+.loading{display:flex;justify-content:center;padding:40px}
+.spinner{width:32px;height:32px;border:3px solid var(--b);border-top-color:var(--a);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.back-btn{display:flex;align-items:center;gap:8px;padding:14px 16px;font-size:14px;font-weight:600;cursor:pointer;color:var(--m)}
+.back-btn:hover{color:var(--t)}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<nav>
+  <div class="logo">зараа<span>.</span></div>
+  <div class="nav-right" id="navRight">
+    <button class="btn btn-ghost" onclick="openAuth('login')">Нэвтрэх</button>
+    <button class="btn btn-primary" onclick="openAuth('register')">Бүртгүүлэх</button>
+  </div>
+</nav>
+
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-badge">Шинэ платформ • УБ</div>
+    <h1>Зар, <span class="hl">хүргэлт</span><br>нэг дор</h1>
+    <p>Зараад хүргүүл. Хурдан, найдвартай.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary btn-lg" onclick="showPostModal()">+ Зар байршуулах</button>
+      <button class="btn btn-ghost btn-lg" onclick="showPage('deliveries')">Хүргэлт захиалах</button>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <div class="search-bar">
+      <svg width="16" height="16" fill="none" stroke="#8A8A9A" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Юу хайж байна вэ?" oninput="doSearch()">
+      <button onclick="doSearch()">Хайх</button>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="statListings">0</div><div class="stat-label">Идэвхтэй зар</div></div>
+    <div class="stat"><div class="stat-num" id="statCouriers">0</div><div class="stat-label">Хүргэгч</div></div>
+    <div class="stat"><div class="stat-num">~30мин</div><div class="stat-label">Дундаж хүргэлт</div></div>
+  </div>
+  <div class="section">
+    <div class="section-title">Ангилал</div>
+    <div class="cats" id="catList">
+      <div class="cat active" data-cat=''>🔥 Бүгд</div>
+      <div class="cat" data-cat='Техник'>📱 Техник</div>
+      <div class="cat" data-cat='Хувцас'>👗 Хувцас</div>
+      <div class="cat" data-cat='Гутал'>👟 Гутал</div>
+      <div class="cat" data-cat='Гоо сайхан'>💄 Гоо сайхан</div>
+      <div class="cat" data-cat='Тавилга'>🪑 Тавилга</div>
+      <div class="cat" data-cat='Гэр ахуй'>🏡 Гэр ахуй</div>
+      <div class="cat" data-cat='Авто'>🚗 Авто</div>
+      <div class="cat" data-cat='Үл хөдлөх'>🏠 Үл хөдлөх</div>
+      <div class="cat" data-cat='Тоглоом'>🎮 Тоглоом</div>
+      <div class="cat" data-cat='Спорт'>⚽ Спорт</div>
+      <div class="cat" data-cat='Хүүхдийн бараа'>🧸 Хүүхэд</div>
+      <div class="cat" data-cat='Эрүүл мэнд'>💊 Эрүүл мэнд</div>
+      <div class="cat" data-cat='Хоол хүнс'>🍎 Хоол хүнс</div>
+      <div class="cat" data-cat='Амьтад'>🐾 Амьтад</div>
+      <div class="cat" data-cat='Ном'>📚 Ном</div>
+      <div class="cat" data-cat='Ажлын байр'>💼 Ажлын байр</div>
+      <div class="cat" data-cat='Үйлчилгээ'>🔧 Үйлчилгээ</div>
+      <div class="cat" data-cat='Бусад'>📦 Бусад</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Шинэ зарууд</div>
+    <div id="listingsGrid" class="grid"><div class="loading"><div class="spinner"></div></div></div>
+  </div>
+  <div class="delivery-cta">
+    <h2>Хүргэгч болох уу?</h2>
+    <p>Чөлөөт цагтаа мөнгө олоорой.</p>
+    <button class="btn-white" onclick="becomeCourier()">Бүртгүүлэх →</button>
+  </div>
+</div>
+
+<div class="page" id="page-deliveries">
+  <div style="padding:20px 16px 10px"><div class="section-title">Миний захиалгууд</div></div>
+  <div class="section"><div id="myDeliveries"><div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div></div></div>
+</div>
+
+<div class="page" id="page-listings">
+  <div style="padding:20px 16px 10px"><div class="section-title">Миний зарууд</div></div>
+  <div class="section"><div id="myListings"><div class="empty"><div class="empty-icon">📋</div><p>Зар байхгүй<br><br><button class="btn btn-primary" onclick="showPostModal()">+ Зар байршуулах</button></p></div></div></div>
+</div>
+
+<div class="page" id="page-profile">
+  <div id="profileContent">
+    <div class="empty" style="padding-top:80px"><div class="empty-icon">👤</div><p>Нэвтэрч профайлаа харна уу</p><br><button class="btn btn-primary" onclick="openAuth('login')">Нэвтрэх</button></div>
+  </div>
+</div>
+
+<div class="page" id="page-detail">
+  <div class="back-btn" onclick="showPage('home')">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Буцах
+  </div>
+  <div id="detailContent"></div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-home" onclick="showPage('home')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Нүүр
+  </div>
+  <div class="nav-item" id="nav-deliveries" onclick="showPage('deliveries')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Хүргэлт
+  </div>
+  <div class="nav-item post-btn" onclick="showPostModal()">
+    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Зар
+  </div>
+  <div class="nav-item" id="nav-listings" onclick="showPage('listings')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Зарууд
+  </div>
+  <div class="nav-item" id="nav-profile" onclick="showPage('profile')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профайл
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal('authModal')">×</button>
+    <div class="modal-title">Тавтай морил 👋</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTab" onclick="switchAuth('login')">Нэвтрэх</button>
+      <button class="auth-tab" id="registerTab" onclick="switchAuth('register')">Бүртгүүлэх</button>
+    </div>
+    <div id="loginForm">
+      <div class="form-group"><label class="form-label">Имэйл</label><input class="form-input" type="email" id="loginEmail" placeholder="email@example.com"></div>
+      <div class="form-group"><label class="form-label">Нууц үг</label><input class="form-input" type="password" id="loginPassword" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-full" onclick="login()">Нэвтрэх</button>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div class="form-group"><label class="form-label">Нэр</label><input class="form-input" type="text" id="regName" placeholder="Таны нэр"></div>
+      <div class="form-group"><label class="form-label">Имэйл</label><input class="form-input" type="email" id="regEmail" placeholder="email@example.com"></div>
+      <div class="form-group"><label class="form-label">Утас</label><input class="form-input" type="tel" id="regPhone" placeholder="99xxxxxx"></div>
+      <div class="form-group"><label class="form-label">Нууц үг</label><input class="form-input" type="password" id="regPassword" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-full" onclick="register()">Бүртгүүлэх</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST MODAL -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal('postModal')">×</button>
+    <div class="modal-title">Зар байршуулах</div>
+    <div class="form-group"><label class="form-label">Гарчиг</label><input class="form-input" id="postTitle" placeholder="Барааны нэр"></div>
+    <div class="form-group"><label class="form-label">Тайлбар</label><textarea class="form-input" id="postDesc" placeholder="Барааны тухай дэлгэрэнгүй..."></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Үнэ (₮)</label><input class="form-input" type="number" id="postPrice" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Байршил</label><input class="form-input" id="postLocation" placeholder="Дүүрэг"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ангилал</label>
+      <select class="form-input" id="postCategory">
+        <option value="Техник">📱 Техник</option>
+        <option value="Хувцас">👗 Хувцас</option>
+        <option value="Гутал">👟 Гутал</option>
+        <option value="Гоо сайхан">💄 Гоо сайхан</option>
+        <option value="Тавилга">🪑 Тавилга</option>
+        <option value="Гэр ахуй">🏡 Гэр ахуй</option>
+        <option value="Авто">🚗 Авто</option>
+        <option value="Үл хөдлөх">🏠 Үл хөдлөх</option>
+        <option value="Тоглоом">🎮 Тоглоом</option>
+        <option value="Спорт">⚽ Спорт</option>
+        <option value="Хүүхдийн бараа">🧸 Хүүхэд</option>
+        <option value="Эрүүл мэнд">💊 Эрүүл мэнд</option>
+        <option value="Хоол хүнс">🍎 Хоол хүнс</option>
+        <option value="Амьтад">🐾 Амьтад</option>
+        <option value="Ном">📚 Ном</option>
+        <option value="Ажлын байр">💼 Ажлын байр</option>
+        <option value="Үйлчилгээ">🔧 Үйлчилгээ</option>
+        <option value="Бусад">📦 Бусад</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Зурагнууд (макс 10)</label>
+      <div id="imgPreview" style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap"></div>
+      <label style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px dashed var(--b);border-radius:10px;padding:12px 14px;cursor:pointer;color:var(--m);font-size:13px">
+        📷 Зураг сонгох
+        <input type="file" id="postImages" accept="image/*" multiple style="display:none" onchange="previewImages(this)">
+      </label>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Бичлэг (макс 100MB)</label>
+      <div id="videoPreview" style="margin-bottom:8px"></div>
+      <label style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px dashed var(--b);border-radius:10px;padding:12px 14px;cursor:pointer;color:var(--m);font-size:13px">
+        🎥 Бичлэг сонгох
+        <input type="file" id="postVideo" accept="video/*" style="display:none" onchange="previewVideo(this)">
+      </label>
+    </div>
+    <div class="form-group">
+      <div class="toggle-row">
+        <span class="toggle-label">🚚 Хүргэлт боломжтой</span>
+        <label class="toggle"><input type="checkbox" id="postDelivery"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="postListing()">Зар байршуулах</button>
+  </div>
+</div>
+
+<!-- DELIVERY MODAL -->
+<div class="modal-overlay" id="deliveryModal">
+  <div class="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal('deliveryModal')">×</button>
+    <div class="modal-title">Хүргэлт захиалах 🚚</div>
+    <input type="hidden" id="deliveryListingId">
+    <div class="form-group"><label class="form-label">Хүргэх хаяг</label><input class="form-input" id="deliveryAddress" placeholder="Дүүрэг, хороо, байр, тоот..."></div>
+    <div class="form-group"><label class="form-label">Утасны дугаар</label><input class="form-input" type="tel" id="deliveryPhone" placeholder="99xxxxxx"></div>
+    <div class="form-group"><label class="form-label">Нэмэлт тайлбар</label><textarea class="form-input" id="deliveryNote" placeholder="3 давхар, баруун гар талын хаалга..."></textarea></div>
+    <button class="btn btn-primary btn-full" onclick="orderDelivery()">Захиалах</button>
+  </div>
+</div>
+
+<script>
+const SURL = 'https://xtxdktakcpscpdjdcalf.supabase.co';
+const SKEY = 'sb_publishable_LLuvIl44tpDQhPamDiV9Ww_i_ry2kiW';
+const sb = supabase.createClient(SURL, SKEY);
+
+var CU = null;
+var AL = [];
+var CC = '';
+var EMOJIS = {'Техник':'📱','Хувцас':'👗','Гутал':'👟','Гоо сайхан':'💄','Тавилга':'🪑','Гэр ахуй':'🏡','Авто':'🚗','Үл хөдлөх':'🏠','Тоглоом':'🎮','Спорт':'⚽','Хүүхдийн бараа':'🧸','Эрүүл мэнд':'💊','Хоол хүнс':'🍎','Амьтад':'🐾','Ном':'📚','Ажлын байр':'💼','Үйлчилгээ':'🔧','Бусад':'📦'};
+
+// Category click
+document.getElementById('catList').addEventListener('click', function(e) {
+  var el = e.target.closest('.cat');
+  if (!el) return;
+  CC = el.getAttribute('data-cat');
+  document.querySelectorAll('.cat').forEach(function(c){ c.classList.remove('active'); });
+  el.classList.add('active');
+  applyFilter();
+});
+
+function doSearch() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var arr = AL.slice();
+  if (q) {
+    arr = arr.filter(function(l){ return (l.title||'').toLowerCase().indexOf(q) > -1 || (l.description||'').toLowerCase().indexOf(q) > -1; });
+  } else {
+    if (CC) arr = arr.filter(function(l){ return l.category === CC; });
+  }
+  renderListings(arr);
+}
+
+function applyFilter() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var arr = AL.slice();
+  if (CC) arr = arr.filter(function(l){ return l.category === CC; });
+  if (q) arr = arr.filter(function(l){ return (l.title||'').toLowerCase().indexOf(q) > -1 || (l.description||'').toLowerCase().indexOf(q) > -1; });
+  renderListings(arr);
+}
+
+async function init() {
+  var s = await sb.auth.getSession();
+  if (s.data.session) { CU = s.data.session.user; updateNav(); loadProfile(); }
+  loadListings();
+  loadStats();
+}
+
+async function loadStats() {
+  var r1 = await sb.from('listings').select('*',{count:'exact',head:true}).eq('is_active',true);
+  var r2 = await sb.from('users').select('*',{count:'exact',head:true}).eq('is_courier',true);
+  document.getElementById('statListings').textContent = r1.count||0;
+  document.getElementById('statCouriers').textContent = r2.count||0;
+}
+
+async function loadListings() {
+  var grid = document.getElementById('listingsGrid');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  var r = await sb.from('listings').select('*, users(name,rating)').eq('is_active',true).order('created_at',{ascending:false});
+  if (r.error) { grid.innerHTML = '<div class="empty"><div class="empty-icon">😕</div><p>Алдаа гарлаа</p></div>'; return; }
+  AL = r.data || [];
+  applyFilter();
+}
+
+function renderListings(arr) {
+  var grid = document.getElementById('listingsGrid');
+  if (!arr || !arr.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:span 2"><div class="empty-icon">📭</div><p>Зар олдсонгүй</p></div>';
+    return;
+  }
+  grid.innerHTML = arr.map(function(l) {
+    return '<div class="card" onclick="showDetail(\''+l.id+'\')">'+
+      '<div class="card-img">'+
+      (l.images&&l.images[0]?'<img src="'+l.images[0]+'" onerror="this.parentElement.innerHTML=\''+( EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+      (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
+      (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
+      '</div>'+
+      '<div class="card-body">'+
+      '<div class="card-title">'+l.title+'</div>'+
+      '<div class="card-price">₮'+Number(l.price).toLocaleString()+'</div>'+
+      '<div class="card-meta"><span>'+(l.location||'УБ')+'</span><span>⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+'</span></div>'+
+      '</div></div>';
+  }).join('');
+}
+
+async function showDetail(id) {
+  showPage('detail');
+  var r = await sb.from('listings').select('*, users(name,rating,phone)').eq('id',id).single();
+  var l = r.data;
+  if (!l) return;
+  var imgs = l.images&&l.images.length ? l.images : null;
+  var imgHtml = imgs ?
+    '<div style="position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--surface2)" id="imgSlider">'+
+    '<div style="display:flex;transition:transform 0.3s;height:100%" id="imgSliderInner">'+
+    imgs.map(function(url){ return '<img src="'+url+'" style="min-width:100%;height:100%;object-fit:cover">'; }).join('')+
+    '</div>'+
+    (imgs.length>1?
+    '<div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px" id="imgDots">'+
+    imgs.map(function(_,i){ return '<div onclick="slideImg('+i+')" style="width:6px;height:6px;border-radius:50%;background:'+(i===0?'white':'rgba(255,255,255,0.5)')+';cursor:pointer" id="dot'+i+'"></div>'; }).join('')+
+    '</div>'+
+    '<button onclick="slideImg(-1,true)" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer">‹</button>'+
+    '<button onclick="slideImg(1,true)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer">›</button>':'')+
+    '</div>' :
+    '<div class="detail-img">'+(EMOJIS[l.category]||'📦')+'</div>';
+  document.getElementById('detailContent').innerHTML =
+    imgHtml+
+    '<div class="detail-body">'+
+    '<div class="detail-title">'+l.title+'</div>'+
+    '<div class="detail-price">₮'+Number(l.price).toLocaleString()+'</div>'+
+    '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'</div>'+
+    '<div class="detail-desc">'+(l.description||'Тайлбар байхгүй')+'</div>'+
+    (l.video_url?'<div style="margin-bottom:16px"><video src="'+l.video_url+'" controls style="width:100%;border-radius:10px;max-height:220px;background:#000"></video></div>':'')+
+    '<div class="seller-card"><div class="seller-avatar">'+((l.users&&l.users.name?l.users.name:'?')[0].toUpperCase())+'</div>'+
+    '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.name?l.users.name:'Хэрэглэгч')+'</div>'+
+    '<div class="seller-rating">⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+' • Найдвартай</div></div></div>'+
+    '<div class="action-btns">'+
+    '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none"><button class="btn btn-ghost btn-full" style="width:100%">📞 Холбоо барих</button></a>'+
+    (l.has_delivery?'<button class="btn btn-primary btn-full" onclick="openDelivery(\''+l.id+'\')">🚚 Хүргэлт захиалах</button>':'<button class="btn btn-ghost btn-full" disabled style="opacity:0.5">Хүргэлтгүй</button>')+
+    '</div>'+
+    (CU&&l.user_id===CU.id?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><button class="btn btn-ghost btn-full" style="color:#e53e3e;border-color:#e53e3e" onclick="deleteListing(\''+l.id+'\')">🗑️ Устгах</button><button class="btn btn-ghost btn-full" onclick="editListing(\''+l.id+'\')">✏️ Засах</button></div>':'')+
+    '</div>';
+  window._slideIdx = 0;
+  window._slideTotal = imgs ? imgs.length : 0;
+}
+
+function slideImg(n, isRelative) {
+  var total = window._slideTotal;
+  if (!total) return;
+  if (isRelative) window._slideIdx = (window._slideIdx + n + total) % total;
+  else window._slideIdx = n;
+  var inner = document.getElementById('imgSliderInner');
+  if (inner) inner.style.transform = 'translateX(-'+window._slideIdx*100+'%)';
+  for (var i=0; i<total; i++) {
+    var dot = document.getElementById('dot'+i);
+    if (dot) dot.style.background = i===window._slideIdx ? 'white' : 'rgba(255,255,255,0.5)';
+  }
+}
+
+async function deleteListing(id) {
+  if (!confirm('Зарыг устгах уу?')) return;
+  var r = await sb.from('listings').delete().eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Зар устгагдлаа!');
+  showPage('home');
+  loadListings();
+  loadStats();
+}
+
+async function editListing(id) {
+  var r = await sb.from('listings').select('*').eq('id', id).single();
+  var l = r.data;
+  if (!l) return;
+  document.getElementById('postTitle').value = l.title||'';
+  document.getElementById('postDesc').value = l.description||'';
+  document.getElementById('postPrice').value = l.price||'';
+  document.getElementById('postLocation').value = l.location||'';
+  document.getElementById('postCategory').value = l.category||'Бусад';
+  document.getElementById('postDelivery').checked = l.has_delivery||false;
+  document.getElementById('postModal').setAttribute('data-edit-id', id);
+  document.querySelector('#postModal .modal-title').textContent = 'Зар засах';
+  document.querySelector('#postModal .btn-primary.btn-full').textContent = 'Хадгалах';
+  openModal('postModal');
+}
+
+function openAuth(tab) { openModal('authModal'); switchAuth(tab); }
+function switchAuth(tab) {
+  document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
+  document.getElementById('registerForm').style.display = tab==='register'?'block':'none';
+  document.getElementById('loginTab').className = 'auth-tab'+(tab==='login'?' active':'');
+  document.getElementById('registerTab').className = 'auth-tab'+(tab==='register'?' active':'');
+}
+
+async function login() {
+  var email = document.getElementById('loginEmail').value;
+  var pass = document.getElementById('loginPassword').value;
+  if (!email||!pass) { showToast('Имэйл, нууц үг оруулна уу',true); return; }
+  var r = await sb.auth.signInWithPassword({email:email,password:pass});
+  if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
+  CU = r.data.user; closeModal('authModal'); updateNav(); loadProfile(); showToast('Амжилттай нэвтэрлээ! 👋');
+}
+
+async function register() {
+  var name = document.getElementById('regName').value;
+  var email = document.getElementById('regEmail').value;
+  var phone = document.getElementById('regPhone').value;
+  var pass = document.getElementById('regPassword').value;
+  if (!name||!email||!pass) { showToast('Бүх талбарыг бөглөнө үү',true); return; }
+  var r = await sb.auth.signUp({email:email,password:pass});
+  if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
+  if (r.data.user) {
+    await sb.from('users').insert({id:r.data.user.id,email:email,name:name,phone:phone});
+    CU = r.data.user; closeModal('authModal'); updateNav(); loadProfile(); showToast('Бүртгэл амжилттай! 🎉');
+  }
+}
+
+async function logout() {
+  await sb.auth.signOut(); CU = null; updateNav();
+  document.getElementById('profileContent').innerHTML = '<div class="empty" style="padding-top:80px"><div class="empty-icon">👤</div><p>Нэвтэрч профайлаа харна уу</p><br><button class="btn btn-primary" onclick="openAuth(\'login\')">Нэвтрэх</button></div>';
+  showToast('Гарлаа');
+}
+
+function updateNav() {
+  document.getElementById('navRight').innerHTML = CU ?
+    '<button class="btn btn-ghost" onclick="showPage(\'profile\')">👤 Профайл</button>' :
+    '<button class="btn btn-ghost" onclick="openAuth(\'login\')">Нэвтрэх</button><button class="btn btn-primary" onclick="openAuth(\'register\')">Бүртгүүлэх</button>';
+}
+
+function showPostModal() {
+  if (!CU) { openAuth('login'); showToast('Эхлээд нэвтэрнэ үү',true); return; }
+  openModal('postModal');
+}
+
+function previewImages(input) {
+  var preview = document.getElementById('imgPreview');
+  preview.innerHTML = '';
+  var files = Array.from(input.files).slice(0,10);
+  files.forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var div = document.createElement('div');
+      div.innerHTML = '<img src="'+e.target.result+'" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--b)">';
+      preview.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function previewVideo(input) {
+  var preview = document.getElementById('videoPreview');
+  var file = input.files[0];
+  if (!file) return;
+  var url = URL.createObjectURL(file);
+  preview.innerHTML = '<video src="'+url+'" controls style="width:100%;border-radius:10px;max-height:180px;background:#000"></video><div style="font-size:11px;color:var(--m);margin-top:4px">'+file.name+' ('+( file.size/1024/1024).toFixed(1)+'MB)</div>';
+}
+
+async function uploadImages(files) {
+  var urls = [];
+  for (var i=0; i<Math.min(files.length,10); i++) {
+    var file = files[i];
+    var ext = file.name.split('.').pop();
+    var path = CU.id+'/img_'+Date.now()+'_'+i+'_'+Math.random().toString(36).substr(2,5)+'.'+ext;
+    var r = await sb.storage.from('listings').upload(path, file, {cacheControl:'3600', upsert:false});
+    if (!r.error) {
+      urls.push('https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path);
+    }
+  }
+  return urls;
+}
+
+async function uploadVideo(file) {
+  if (!file) return null;
+  var ext = file.name.split('.').pop();
+  var path = CU.id+'/vid_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.'+ext;
+  var r = await sb.storage.from('videos').upload(path, file, {cacheControl:'3600', upsert:false});
+  if (r.error) { showToast('Бичлэг upload алдаа: '+r.error.message, true); return null; }
+  var url = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/videos/'+path;
+  return url;
+}
+
+async function postListing() {
+  var title = document.getElementById('postTitle').value;
+  var desc = document.getElementById('postDesc').value;
+  var price = document.getElementById('postPrice').value;
+  var loc = document.getElementById('postLocation').value;
+  var cat = document.getElementById('postCategory').value;
+  var hasD = document.getElementById('postDelivery').checked;
+  var imgFiles = document.getElementById('postImages').files;
+  var vidFile = document.getElementById('postVideo').files[0];
+  var editId = document.getElementById('postModal').getAttribute('data-edit-id');
+  if (!title||!price) { showToast('Гарчиг, үнэ оруулна уу',true); return; }
+  showToast('Байршуулж байна...');
+  var imgUrls = imgFiles.length ? await uploadImages(imgFiles) : [];
+  var vidUrl = vidFile ? await uploadVideo(vidFile) : null;
+  var data = {title:title,description:desc,price:Number(price),location:loc,category:cat,has_delivery:hasD};
+  if (imgUrls.length) data.images = imgUrls;
+  if (vidUrl) data.video_url = vidUrl;
+  var r;
+  if (editId) {
+    r = await sb.from('listings').update(data).eq('id',editId);
+  } else {
+    data.user_id = CU.id; data.is_active = true;
+    r = await sb.from('listings').insert(data);
+  }
+  if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
+  closeModal('postModal');
+  document.getElementById('postModal').removeAttribute('data-edit-id');
+  document.querySelector('#postModal .modal-title').textContent='Зар байршуулах';
+  document.querySelector('#postModal .btn-primary.btn-full').textContent='Зар байршуулах';
+  document.getElementById('postTitle').value='';
+  document.getElementById('postDesc').value='';
+  document.getElementById('postPrice').value='';
+  document.getElementById('postImages').value='';
+  document.getElementById('postVideo').value='';
+  document.getElementById('imgPreview').innerHTML='';
+  document.getElementById('videoPreview').innerHTML='';
+  showToast(editId?'Зар засагдлаа! ✅':'Зар амжилттай байршлаа! 🎉');
+  loadListings(); loadStats();
+}
+
+function openDelivery(id) {
+  if (!CU) { openAuth('login'); return; }
+  document.getElementById('deliveryListingId').value = id;
+  openModal('deliveryModal');
+}
+
+async function orderDelivery() {
+  var id = document.getElementById('deliveryListingId').value;
+  var addr = document.getElementById('deliveryAddress').value;
+  var phone = document.getElementById('deliveryPhone').value;
+  var note = document.getElementById('deliveryNote').value;
+  if (!addr||!phone) { showToast('Хаяг, утас оруулна уу',true); return; }
+  var r = await sb.from('deliveries').insert({listing_id:id,buyer_id:CU.id,status:'pending',address:addr+(note?' | '+note:'')});
+  if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
+  closeModal('deliveryModal'); showToast('Хүргэлт захиалагдлаа! 🚚');
+}
+
+async function loadProfile() {
+  if (!CU) return;
+  var u = await sb.from('users').select('*').eq('id',CU.id).single();
+  var ls = await sb.from('listings').select('*').eq('user_id',CU.id);
+  var ds = await sb.from('deliveries').select('*, listings(title)').eq('buyer_id',CU.id);
+  var user = u.data; if (!user) return;
+  document.getElementById('profileContent').innerHTML =
+    '<div class="profile-header"><div class="profile-avatar">'+(user.name||'?')[0].toUpperCase()+'</div>'+
+    '<div class="profile-name">'+(user.name||'Хэрэглэгч')+'</div><div class="profile-email">'+user.email+'</div></div>'+
+    '<div class="stats" style="margin:0 16px 20px"><div class="stat"><div class="stat-num">'+(ls.data?ls.data.length:0)+'</div><div class="stat-label">Зар</div></div>'+
+    '<div class="stat"><div class="stat-num">'+(ds.data?ds.data.length:0)+'</div><div class="stat-label">Захиалга</div></div>'+
+    '<div class="stat"><div class="stat-num">⭐ '+(user.rating||5.0)+'</div><div class="stat-label">Үнэлгээ</div></div></div>'+
+    '<div class="menu-item" onclick="showPage(\'listings\')"><div class="menu-left"><div class="menu-icon">📋</div>Миний зарууд</div></div>'+
+    '<div class="menu-item" onclick="showPage(\'deliveries\')"><div class="menu-left"><div class="menu-icon">📦</div>Миний захиалгууд</div></div>'+
+    '<div class="menu-item" onclick="becomeCourier()"><div class="menu-left"><div class="menu-icon">🚚</div>'+(user.is_courier?'Хүргэгч горим идэвхтэй':'Хүргэгч болох')+'</div></div>'+
+    '<div class="menu-item" onclick="logout()"><div class="menu-left"><div class="menu-icon">🚪</div>Гарах</div></div>';
+  if (ls.data&&ls.data.length) {
+    document.getElementById('myListings').innerHTML = '<div class="grid">'+ls.data.map(function(l){
+      return '<div class="card" onclick="showDetail(\''+l.id+'\')"><div class="card-img">'+(EMOJIS[l.category]||'📦')+(l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+'</div>'+
+        '<div class="card-body"><div class="card-title">'+l.title+'</div><div class="card-price">₮'+Number(l.price).toLocaleString()+'</div></div></div>';
+    }).join('')+'</div>';
+  }
+  if (ds.data&&ds.data.length) {
+    var sl = {pending:'⏳ Хүлээгдэж байна',accepted:'✅ Хүлээн авсан',delivered:'🎉 Хүргэгдсэн'};
+    document.getElementById('myDeliveries').innerHTML = ds.data.map(function(d){
+      return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:10px">'+
+        '<div style="font-weight:600;margin-bottom:6px">'+(d.listings?d.listings.title:'Зар')+'</div>'+
+        '<div style="font-size:12px;color:var(--m)">'+d.address+'</div>'+
+        '<div style="font-size:12px;margin-top:6px">'+(sl[d.status]||d.status)+'</div></div>';
+    }).join('');
+  }
+}
+
+async function becomeCourier() {
+  if (!CU) { openAuth('login'); return; }
+  await sb.from('users').update({is_courier:true}).eq('id',CU.id);
+  showToast('Хүргэгчээр бүртгэгдлээ! 🚀'); loadProfile(); loadStats();
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  var el = document.getElementById('nav-'+name);
+  if (el) el.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(function(m){
+  m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
+});
+
+function showToast(msg, isError) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast'+(isError?' error':'')+' show';
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+init();
+</script>
+</body>
+</html>
