@@ -159,7 +159,7 @@ select.form-input{cursor:pointer}
   <div class="search-wrap">
     <div class="search-bar">
       <svg width="16" height="16" fill="none" stroke="var(--m)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="searchInput" placeholder="Юу хайж байна вэ?" oninput="doSearch()">
+      <input type="text" id="searchInput" placeholder="Юу хайж байна вэ?" oninput="doSearch()" autocomplete="off">
       <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px;color:var(--m)" title="Шүүлтүүр">⚙️</button>
       <button onclick="doSearch()">Хайх</button>
     </div>
@@ -640,7 +640,7 @@ function renderListings(arr) {
       '</div>'+
       '<div class="card-body">'+
       '<div class="card-title">'+l.title+'</div>'+
-      price+
+      (l.is_negotiable?'<div class="card-price">Тохиролцооны</div>':'<div class="card-price">₮'+Number(l.price).toLocaleString()+'</div>')+
       '<div class="card-meta"><span>'+(l.location||'УБ')+'</span><span>⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+'</span></div>'+
       '</div></div>';
   }).join('');
