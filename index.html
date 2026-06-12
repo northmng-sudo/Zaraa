@@ -615,7 +615,7 @@ function applyFilter() {
 
 async function init() {
   var s = await sb.auth.getSession();
-  if (s.data.session) { CU = s.data.session.user; updateNav(); loadProfile(); startGlobalNotifications(); }
+  if (s.data.session) { CU = s.data.session.user; await updateNav(); loadProfile(); startGlobalNotifications(); }
   loadListings();
   loadStats();
   // Request notification permission
@@ -971,8 +971,11 @@ async function loadAdmin() {
   document.getElementById('adminUsers').innerHTML = (us.data||[]).map(function(u) {
     return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">'+
       '<div style="flex:1">'+
-      '<div style="font-weight:600;font-size:13px">'+u.name+'</div>'+
-      '<div style="font-size:11px;color:var(--m)">'+u.email+'</div>'+
+      '<div style="font-weight:600;font-size:13px">'+u.name+
+      (u.is_courier?' <span style="background:#FF5C00;color:white;border-radius:4px;padding:1px 6px;font-size:10px">🚚 Хүргэгч</span>':' <span style="background:#5C8BFF;color:white;border-radius:4px;padding:1px 6px;font-size:10px">🛍️ Хэрэглэгч</span>')+
+      (u.is_admin?' <span style="background:#333;color:white;border-radius:4px;padding:1px 6px;font-size:10px">🛡️ Admin</span>':'')+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--m)">'+u.email+(u.phone?' • '+u.phone:'')+'</div>'+
       '</div>'+
       '<div style="display:flex;gap:6px">'+
       '<button onclick="toggleVerified(\''+u.id+'\','+u.is_verified+')" style="background:'+(u.is_verified?'#00C96B':'var(--s2)')+';color:'+(u.is_verified?'white':'var(--t)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">'+(u.is_verified?'✓ Баталгаажсан':'Баталгаажуулах')+'</button>'+
@@ -1078,7 +1081,11 @@ async function login() {
   if (!email||!pass) { showToast('Имэйл, нууц үг оруулна уу',true); return; }
   var r = await sb.auth.signInWithPassword({email:email,password:pass});
   if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
-  CU = r.data.user; closeModal('authModal'); updateNav(); loadProfile(); showToast('Амжилттай нэвтэрлээ! 👋');
+  CU = r.data.user;
+  closeModal('authModal');
+  await updateNav();
+  loadProfile();
+  showToast('Амжилттай нэвтэрлээ! 👋');
 }
 
 async function register() {
@@ -1094,7 +1101,7 @@ async function register() {
     await sb.from('users').insert({id:r.data.user.id,email:email,name:name,phone:phone,is_courier:role==='courier'});
     CU = r.data.user;
     closeModal('authModal');
-    updateNav();
+    await updateNav();
     loadProfile();
     showToast(role==='courier'?'Хүргэгчээр бүртгэгдлээ! 🚚':'Бүртгэл амжилттай! 🎉');
   }
