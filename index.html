@@ -202,6 +202,11 @@ select.form-input{cursor:pointer}
   <div class="section"><div id="myDeliveries"><div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div></div></div>
 </div>
 
+<div class="page" id="page-chats">
+  <div style="padding:20px 16px 10px"><div class="section-title">💬 Миний чатууд</div></div>
+  <div class="section"><div id="chatsList"><div class="empty"><div class="empty-icon">💬</div><p>Чат байхгүй байна</p></div></div></div>
+</div>
+
 <div class="page" id="page-listings">
   <div style="padding:20px 16px 10px"><div class="section-title">Миний зарууд</div></div>
   <div class="section"><div id="myListings"><div class="empty"><div class="empty-icon">📋</div><p>Зар байхгүй<br><br><button class="btn btn-primary" onclick="showPostModal()">+ Зар байршуулах</button></p></div></div></div>
@@ -801,6 +806,7 @@ async function loadProfile() {
     '<div class="stat"><div class="stat-num">'+(ds.data?ds.data.length:0)+'</div><div class="stat-label">Захиалга</div></div>'+
     '<div class="stat"><div class="stat-num">⭐ '+(user.rating||5.0)+'</div><div class="stat-label">Үнэлгээ</div></div></div>'+
     '<div class="menu-item" onclick="showPage(\'listings\')"><div class="menu-left"><div class="menu-icon">📋</div>Миний зарууд</div></div>'+
+    '<div class="menu-item" onclick="showPage(\'chats\')"><div class="menu-left"><div class="menu-icon">💬</div>Миний чатууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'deliveries\')"><div class="menu-left"><div class="menu-icon">📦</div>Миний захиалгууд</div></div>'+
     '<div class="menu-item" onclick="editProfile()"><div class="menu-left"><div class="menu-icon">✏️</div>Профайл засах</div></div>'+
     '<div class="menu-item" onclick="becomeCourier()"><div class="menu-left"><div class="menu-icon">🚚</div>'+(user.is_courier?'Хүргэгч горим идэвхтэй':'Хүргэгч болох')+'</div></div>'+
@@ -849,13 +855,52 @@ async function becomeCourier() {
   showToast('Хүргэгчээр бүртгэгдлээ! 🚀'); loadProfile(); loadStats();
 }
 
-function showPage(name) {
+async function loadMyChats() {
+  var box = document.getElementById('chatsList');
+  if (!box || !CU) return;
+  var r = await sb.from('messages').select('*, listings(title, id)').or('sender_id.eq.'+CU.id+',receiver_id.eq.'+CU.id).order('created_at', {ascending:false});
+  var msgs = r.data || [];
+  // Group by listing
+  var seen = {};
+  var chats = [];
+  msgs.forEach(function(m) {
+    if (!seen[m.listing_id]) {
+      seen[m.listing_id] = true;
+      chats.push(m);
+    }
+  });
+  if (!chats.length) {
+    box.innerHTML = '<div class="empty"><div class="empty-icon">💬</div><p>Чат байхгүй байна</p></div>';
+    return;
+  }
+  box.innerHTML = chats.map(function(m) {
+    var otherId = m.sender_id === CU.id ? m.receiver_id : m.sender_id;
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer" onclick="openChatFromList(\''+m.listing_id+'\',\''+otherId+'\')">'+
+      '<div style="font-weight:600;margin-bottom:4px">'+(m.listings&&m.listings.title?m.listings.title:'Зар')+'</div>'+
+      '<div style="font-size:12px;color:var(--m)">'+m.content+'</div></div>';
+  }).join('');
+}
+
+function openChatFromList(listingId, otherId) {
+  window._chatListingId = listingId;
+  window._chatSellerId = otherId;
+  loadChat(listingId, otherId);
+  openModal('chatModal');
+  if (window._chatChannel) sb.removeChannel(window._chatChannel);
+  window._chatChannel = sb.channel('chat_'+listingId)
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'messages', filter:'listing_id=eq.'+listingId}, function() {
+      loadChat(listingId, otherId);
+    }).subscribe();
+}
+
+
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   var el = document.getElementById('nav-'+name);
   if (el) el.classList.add('active');
   window.scrollTo(0,0);
+  if (name === 'chats') loadMyChats();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
