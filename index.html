@@ -722,6 +722,7 @@ async function saveProfile() {
 }
 
 
+async function becomeCourier() {
   if (!CU) { openAuth('login'); return; }
   await sb.from('users').update({is_courier:true}).eq('id',CU.id);
   showToast('Хүргэгчээр бүртгэгдлээ! 🚀'); loadProfile(); loadStats();
