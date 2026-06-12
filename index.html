@@ -319,6 +319,17 @@ select.form-input{cursor:pointer}
   </div>
 </div>
 
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal('editProfileModal')">×</button>
+    <div class="modal-title">Профайл засах</div>
+    <div class="form-group"><label class="form-label">Нэр</label><input class="form-input" id="editName" placeholder="Таны нэр"></div>
+    <div class="form-group"><label class="form-label">Утас</label><input class="form-input" type="tel" id="editPhone" placeholder="99xxxxxx"></div>
+    <button class="btn btn-primary btn-full" onclick="saveProfile()">Хадгалах</button>
+  </div>
+</div>
+
 <!-- DELIVERY MODAL -->
 <div class="modal-overlay" id="deliveryModal">
   <div class="modal" style="position:relative">
@@ -581,12 +592,22 @@ async function uploadImages(files) {
 
 async function uploadVideo(file) {
   if (!file) return null;
-  var ext = file.name.split('.').pop();
-  var path = CU.id+'/vid_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.'+ext;
-  var r = await sb.storage.from('videos').upload(path, file, {cacheControl:'3600', upsert:true});
-  if (r.error) { showToast('Бичлэг upload алдаа: '+r.error.message, true); return null; }
-  var url = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/videos/'+path;
-  return url;
+  var ext = file.name.split('.').pop().toLowerCase();
+  var uniqueName = 'vid_' + Date.now() + '_' + Math.random().toString(36).substr(2,8) + '.' + ext;
+  var path = CU.id + '/' + uniqueName;
+  var r = await sb.storage.from('videos').upload(path, file, {
+    cacheControl: '3600',
+    upsert: true,
+    contentType: file.type || 'video/' + ext
+  });
+  if (r.error) {
+    showToast('Бичлэг upload алдаа: ' + r.error.message, true);
+    console.log('Upload error:', r.error);
+    return null;
+  }
+  var pub = sb.storage.from('videos').getPublicUrl(path);
+  console.log('Video URL:', pub.data.publicUrl);
+  return pub.data.publicUrl;
 }
 
 async function postListing() {
@@ -660,6 +681,7 @@ async function loadProfile() {
     '<div class="stat"><div class="stat-num">⭐ '+(user.rating||5.0)+'</div><div class="stat-label">Үнэлгээ</div></div></div>'+
     '<div class="menu-item" onclick="showPage(\'listings\')"><div class="menu-left"><div class="menu-icon">📋</div>Миний зарууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'deliveries\')"><div class="menu-left"><div class="menu-icon">📦</div>Миний захиалгууд</div></div>'+
+    '<div class="menu-item" onclick="editProfile()"><div class="menu-left"><div class="menu-icon">✏️</div>Профайл засах</div></div>'+
     '<div class="menu-item" onclick="becomeCourier()"><div class="menu-left"><div class="menu-icon">🚚</div>'+(user.is_courier?'Хүргэгч горим идэвхтэй':'Хүргэгч болох')+'</div></div>'+
     '<div class="menu-item" onclick="logout()"><div class="menu-left"><div class="menu-icon">🚪</div>Гарах</div></div>';
   if (ls.data&&ls.data.length) {
@@ -679,7 +701,27 @@ async function loadProfile() {
   }
 }
 
-async function becomeCourier() {
+async function editProfile() {
+  var u = await sb.from('users').select('*').eq('id',CU.id).single();
+  if (u.data) {
+    document.getElementById('editName').value = u.data.name||'';
+    document.getElementById('editPhone').value = u.data.phone||'';
+  }
+  openModal('editProfileModal');
+}
+
+async function saveProfile() {
+  var name = document.getElementById('editName').value;
+  var phone = document.getElementById('editPhone').value;
+  if (!name) { showToast('Нэр оруулна уу',true); return; }
+  var r = await sb.from('users').update({name:name, phone:phone}).eq('id',CU.id);
+  if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
+  closeModal('editProfileModal');
+  showToast('Профайл хадгалагдлаа! ✅');
+  loadProfile();
+}
+
+
   if (!CU) { openAuth('login'); return; }
   await sb.from('users').update({is_courier:true}).eq('id',CU.id);
   showToast('Хүргэгчээр бүртгэгдлээ! 🚀'); loadProfile(); loadStats();
