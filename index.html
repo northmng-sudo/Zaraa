@@ -571,7 +571,7 @@ async function uploadImages(files) {
     var file = files[i];
     var ext = file.name.split('.').pop();
     var path = CU.id+'/img_'+Date.now()+'_'+i+'_'+Math.random().toString(36).substr(2,5)+'.'+ext;
-    var r = await sb.storage.from('listings').upload(path, file, {cacheControl:'3600', upsert:false});
+    var r = await sb.storage.from('listings').upload(path, file, {cacheControl:'3600', upsert:true});
     if (!r.error) {
       urls.push('https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path);
     }
@@ -583,7 +583,7 @@ async function uploadVideo(file) {
   if (!file) return null;
   var ext = file.name.split('.').pop();
   var path = CU.id+'/vid_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.'+ext;
-  var r = await sb.storage.from('videos').upload(path, file, {cacheControl:'3600', upsert:false});
+  var r = await sb.storage.from('videos').upload(path, file, {cacheControl:'3600', upsert:true});
   if (r.error) { showToast('Бичлэг upload алдаа: '+r.error.message, true); return null; }
   var url = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/videos/'+path;
   return url;
