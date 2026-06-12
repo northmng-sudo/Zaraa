@@ -615,7 +615,12 @@ function applyFilter() {
 
 async function init() {
   var s = await sb.auth.getSession();
-  if (s.data.session) { CU = s.data.session.user; await updateNav(); loadProfile(); startGlobalNotifications(); }
+  if (s.data.session) { 
+    CU = s.data.session.user; 
+    await updateNav(); 
+    await loadProfile(); 
+    startGlobalNotifications(); 
+  }
   loadListings();
   loadStats();
   // Request notification permission
@@ -1173,8 +1178,10 @@ async function quickToggleAvailability() {
   if (status) status.textContent = !current ? '🟢 Идэвхтэй' : '⏸ Идэвхгүй';
 }
 
-function showPostModal() {
+async function showPostModal() {
   if (!CU) { openAuth('login'); showToast('Эхлээд нэвтэрнэ үү',true); return; }
+  var u = await sb.from('users').select('is_courier').eq('id', CU.id).single();
+  if (u.data && u.data.is_courier) { showToast('Хүргэгч зар байршуулах боломжгүй',true); return; }
   goStep(1);
   openModal('postModal');
 }
@@ -1607,6 +1614,7 @@ function showPage(name) {
   if (name === 'chats') { loadMyChats(); clearChatBadge(); }
   if (name === 'admin') loadAdmin();
   if (name === 'deliveries') loadDeliveriesPage();
+  if (name === 'profile') loadProfile();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
