@@ -894,6 +894,7 @@ function openChatFromList(listingId, otherId) {
 }
 
 
+function showPage(name) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
