@@ -48,7 +48,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(245,245,247,0.95);backdrop
 .cat{flex-shrink:0;background:var(--s);border:1px solid var(--b);border-radius:50px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m)}
 .cat-card{background:var(--s2);border:2px solid var(--b);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:28px}
 .cat-card div{font-size:12px;font-weight:600;margin-top:6px;color:var(--t)}
-.cat-card:hover,.cat-card.selected{border-color:var(--a);background:rgba(255,92,0,0.08)}
+.card-featured{border:2px solid #FFD700!important;box-shadow:0 4px 20px rgba(255,215,0,0.3)}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 @media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
@@ -618,6 +618,7 @@ async function loadListings() {
   var r = await sb.from('listings').select('*, users(name,rating)').eq('is_active',true).order('created_at',{ascending:false});
   if (r.error) { grid.innerHTML = '<div class="empty"><div class="empty-icon">😕</div><p>Алдаа гарлаа</p></div>'; return; }
   AL = r.data || [];
+  AL.sort(function(a, b) { return (b.is_featured?1:0) - (a.is_featured?1:0); });
   applyFilter();
 }
 
@@ -628,10 +629,11 @@ function renderListings(arr) {
     return;
   }
   grid.innerHTML = arr.map(function(l) {
-    var price = l.is_negotiable ? '<div class="card-price">Тохиролцооны</div>' : '<div class="card-price">₮'+Number(l.price).toLocaleString()+'</div>';
-    return '<div class="card'+(l.is_featured?' card-featured':'')+'" onclick="showDetail(\''+l.id+'\')">'+
-      (l.is_featured?'<div style="background:linear-gradient(90deg,#FFD700,#FFA500);color:white;font-size:10px;font-weight:700;padding:3px 8px;text-align:center">⭐ ОНЦЛОХ</div>':'')+
-      '<div class="card-img">'+
+    var featuredBadge = l.is_featured ?
+      '<div style="background:linear-gradient(90deg,#FF8C00,#FFD700);color:white;font-size:10px;font-weight:800;padding:4px 8px;text-align:center;letter-spacing:0.5px">⭐ ОНЦЛОХ ЗАР</div>' : '';
+    return '<div class="card'+(l.is_featured?' card-featured':'')+'" style="'+(l.is_featured?'grid-column:span 2':'')+'" onclick="showDetail(\''+l.id+'\')">'+
+      featuredBadge+
+      '<div class="card-img" style="'+(l.is_featured?'aspect-ratio:16/7':'')+'">'+
       (l.images&&l.images[0]?'<img src="'+l.images[0]+'" onerror="this.parentElement.innerHTML=\''+( EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
