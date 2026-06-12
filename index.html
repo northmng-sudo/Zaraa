@@ -322,6 +322,19 @@ select.form-input{cursor:pointer}
   </div>
 </div>
 
+<!-- CHAT MODAL -->
+<div class="modal-overlay" id="chatModal">
+  <div class="modal" style="position:relative;padding-bottom:20px">
+    <button class="close-btn" onclick="closeModal('chatModal')">×</button>
+    <div class="modal-title">💬 Чат</div>
+    <div id="chatMessages" style="height:300px;overflow-y:auto;background:var(--s2);border-radius:12px;padding:12px;margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px">
+      <input class="form-input" id="chatInput" placeholder="Мессеж бичих..." style="flex:1" onkeypress="if(event.key==='Enter')sendMessage()">
+      <button class="btn btn-primary" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</div>
+
 <!-- EDIT PROFILE MODAL -->
 <div class="modal-overlay" id="editProfileModal">
   <div class="modal" style="position:relative">
@@ -463,10 +476,15 @@ async function showDetail(id) {
     '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none"><button class="btn btn-ghost btn-full" style="width:100%">📞 Холбоо барих</button></a>'+
     (l.has_delivery?'<button class="btn btn-primary btn-full" onclick="openDelivery(\''+l.id+'\')">🚚 Хүргэлт захиалах</button>':'<button class="btn btn-ghost btn-full" disabled style="opacity:0.5">Хүргэлтгүй</button>')+
     '</div>'+
+    '<button class="btn btn-ghost btn-full" style="margin-top:10px;width:100%" onclick="openChat(\''+l.id+'\',\''+l.user_id+'\')">💬 Чат бичих</button>'+
+    (l.location?'<div id="mapBox" style="margin-top:16px;border-radius:12px;overflow:hidden;height:200px"><iframe width="100%" height="200" frameborder="0" src="https://maps.google.com/maps?q='+encodeURIComponent((l.location||'Улаанбаатар')+', Улаанбаатар, Монгол')+'&output=embed&z=14" style="border:none"></iframe></div>':'')+'<div style="margin-top:16px" id="reviewSection"></div>'+
     (CU&&l.user_id===CU.id?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><button class="btn btn-ghost btn-full" style="color:#e53e3e;border-color:#e53e3e" onclick="deleteListing(\''+l.id+'\')">🗑️ Устгах</button><button class="btn btn-ghost btn-full" onclick="editListing(\''+l.id+'\')">✏️ Засах</button></div>':'')+
     '</div>';
   window._slideIdx = 0;
   window._slideTotal = imgs ? imgs.length : 0;
+  window._currentListingId = l.id;
+  window._currentSellerId = l.user_id;
+  loadReviews(l.id);
 }
 
 function slideImg(n, isRelative) {
@@ -482,7 +500,95 @@ function slideImg(n, isRelative) {
   }
 }
 
-async function deleteListing(id) {
+async function loadReviews(listingId) {
+  var sec = document.getElementById('reviewSection');
+  if (!sec) return;
+  var r = await sb.from('reviews').select('*, users(name)').eq('listing_id', listingId).order('created_at', {ascending:false});
+  var reviews = r.data || [];
+  var stars = function(n) { return '⭐'.repeat(n)+'☆'.repeat(5-n); };
+  sec.innerHTML = '<div style="font-size:15px;font-weight:700;margin-bottom:12px">Үнэлгээ '+(reviews.length?'('+reviews.length+')':'')+'</div>'+
+    (CU?'<div style="background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:14px;margin-bottom:12px">'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px" id="starRow">'+
+    [1,2,3,4,5].map(function(i){ return '<span onclick="setRating('+i+')" style="font-size:24px;cursor:pointer" id="star'+i+'">☆</span>'; }).join('')+
+    '</div>'+
+    '<textarea class="form-input" id="reviewText" placeholder="Сэтгэгдэл бичих..." style="min-height:60px;margin-bottom:8px"></textarea>'+
+    '<button class="btn btn-primary" style="width:100%" onclick="submitReview(\''+listingId+'\')">Үнэлгээ өгөх</button></div>':'')+
+    (reviews.length ? reviews.map(function(rv){
+      return '<div style="padding:12px 0;border-bottom:1px solid var(--b)">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px">'+
+        '<span style="font-weight:600;font-size:13px">'+(rv.users&&rv.users.name?rv.users.name:'Хэрэглэгч')+'</span>'+
+        '<span style="font-size:12px">'+stars(rv.rating||5)+'</span></div>'+
+        '<div style="font-size:13px;color:var(--m)">'+(rv.comment||'')+'</div></div>';
+    }).join('') : '<div style="color:var(--m);font-size:13px;text-align:center;padding:20px">Үнэлгээ байхгүй байна</div>');
+}
+
+var _rating = 0;
+function setRating(n) {
+  _rating = n;
+  for (var i=1; i<=5; i++) {
+    var s = document.getElementById('star'+i);
+    if (s) s.textContent = i<=n ? '⭐' : '☆';
+  }
+}
+
+async function submitReview(listingId) {
+  if (!CU) { openAuth('login'); return; }
+  if (!_rating) { showToast('Од сонгоно уу', true); return; }
+  var comment = document.getElementById('reviewText').value;
+  var r = await sb.from('reviews').insert({
+    reviewer_id: CU.id,
+    listing_id: listingId,
+    target_id: window._currentSellerId,
+    rating: _rating,
+    comment: comment
+  });
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Үнэлгээ өгөгдлөө! ⭐');
+  _rating = 0;
+  loadReviews(listingId);
+}
+
+function openChat(listingId, sellerId) {
+  if (!CU) { openAuth('login'); return; }
+  if (CU.id === sellerId) { showToast('Өөрийнхөөрөө чат хийх боломжгүй', true); return; }
+  window._chatListingId = listingId;
+  window._chatSellerId = sellerId;
+  loadChat(listingId, sellerId);
+  openModal('chatModal');
+}
+
+async function loadChat(listingId, sellerId) {
+  var box = document.getElementById('chatMessages');
+  if (!box) return;
+  var r = await sb.from('messages').select('*, users(name)').eq('listing_id', listingId).order('created_at', {ascending:true});
+  var msgs = r.data || [];
+  box.innerHTML = msgs.length ? msgs.map(function(m){
+    var isMine = m.sender_id === CU.id;
+    return '<div style="display:flex;justify-content:'+(isMine?'flex-end':'flex-start')+';margin-bottom:8px">'+
+      '<div style="max-width:75%;background:'+(isMine?'var(--a)':'var(--s2)')+';padding:8px 12px;border-radius:12px;font-size:13px">'+
+      (isMine?'':('<div style="font-size:10px;color:var(--m);margin-bottom:2px">'+(m.users&&m.users.name?m.users.name:'?')+'</div>'))+
+      m.content+'</div></div>';
+  }).join('') : '<div style="text-align:center;color:var(--m);font-size:13px;padding:20px">Чат эхлүүлэх</div>';
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendMessage() {
+  var input = document.getElementById('chatInput');
+  var content = input.value.trim();
+  if (!content) return;
+  var r = await sb.from('messages').insert({
+    listing_id: window._chatListingId,
+    sender_id: CU.id,
+    receiver_id: window._chatSellerId,
+    content: content
+  });
+  if (!r.error) {
+    input.value = '';
+    loadChat(window._chatListingId, window._chatSellerId);
+  }
+}
+
+
   if (!confirm('Зарыг устгах уу?')) return;
   var r = await sb.from('listings').delete().eq('id', id);
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
