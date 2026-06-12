@@ -243,8 +243,44 @@ select.form-input{cursor:pointer}
 </div>
 
 <div class="page" id="page-deliveries">
-  <div style="padding:20px 16px 10px"><div class="section-title">Миний захиалгууд</div></div>
-  <div class="section"><div id="myDeliveries"><div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div></div></div>
+  <!-- BUYER VIEW -->
+  <div id="buyerDeliveries">
+    <div style="padding:20px 16px 10px"><div class="section-title">📦 Миний захиалгууд</div></div>
+    <div class="section"><div id="myDeliveries"><div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div></div></div>
+  </div>
+
+  <!-- COURIER DASHBOARD -->
+  <div id="courierDashboard" style="display:none">
+    <div style="padding:16px">
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,var(--a),#FF8A3D);border-radius:16px;padding:20px;margin-bottom:16px;color:white">
+        <div style="font-size:18px;font-weight:800;margin-bottom:4px">🚀 Хүргэгчийн хэсэг</div>
+        <div style="font-size:13px;opacity:0.85;margin-bottom:16px">Захиалга хүлээн авч байна</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:13px;font-weight:600" id="courierStatus">⏸ Идэвхгүй</span>
+          <label class="toggle" style="transform:scale(1.2)">
+            <input type="checkbox" id="courierAvailable" onchange="toggleAvailability()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+        <div class="stat"><div class="stat-num" id="courierTodayCount">0</div><div class="stat-label">Өнөөдөр</div></div>
+        <div class="stat"><div class="stat-num" id="courierTotalCount">0</div><div class="stat-label">Нийт</div></div>
+        <div class="stat"><div class="stat-num" id="courierEarned">₮0</div><div class="stat-label">Орлого</div></div>
+      </div>
+
+      <!-- New orders -->
+      <div style="font-weight:700;font-size:15px;margin-bottom:10px">🔔 Шинэ захиалгууд</div>
+      <div id="newOrders"><div class="empty"><div class="empty-icon">📭</div><p>Шинэ захиалга байхгүй</p></div></div>
+
+      <!-- Active orders -->
+      <div style="font-weight:700;font-size:15px;margin:16px 0 10px">🚚 Миний захиалгууд</div>
+      <div id="courierOrders"><div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div></div>
+    </div>
+  </div>
 </div>
 
 <div class="page" id="page-chats">
@@ -1212,6 +1248,118 @@ async function saveProfile() {
 }
 
 
+async function loadDeliveriesPage() {
+  if (!CU) return;
+  var u = await sb.from('users').select('is_courier, is_available, total_deliveries, total_earned').eq('id', CU.id).single();
+  var user = u.data;
+  if (user && user.is_courier) {
+    document.getElementById('buyerDeliveries').style.display = 'none';
+    document.getElementById('courierDashboard').style.display = 'block';
+    document.getElementById('courierAvailable').checked = user.is_available || false;
+    document.getElementById('courierStatus').textContent = user.is_available ? '🟢 Идэвхтэй' : '⏸ Идэвхгүй';
+    document.getElementById('courierTotalCount').textContent = user.total_deliveries || 0;
+    document.getElementById('courierEarned').textContent = '₮' + Number(user.total_earned||0).toLocaleString();
+    loadNewOrders();
+    loadCourierOrders();
+    startCourierNotifications();
+  } else {
+    document.getElementById('buyerDeliveries').style.display = 'block';
+    document.getElementById('courierDashboard').style.display = 'none';
+    loadMyDeliveries();
+  }
+}
+
+async function loadMyDeliveries() {
+  var box = document.getElementById('myDeliveries');
+  if (!box || !CU) return;
+  var r = await sb.from('deliveries').select('*, listings(title)').eq('buyer_id', CU.id).order('created_at', {ascending:false});
+  var ds = r.data || [];
+  var statusLabel = {pending:'⏳ Хүлээгдэж байна', accepted:'🚗 Замдаа', delivered:'✅ Хүргэгдсэн', cancelled:'❌ Цуцлагдсан'};
+  if (!ds.length) { box.innerHTML = '<div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div>'; return; }
+  box.innerHTML = ds.map(function(d) {
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:10px">'+
+      '<div style="font-weight:600;margin-bottom:4px">'+(d.listings&&d.listings.title||'Зар')+'</div>'+
+      '<div style="font-size:12px;color:var(--m);margin-bottom:6px">📍 '+d.address+'</div>'+
+      '<div style="font-size:13px;font-weight:600">'+(statusLabel[d.status]||d.status)+'</div>'+
+      (d.status==='delivered'?'<button class="btn btn-ghost" style="margin-top:8px;font-size:12px" onclick="confirmDelivery(\''+d.id+'\')">✅ Баталгаажуулах</button>':'')+
+      '</div>';
+  }).join('');
+}
+
+async function loadNewOrders() {
+  var box = document.getElementById('newOrders');
+  if (!box) return;
+  var r = await sb.from('deliveries').select('*, listings(title, location), users!buyer_id(name, phone)').eq('status', 'pending').order('created_at', {ascending:false}).limit(10);
+  var orders = r.data || [];
+  if (!orders.length) { box.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Шинэ захиалга байхгүй</p></div>'; return; }
+  box.innerHTML = orders.map(function(d) {
+    return '<div style="background:var(--s);border:2px solid var(--a);border-radius:var(--r);padding:14px;margin-bottom:10px">'+
+      '<div style="font-weight:700;margin-bottom:4px">'+(d.listings&&d.listings.title||'Зар')+'</div>'+
+      '<div style="font-size:12px;color:var(--m);margin-bottom:2px">📍 Авах: '+(d.listings&&d.listings.location||'УБ')+'</div>'+
+      '<div style="font-size:12px;color:var(--m);margin-bottom:8px">🏠 Хүргэх: '+d.address+'</div>'+
+      '<div style="font-size:12px;margin-bottom:10px">👤 '+(d.users&&d.users.name||'?')+' • 📞 '+(d.users&&d.users.phone||'?')+'</div>'+
+      '<button class="btn btn-primary btn-full" onclick="acceptOrder(\''+d.id+'\')">✅ Хүлээн авах</button>'+
+      '</div>';
+  }).join('');
+}
+
+async function loadCourierOrders() {
+  var box = document.getElementById('courierOrders');
+  if (!box || !CU) return;
+  var r = await sb.from('deliveries').select('*, listings(title), users!buyer_id(name, phone)').eq('courier_id', CU.id).neq('status', 'delivered').order('created_at', {ascending:false});
+  var orders = r.data || [];
+  if (!orders.length) { box.innerHTML = '<div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div>'; return; }
+  box.innerHTML = orders.map(function(d) {
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:10px">'+
+      '<div style="font-weight:600;margin-bottom:4px">'+(d.listings&&d.listings.title||'Зар')+'</div>'+
+      '<div style="font-size:12px;color:var(--m);margin-bottom:4px">🏠 '+d.address+'</div>'+
+      '<div style="font-size:12px;margin-bottom:10px">📞 '+(d.users&&d.users.phone||'?')+'</div>'+
+      '<button class="btn btn-primary btn-full" onclick="markDelivered(\''+d.id+'\')">✅ Хүргэлт дууссан</button>'+
+      '</div>';
+  }).join('');
+}
+
+async function acceptOrder(id) {
+  var r = await sb.from('deliveries').update({courier_id: CU.id, status: 'accepted', accepted_at: new Date().toISOString()}).eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Захиалга хүлээн авлаа! 🚀');
+  loadNewOrders();
+  loadCourierOrders();
+}
+
+async function markDelivered(id) {
+  var r = await sb.from('deliveries').update({status: 'delivered', delivered_at: new Date().toISOString()}).eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  await sb.from('users').update({total_deliveries: CU.total_deliveries ? CU.total_deliveries+1 : 1}).eq('id', CU.id);
+  showToast('Хүргэлт дууссан! 🎉');
+  loadCourierOrders();
+  loadDeliveriesPage();
+}
+
+async function confirmDelivery(id) {
+  await sb.from('deliveries').update({status: 'confirmed'}).eq('id', id);
+  showToast('Баталгаажлаа! ⭐');
+  loadMyDeliveries();
+}
+
+async function toggleAvailability() {
+  var available = document.getElementById('courierAvailable').checked;
+  await sb.from('users').update({is_available: available}).eq('id', CU.id);
+  document.getElementById('courierStatus').textContent = available ? '🟢 Идэвхтэй' : '⏸ Идэвхгүй';
+  showToast(available ? 'Захиалга хүлээж байна! 🟢' : 'Идэвхгүй болов');
+}
+
+function startCourierNotifications() {
+  if (window._courierChannel) sb.removeChannel(window._courierChannel);
+  window._courierChannel = sb.channel('courier_'+CU.id)
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'deliveries', filter:'status=eq.pending'}, function() {
+      sendNotification('📦 Шинэ захиалга!', 'Шинэ хүргэлтийн захиалга ирлээ');
+      showToast('📦 Шинэ захиалга ирлээ!');
+      loadNewOrders();
+    }).subscribe();
+}
+
+
 async function becomeCourier() {
   if (!CU) { openAuth('login'); return; }
   await sb.from('users').update({is_courier:true}).eq('id',CU.id);
@@ -1290,6 +1438,7 @@ function showPage(name) {
   window.scrollTo(0,0);
   if (name === 'chats') { loadMyChats(); clearChatBadge(); }
   if (name === 'admin') loadAdmin();
+  if (name === 'deliveries') loadDeliveriesPage();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
