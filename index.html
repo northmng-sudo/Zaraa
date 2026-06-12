@@ -1055,7 +1055,7 @@ function selectRole(role) {
   }
 }
 
- openModal('authModal'); switchAuth(tab); }
+function openAuth(tab) { openModal('authModal'); switchAuth(tab); }
 function switchAuth(tab) {
   document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
   document.getElementById('registerForm').style.display = tab==='register'?'block':'none';
