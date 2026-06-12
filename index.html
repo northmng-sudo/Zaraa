@@ -358,6 +358,23 @@ select.form-input{cursor:pointer}
       <button class="btn btn-primary btn-full" onclick="login()">Нэвтрэх</button>
     </div>
     <div id="registerForm" style="display:none">
+      <!-- ROLE SELECTION -->
+      <div class="form-group">
+        <label class="form-label">Та хэн бэ?</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px">
+          <div id="roleUser" onclick="selectRole('user')" style="border:2px solid var(--a);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;background:rgba(255,92,0,0.08)">
+            <div style="font-size:32px">🛍️</div>
+            <div style="font-size:13px;font-weight:700;margin-top:6px">Худалдан авагч</div>
+            <div style="font-size:11px;color:var(--m);margin-top:2px">Зар үзэх, захиалах</div>
+          </div>
+          <div id="roleCourier" onclick="selectRole('courier')" style="border:2px solid var(--b);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer">
+            <div style="font-size:32px">🚚</div>
+            <div style="font-size:13px;font-weight:700;margin-top:6px">Хүргэгч</div>
+            <div style="font-size:11px;color:var(--m);margin-top:2px">Захиалга хүлээн авах</div>
+          </div>
+        </div>
+        <input type="hidden" id="regRole" value="user">
+      </div>
       <div class="form-group"><label class="form-label">Нэр</label><input class="form-input" type="text" id="regName" placeholder="Таны нэр"></div>
       <div class="form-group"><label class="form-label">Имэйл</label><input class="form-input" type="email" id="regEmail" placeholder="email@example.com"></div>
       <div class="form-group"><label class="form-label">Утас</label><input class="form-input" type="tel" id="regPhone" placeholder="99xxxxxx"></div>
@@ -1021,7 +1038,24 @@ async function editListing(id) {
   openModal('postModal');
 }
 
-function openAuth(tab) { openModal('authModal'); switchAuth(tab); }
+function selectRole(role) {
+  document.getElementById('regRole').value = role;
+  var userCard = document.getElementById('roleUser');
+  var courierCard = document.getElementById('roleCourier');
+  if (role === 'user') {
+    userCard.style.border = '2px solid var(--a)';
+    userCard.style.background = 'rgba(255,92,0,0.08)';
+    courierCard.style.border = '2px solid var(--b)';
+    courierCard.style.background = 'transparent';
+  } else {
+    courierCard.style.border = '2px solid var(--a)';
+    courierCard.style.background = 'rgba(255,92,0,0.08)';
+    userCard.style.border = '2px solid var(--b)';
+    userCard.style.background = 'transparent';
+  }
+}
+
+ openModal('authModal'); switchAuth(tab); }
 function switchAuth(tab) {
   document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
   document.getElementById('registerForm').style.display = tab==='register'?'block':'none';
@@ -1043,12 +1077,17 @@ async function register() {
   var email = document.getElementById('regEmail').value;
   var phone = document.getElementById('regPhone').value;
   var pass = document.getElementById('regPassword').value;
+  var role = document.getElementById('regRole').value;
   if (!name||!email||!pass) { showToast('Бүх талбарыг бөглөнө үү',true); return; }
   var r = await sb.auth.signUp({email:email,password:pass});
   if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
   if (r.data.user) {
-    await sb.from('users').insert({id:r.data.user.id,email:email,name:name,phone:phone});
-    CU = r.data.user; closeModal('authModal'); updateNav(); loadProfile(); showToast('Бүртгэл амжилттай! 🎉');
+    await sb.from('users').insert({id:r.data.user.id,email:email,name:name,phone:phone,is_courier:role==='courier'});
+    CU = r.data.user;
+    closeModal('authModal');
+    updateNav();
+    loadProfile();
+    showToast(role==='courier'?'Хүргэгчээр бүртгэгдлээ! 🚚':'Бүртгэл амжилттай! 🎉');
   }
 }
 
