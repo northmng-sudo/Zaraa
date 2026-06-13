@@ -477,7 +477,7 @@ select.form-input{cursor:pointer}
         <div style="display:flex;gap:10px;align-items:center">
           <input class="form-input" type="number" id="postPrice" placeholder="0" style="flex:1">
           <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="postNegotiable" onchange="document.getElementById('postPrice').disabled=this.checked;if(this.checked)document.getElementById('postPrice').value=''">
+            <input type="checkbox" id="postNegotiable">
             Тохиролцооны
           </label>
         </div>
@@ -1206,8 +1206,19 @@ async function toggleFeatured(id, current) {
   days = parseInt(days) || 7;
   var until = new Date();
   until.setDate(until.getDate() + days);
+  var untilStr = until.toLocaleDateString('mn-MN', {month:'2-digit', day:'2-digit'});
   await sb.from('listings').update({is_featured:true, featured_until:until.toISOString()}).eq('id',id);
-  showToast('Онцлох болгогдлоо! '+days+' хоног');
+  // Хэрэглэгчид мэдэгдэл илгээх
+  var listing = await sb.from('listings').select('user_id, title').eq('id', id).single();
+  if (listing.data) {
+    await sb.from('notifications').insert({
+      user_id: listing.data.user_id,
+      title: '⭐ Таны зар онцлох боллоо!',
+      body: '"'+listing.data.title+'" зар '+untilStr+' хүртэл онцлох зарт орлоо!',
+      listing_id: id
+    });
+  }
+  showToast('Онцлох болгогдлоо! '+days+' хоног ⭐');
   loadAdmin(); loadListings();
 }
 
@@ -1682,7 +1693,7 @@ async function uploadVideo(file) {
 async function postListing() {
   var title = document.getElementById('postTitle').value;
   var desc = document.getElementById('postDesc').value;
-  var price = document.getElementById('postNegotiable').checked ? 0 : document.getElementById('postPrice').value;
+  var price = document.getElementById('postPrice').value;
   var negotiable = document.getElementById('postNegotiable').checked;
   var district = document.getElementById('postDistrict').value;
   var khoroo = document.getElementById('postKhoroo').value;
@@ -1710,7 +1721,7 @@ async function postListing() {
   var vidUrl = vidFile ? await uploadVideo(vidFile) : null;
   var data = {
     title: title, description: desc,
-    price: negotiable ? null : Number(price),
+    price: price ? Number(price) : null,
     location: loc, category: cat, has_delivery: hasD,
     extra_data: Object.keys(extra).length ? extra : null,
     is_negotiable: negotiable
