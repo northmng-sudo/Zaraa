@@ -1385,7 +1385,7 @@ async function loadProfile() {
     '<div class="menu-item" onclick="showPage(\'chats\')"><div class="menu-left"><div class="menu-icon">💬</div>Миний чатууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'deliveries\')"><div class="menu-left"><div class="menu-icon">📦</div>Миний захиалгууд</div></div>'+
     '<div class="menu-item" onclick="editProfile()"><div class="menu-left"><div class="menu-icon">✏️</div>Профайл засах</div></div>'+
-    '<div class="menu-item" onclick="becomeCourier()"><div class="menu-left"><div class="menu-icon">🚚</div>'+(user.is_courier?'Хүргэгч горим идэвхтэй':'Хүргэгч болох')+'</div></div>'+
+    '<div class="menu-item" onclick="toggleCourierMode()"><div class="menu-left"><div class="menu-icon">🚚</div>'+(user.is_courier?'Хүргэгч горим — Идэвхтэй':'Хүргэгч болох')+'</div><div style="font-size:11px;color:'+(user.is_courier?'#00C96B':'var(--m)')+'">'+( user.is_courier?'Дарж болиулах':'→')+'</div></div>'+
     (user.is_admin?'<div class="menu-item" onclick="showPage(\'admin\')"><div class="menu-left"><div class="menu-icon">🛡️</div>Admin Panel</div></div>':'')+
     '<div class="menu-item" onclick="logout()"><div class="menu-left"><div class="menu-icon">🚪</div>Гарах</div></div>';
   if (ls.data&&ls.data.length) {
@@ -1582,6 +1582,18 @@ function startCourierNotifications() {
     }).subscribe();
 }
 
+
+async function toggleCourierMode() {
+  var u = await sb.from('users').select('is_courier').eq('id', CU.id).single();
+  var current = u.data && u.data.is_courier;
+  if (current) {
+    if (!confirm('Хүргэгч горимоос гарах уу?')) return;
+  }
+  await sb.from('users').update({is_courier: !current}).eq('id', CU.id);
+  showToast(!current ? 'Хүргэгчээр бүртгэгдлээ! 🚚' : 'Хүргэгч горимоос гарлаа');
+  await updateNav();
+  loadProfile();
+}
 
 async function becomeCourier() {
   if (!CU) { openAuth('login'); return; }
