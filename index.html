@@ -1143,13 +1143,21 @@ async function loadAdminAds() {
   var ads = r.data || [];
   if (!ads.length) { box.innerHTML = '<div style="color:var(--m);font-size:13px;margin-bottom:8px">Реклам байхгүй</div>'; return; }
   box.innerHTML = ads.map(function(a) {
-    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">'+
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px">'+
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
       '<div style="flex:1">'+
       '<div style="font-weight:600;font-size:13px">'+a.title+'</div>'+
-      '<div style="font-size:11px;color:var(--m)">'+(a.video_url||a.image_url||'')+'</div>'+
+      '<div style="font-size:11px;color:var(--m)">'+(a.video_url?'🎥 Видео':a.image_url?'🖼️ Зураг':'Медиагүй')+'</div>'+
       '</div>'+
       '<button onclick="toggleAd(\''+a.id+'\','+a.is_active+')" style="background:'+(a.is_active?'#00C96B':'var(--s2)')+';color:'+(a.is_active?'white':'var(--t)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">'+(a.is_active?'✓ Идэвхтэй':'Идэвхгүй')+'</button>'+
       '<button onclick="deleteAd(\''+a.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
+      '</div>'+
+      (a.image_url?'<img src="'+a.image_url+'" style="width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:6px">':'')+
+      (a.video_url?'<video src="'+a.video_url+'" style="width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:6px" muted></video>':'')+
+      '<div style="display:flex;gap:6px;margin-top:6px">'+
+      '<input class="form-input" id="adLink_'+a.id+'" value="'+(a.link_url||'')+'" placeholder="Линк оруулах" style="flex:1;font-size:12px">'+
+      '<button onclick="updateAdLink(\''+a.id+'\')" style="background:var(--a);color:white;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer">Хадгалах</button>'+
+      '</div>'+
       '</div>';
   }).join('');
 }
@@ -1193,6 +1201,15 @@ async function addAd() {
   showToast('Реклам нэмэгдлээ! 📺');
   loadAdminAds();
   updateAdSpace(false);
+}
+
+async function updateAdLink(id) {
+  var link = document.getElementById('adLink_'+id).value;
+  if (link && !link.startsWith('http')) link = 'https://'+link;
+  var r = await sb.from('ads').update({link_url: link||null}).eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Линк хадгалагдлаа!');
+  loadAdminAds();
 }
 
 async function toggleAd(id, current) {
@@ -1278,7 +1295,8 @@ async function updateAdSpace(isCourier) {
       } else if (ad.image_url) {
         content = '<img src="'+ad.image_url+'" style="width:100%;height:100%;object-fit:cover">';
       }
-      box.innerHTML = '<div style="margin:0 16px 24px;border-radius:18px;overflow:hidden;background:#000;position:relative;aspect-ratio:16/9;cursor:pointer" onclick="'+(ad.link_url?'window.open(\''+ad.link_url+'\',\'_blank\')':'')+'">'+
+      var adLink = ad.link_url ? (ad.link_url.startsWith('http') ? ad.link_url : 'https://'+ad.link_url) : '';
+      box.innerHTML = '<div style="margin:0 16px 24px;border-radius:18px;overflow:hidden;background:#000;position:relative;aspect-ratio:16/9;cursor:pointer" onclick="'+(adLink?'window.open(\''+adLink+'\',\'_blank\')':'')+'">'+
         content+
         '<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);color:white;border-radius:4px;padding:2px 6px;font-size:10px">Реклам</div>'+
         '</div>';
