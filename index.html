@@ -690,6 +690,7 @@ async function loadStats() {
 async function loadListings() {
   var grid = document.getElementById('listingsGrid');
   grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  await sb.rpc('check_featured_expiry');
   var r = await sb.from('listings').select('*, users(name,rating)').eq('is_active',true).order('created_at',{ascending:false});
   if (r.error) { grid.innerHTML = '<div class="empty"><div class="empty-icon">😕</div><p>Алдаа гарлаа</p></div>'; return; }
   AL = r.data || [];
@@ -985,7 +986,8 @@ async function loadAdmin() {
       '<div style="font-size:11px;color:var(--m)">'+(l.users&&l.users.name||'?')+' • '+l.category+' • ₮'+Number(l.price).toLocaleString()+'</div>'+
       '</div>'+
       '<div style="display:flex;gap:6px">'+
-      '<button onclick="toggleFeatured(\''+l.id+'\','+l.is_featured+')" style="background:'+(l.is_featured?'#FFD700':'var(--s2)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer" title="Онцлох">'+(l.is_featured?'⭐ Онцлох':'☆ Онцлох')+'</button>'+
+      '<button onclick="toggleFeatured(\''+l.id+'\','+l.is_featured+')" style="background:'+(l.is_featured?'#FFD700':'var(--s2)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer" title="Онцлох">'+
+      (l.is_featured?('⭐ '+(l.featured_until?new Date(l.featured_until).toLocaleDateString('mn-MN',{month:'2-digit',day:'2-digit'})+'хүртэл':'Онцлох')):'☆ Онцлох')+'</button>'+
       '<button onclick="adminDeleteListing(\''+l.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
       '</div></div>';
   }).join('');
@@ -1010,7 +1012,19 @@ async function loadAdmin() {
 }
 
 async function toggleFeatured(id, current) {
-  await sb.from('listings').update({is_featured: !current}).eq('id', id);
+  if (current) {
+    await sb.from('listings').update({is_featured:false, featured_until:null}).eq('id',id);
+    showToast('Онцлох болиулагдлаа');
+    loadAdmin(); loadListings();
+    return;
+  }
+  var days = prompt('Хэдэн хоног онцлох вэ? (1, 3, 7, 14, 30)', '7');
+  if (!days) return;
+  days = parseInt(days) || 7;
+  var until = new Date();
+  until.setDate(until.getDate() + days);
+  await sb.from('listings').update({is_featured:true, featured_until:until.toISOString()}).eq('id',id);
+  showToast('Онцлох болгогдлоо! '+days+' хоног');
   loadAdmin(); loadListings();
 }
 
