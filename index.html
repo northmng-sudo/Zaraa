@@ -1471,8 +1471,10 @@ async function login() {
   CU = r.data.user;
   closeModal('authModal');
   await updateNav();
-  loadProfile();
+  await loadProfile();
+  showPage('profile');
   showToast('Амжилттай нэвтэрлээ! 👋');
+  loadNotifications();
 }
 
 async function register() {
