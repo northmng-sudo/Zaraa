@@ -235,10 +235,13 @@ select.form-input{cursor:pointer}
     <div class="section-title">Шинэ зарууд</div>
     <div id="listingsGrid" class="grid"><div class="loading"><div class="spinner"></div></div></div>
   </div>
-  <div class="delivery-cta">
-    <h2>Хүргэгч болох уу?</h2>
-    <p>Чөлөөт цагтаа мөнгө олоорой.</p>
-    <button class="btn-white" onclick="becomeCourier()">Бүртгүүлэх →</button>
+  <!-- AD SPACE -->
+  <div id="adSpace">
+    <div class="delivery-cta">
+      <h2>Хүргэгч болох уу?</h2>
+      <p>Чөлөөт цагтаа мөнгө олоорой. Бүртгэл хялбар.</p>
+      <button class="btn-white" onclick="openAuth('register');selectRole('courier')">Хүргэгчээр бүртгүүлэх →</button>
+    </div>
   </div>
 </div>
 
@@ -1065,7 +1068,31 @@ async function editListing(id) {
   openModal('postModal');
 }
 
-function selectRole(role) {
+function updateAdSpace(isCourier) {
+  var box = document.getElementById('adSpace');
+  if (!box) return;
+  if (CU && !isCourier) {
+    // Logged in regular user - show video ad space
+    box.innerHTML = '<div style="margin:0 16px 24px;border-radius:18px;overflow:hidden;background:#000;position:relative;aspect-ratio:16/9">'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:20px">'+
+      '<div style="font-size:32px;margin-bottom:8px">📺</div>'+
+      '<div style="font-size:14px;font-weight:700;margin-bottom:4px">Видео реклам</div>'+
+      '<div style="font-size:11px;opacity:0.6">Энд таны бизнесийн реклам харагдана</div>'+
+      '<div style="margin-top:12px;background:var(--a);color:white;border-radius:50px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer" onclick="showToast(\'Реклам байршуулах: admin@zaraa.mn\')">Реклам байршуулах</div>'+
+      '</div></div>';
+  } else if (!CU) {
+    // Not logged in - show courier CTA
+    box.innerHTML = '<div class="delivery-cta">'+
+      '<h2>Хүргэгч болох уу?</h2>'+
+      '<p>Чөлөөт цагтаа мөнгө олоорой. Бүртгэл хялбар.</p>'+
+      '<button class="btn-white" onclick="openAuth(\'register\');selectRole(\'courier\')">Хүргэгчээр бүртгүүлэх →</button>'+
+      '</div>';
+  } else {
+    box.innerHTML = '';
+  }
+}
+
+
   document.getElementById('regRole').value = role;
   var userCard = document.getElementById('roleUser');
   var courierCard = document.getElementById('roleCourier');
@@ -1137,6 +1164,7 @@ async function updateNav() {
   var isCourier = u.data && u.data.is_courier;
   var nav = document.querySelector('.bottom-nav');
   if (isCourier) {
+    updateAdSpace(true);
     nav.innerHTML =
       '<div class="nav-item active" id="nav-home" onclick="showPage(\'home\')">'+
       '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Нүүр</div>'+
@@ -1152,7 +1180,7 @@ async function updateNav() {
       '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профайл</div>';
     updateCourierNavStatus();
   } else {
-    nav.innerHTML =
+    updateAdSpace(false);
       '<div class="nav-item active" id="nav-home" onclick="showPage(\'home\')">'+
       '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Нүүр</div>'+
       '<div class="nav-item" id="nav-chats" onclick="showPage(\'chats\')" style="position:relative">'+
