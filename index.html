@@ -1210,7 +1210,7 @@ async function loadAdmin() {
       '</div>'+
       '<div style="display:flex;gap:6px">'+
       '<button onclick="toggleFeatured(\''+l.id+'\','+l.is_featured+')" style="background:'+(l.is_featured?'#FFD700':'var(--s2)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer" title="Онцлох">'+
-      (l.is_featured?('⭐ '+(l.featured_until?new Date(l.featured_until).toLocaleDateString('mn-MN',{month:'2-digit',day:'2-digit'})+'хүртэл':'Онцлох')):'☆ Онцлох')+'</button>'+
+      (l.is_featured?('⭐ '+(l.featured_until?new Date(l.featured_until).toLocaleDateString('mn-MN',{timeZone:'Asia/Ulaanbaatar',month:'2-digit',day:'2-digit'})+'хүртэл':'Онцлох')):'☆ Онцлох')+'</button>'+
       '<button onclick="adminDeleteListing(\''+l.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
       '</div></div>';
   }).join('');
@@ -1246,7 +1246,7 @@ async function toggleFeatured(id, current) {
   days = parseInt(days) || 7;
   var until = new Date();
   until.setDate(until.getDate() + days);
-  var untilStr = until.toLocaleDateString('mn-MN', {month:'2-digit', day:'2-digit'});
+  var untilStr = until.toLocaleDateString('mn-MN', {timeZone:'Asia/Ulaanbaatar', month:'2-digit', day:'2-digit'});
   await sb.from('listings').update({is_featured:true, featured_until:until.toISOString()}).eq('id',id);
   // Хэрэглэгчид мэдэгдэл илгээх
   var listing = await sb.from('listings').select('user_id, title').eq('id', id).single();
@@ -1477,15 +1477,22 @@ async function editListing(id) {
   var r = await sb.from('listings').select('*').eq('id', id).single();
   var l = r.data;
   if (!l) return;
+  goStep(2);
   document.getElementById('postTitle').value = l.title||'';
   document.getElementById('postDesc').value = l.description||'';
   document.getElementById('postPrice').value = l.price||'';
-  document.getElementById('postLocation').value = l.location||'';
-  document.getElementById('postCategory').value = l.category||'Бусад';
+  document.getElementById('postNegotiable').checked = l.is_negotiable||false;
+  document.getElementById('postCategory').value = l.category||'';
   document.getElementById('postDelivery').checked = l.has_delivery||false;
+  // Location
+  if (l.location) {
+    var parts = l.location.split(', ');
+    if (parts[0]) document.getElementById('postDistrict').value = parts[0];
+    if (parts[1]) { updateKhoroo(); document.getElementById('postKhoroo').value = parts[1]; }
+    if (parts[2]) document.getElementById('postAddress').value = parts.slice(2).join(', ');
+  }
+  document.getElementById('step2Title').textContent = (l.category||'Зар засах');
   document.getElementById('postModal').setAttribute('data-edit-id', id);
-  document.querySelector('#postModal .modal-title').textContent = 'Зар засах';
-  document.querySelector('#postModal .btn-primary.btn-full').textContent = 'Хадгалах';
   openModal('postModal');
 }
 
@@ -1779,6 +1786,7 @@ async function postListing() {
   if (vidUrl) data.video_url = vidUrl;
   var r;
   if (editId) {
+    data.status = 'pending';
     r = await sb.from('listings').update(data).eq('id', editId);
   } else {
     data.user_id = CU.id; data.is_active = true; data.status = 'pending';
@@ -1800,7 +1808,7 @@ async function postListing() {
   document.getElementById('postKhoroo').innerHTML='<option value="">Хороо сонгох</option>';
   document.getElementById('selectedLocation').style.display='none';
   document.getElementById('mapPickerBox').style.display='none';
-  showToast(editId?'Зар засагдлаа! ✅':'⏳ Зар илгээгдлээ! Admin шалгаад удахгүй нийтэлнэ', false, 6000);
+  showToast(editId?'⏳ Зар засагдлаа! Admin шалгаад нийтэлнэ':'⏳ Зар илгээгдлээ! Admin шалгаад удахгүй нийтэлнэ', false, 6000);
   loadListings(); loadStats();
 }
 
@@ -1940,7 +1948,7 @@ async function loadNotifications() {
       '<div style="flex:1;cursor:'+(onclick?'pointer':'default')+'" onclick="markRead(\''+n.id+'\');'+(onclick?onclick+';':'')+'">'+
       '<div style="font-weight:600;font-size:13px;margin-bottom:4px">'+(n.is_read?'':'🔴 ')+n.title+'</div>'+
       '<div style="font-size:12px;color:var(--m)">'+n.body+'</div>'+
-      '<div style="font-size:10px;color:var(--m);margin-top:4px">'+new Date(n.created_at).toLocaleString('mn-MN')+'</div>'+
+      '<div style="font-size:10px;color:var(--m);margin-top:4px">'+new Date(n.created_at).toLocaleString('mn-MN', {timeZone:'Asia/Ulaanbaatar'})+'</div>'+
       '</div>'+
       '<button onclick="deleteNotif(\''+n.id+'\')" style="background:none;border:none;color:var(--m);font-size:16px;cursor:pointer;padding:0;flex-shrink:0">×</button>'+
       '</div>';
