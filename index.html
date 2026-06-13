@@ -307,6 +307,16 @@ select.form-input{cursor:pointer}
     </div>
     <div style="font-weight:700;margin-bottom:12px">Зарууд</div>
     <div id="adminListings"></div>
+    <div style="font-weight:700;margin:16px 0 12px">📺 Рекламууд</div>
+    <div id="adminAds"></div>
+    <div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:16px">
+      <div style="font-weight:600;margin-bottom:10px">+ Шинэ реклам нэмэх</div>
+      <input class="form-input" id="adTitle" placeholder="Рекламын нэр" style="margin-bottom:8px">
+      <input class="form-input" id="adVideo" placeholder="Видео URL" style="margin-bottom:8px">
+      <input class="form-input" id="adImage" placeholder="Зургийн URL" style="margin-bottom:8px">
+      <input class="form-input" id="adLink" placeholder="Дарахад очих линк" style="margin-bottom:8px">
+      <button class="btn btn-primary btn-full" onclick="addAd()">Реклам нэмэх</button>
+    </div>
     <div style="font-weight:700;margin:16px 0 12px">Хэрэглэгчид</div>
     <div id="adminUsers"></div>
   </div>
@@ -965,6 +975,7 @@ async function loadAdmin() {
     '<div class="stat"><div class="stat-num">'+uCount+'</div><div class="stat-label">Хэрэглэгч</div></div>'+
     '<div class="stat"><div class="stat-num">'+mCount+'</div><div class="stat-label">Мессеж</div></div>';
 
+  loadAdminAds();
   // Listings
   var ls = await sb.from('listings').select('*, users(name)').order('created_at', {ascending:false}).limit(50);
   document.getElementById('adminListings').innerHTML = (ls.data||[]).map(function(l) {
@@ -1011,7 +1022,60 @@ async function adminDeleteUser(id) {
   loadAdmin();
 }
 
-async function toggleVerified(id, current) {
+async function loadAds() {
+  var r = await sb.from('ads').select('*').eq('is_active', true).order('created_at', {ascending:false});
+  return r.data || [];
+}
+
+async function loadAdminAds() {
+  var box = document.getElementById('adminAds');
+  if (!box) return;
+  var r = await sb.from('ads').select('*').order('created_at', {ascending:false});
+  var ads = r.data || [];
+  if (!ads.length) { box.innerHTML = '<div style="color:var(--m);font-size:13px;margin-bottom:8px">Реклам байхгүй</div>'; return; }
+  box.innerHTML = ads.map(function(a) {
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">'+
+      '<div style="flex:1">'+
+      '<div style="font-weight:600;font-size:13px">'+a.title+'</div>'+
+      '<div style="font-size:11px;color:var(--m)">'+(a.video_url||a.image_url||'')+'</div>'+
+      '</div>'+
+      '<button onclick="toggleAd(\''+a.id+'\','+a.is_active+')" style="background:'+(a.is_active?'#00C96B':'var(--s2)')+';color:'+(a.is_active?'white':'var(--t)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">'+(a.is_active?'✓ Идэвхтэй':'Идэвхгүй')+'</button>'+
+      '<button onclick="deleteAd(\''+a.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
+      '</div>';
+  }).join('');
+}
+
+async function addAd() {
+  var title = document.getElementById('adTitle').value;
+  var video = document.getElementById('adVideo').value;
+  var image = document.getElementById('adImage').value;
+  var link = document.getElementById('adLink').value;
+  if (!title) { showToast('Нэр оруулна уу', true); return; }
+  var r = await sb.from('ads').insert({title:title, video_url:video||null, image_url:image||null, link_url:link||null});
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  document.getElementById('adTitle').value='';
+  document.getElementById('adVideo').value='';
+  document.getElementById('adImage').value='';
+  document.getElementById('adLink').value='';
+  showToast('Реклам нэмэгдлээ! 📺');
+  loadAdminAds();
+  updateAdSpace(false);
+}
+
+async function toggleAd(id, current) {
+  await sb.from('ads').update({is_active: !current}).eq('id', id);
+  loadAdminAds();
+  updateAdSpace(false);
+}
+
+async function deleteAd(id) {
+  if (!confirm('Рекламыг устгах уу?')) return;
+  await sb.from('ads').delete().eq('id', id);
+  loadAdminAds();
+  updateAdSpace(false);
+}
+
+
   await sb.from('users').update({is_verified: !current}).eq('id', id);
   loadAdmin();
 }
@@ -1068,20 +1132,32 @@ async function editListing(id) {
   openModal('postModal');
 }
 
-function updateAdSpace(isCourier) {
+async function updateAdSpace(isCourier) {
   var box = document.getElementById('adSpace');
   if (!box) return;
   if (CU && !isCourier) {
-    // Logged in regular user - show video ad space
-    box.innerHTML = '<div style="margin:0 16px 24px;border-radius:18px;overflow:hidden;background:#000;position:relative;aspect-ratio:16/9">'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:20px">'+
-      '<div style="font-size:32px;margin-bottom:8px">📺</div>'+
-      '<div style="font-size:14px;font-weight:700;margin-bottom:4px">Видео реклам</div>'+
-      '<div style="font-size:11px;opacity:0.6">Энд таны бизнесийн реклам харагдана</div>'+
-      '<div style="margin-top:12px;background:var(--a);color:white;border-radius:50px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer" onclick="showToast(\'Реклам байршуулах: admin@zaraa.mn\')">Реклам байршуулах</div>'+
-      '</div></div>';
+    var ads = await loadAds();
+    if (ads.length) {
+      var ad = ads[0];
+      var content = '';
+      if (ad.video_url) {
+        content = '<video src="'+ad.video_url+'" autoplay muted loop style="width:100%;height:100%;object-fit:cover"></video>';
+      } else if (ad.image_url) {
+        content = '<img src="'+ad.image_url+'" style="width:100%;height:100%;object-fit:cover">';
+      }
+      box.innerHTML = '<div style="margin:0 16px 24px;border-radius:18px;overflow:hidden;background:#000;position:relative;aspect-ratio:16/9;cursor:pointer" onclick="'+(ad.link_url?'window.open(\''+ad.link_url+'\',\'_blank\')':'')+'">'+
+        content+
+        '<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);color:white;border-radius:4px;padding:2px 6px;font-size:10px">Реклам</div>'+
+        '</div>';
+    } else {
+      box.innerHTML = '<div style="margin:0 16px 24px;border-radius:18px;overflow:hidden;background:#111;position:relative;aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:20px">'+
+        '<div style="font-size:32px;margin-bottom:8px">📺</div>'+
+        '<div style="font-size:14px;font-weight:700;margin-bottom:4px">Видео реклам</div>'+
+        '<div style="font-size:11px;opacity:0.6">Энд таны бизнесийн реклам харагдана</div>'+
+        '<div style="margin-top:12px;background:var(--a);color:white;border-radius:50px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer" onclick="showToast(\'Реклам байршуулах: admin@zaraa.mn\')">Реклам байршуулах</div>'+
+        '</div>';
+    }
   } else if (!CU) {
-    // Not logged in - show courier CTA
     box.innerHTML = '<div class="delivery-cta">'+
       '<h2>Хүргэгч болох уу?</h2>'+
       '<p>Чөлөөт цагтаа мөнгө олоорой. Бүртгэл хялбар.</p>'+
