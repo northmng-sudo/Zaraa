@@ -312,9 +312,15 @@ select.form-input{cursor:pointer}
     <div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:16px">
       <div style="font-weight:600;margin-bottom:10px">+ Шинэ реклам нэмэх</div>
       <input class="form-input" id="adTitle" placeholder="Рекламын нэр" style="margin-bottom:8px">
-      <input class="form-input" id="adVideo" placeholder="Видео URL" style="margin-bottom:8px">
-      <input class="form-input" id="adImage" placeholder="Зургийн URL" style="margin-bottom:8px">
-      <input class="form-input" id="adLink" placeholder="Дарахад очих линк" style="margin-bottom:8px">
+      <div style="margin-bottom:8px">
+        <label class="form-label">Зураг оруулах</label>
+        <label style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px dashed var(--b);border-radius:10px;padding:10px;cursor:pointer;font-size:13px;color:var(--m)">
+          📷 Зураг сонгох
+          <input type="file" id="adImageFile" accept="image/*,video/*" style="display:none" onchange="previewAd(this)">
+        </label>
+        <div id="adPreview" style="margin-top:6px"></div>
+      </div>
+      <input class="form-input" id="adLink" placeholder="Дарахад очих линк (заавал биш)" style="margin-bottom:8px">
       <button class="btn btn-primary btn-full" onclick="addAd()">Реклам нэмэх</button>
     </div>
     <div style="font-weight:700;margin:16px 0 12px">Хэрэглэгчид</div>
@@ -1059,18 +1065,41 @@ async function loadAdminAds() {
   }).join('');
 }
 
-async function addAd() {
+function previewAd(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var url = URL.createObjectURL(file);
+  var box = document.getElementById('adPreview');
+  if (file.type.startsWith('video')) {
+    box.innerHTML = '<video src="'+url+'" controls style="width:100%;border-radius:8px;max-height:150px"></video>';
+  } else {
+    box.innerHTML = '<img src="'+url+'" style="width:100%;border-radius:8px;max-height:150px;object-fit:cover">';
+  }
+}
+
+
   var title = document.getElementById('adTitle').value;
-  var video = document.getElementById('adVideo').value;
-  var image = document.getElementById('adImage').value;
   var link = document.getElementById('adLink').value;
+  var file = document.getElementById('adImageFile').files[0];
   if (!title) { showToast('Нэр оруулна уу', true); return; }
-  var r = await sb.from('ads').insert({title:title, video_url:video||null, image_url:image||null, link_url:link||null});
+  showToast('Байршуулж байна...');
+  var imageUrl = null;
+  var videoUrl = null;
+  if (file) {
+    var ext = file.name.split('.').pop();
+    var path = 'ads/'+Date.now()+'.'+ext;
+    var bucket = file.type.startsWith('video') ? 'videos' : 'listings';
+    var up = await sb.storage.from(bucket).upload(path, file, {contentType: file.type});
+    if (up.error) { showToast('Upload алдаа: '+up.error.message, true); return; }
+    var url = sb.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+    if (file.type.startsWith('video')) { videoUrl = url; } else { imageUrl = url; }
+  }
+  var r = await sb.from('ads').insert({title:title, video_url:videoUrl, image_url:imageUrl, link_url:link||null});
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
   document.getElementById('adTitle').value='';
-  document.getElementById('adVideo').value='';
-  document.getElementById('adImage').value='';
   document.getElementById('adLink').value='';
+  document.getElementById('adImageFile').value='';
+  document.getElementById('adPreview').innerHTML='';
   showToast('Реклам нэмэгдлээ! 📺');
   loadAdminAds();
   updateAdSpace(false);
