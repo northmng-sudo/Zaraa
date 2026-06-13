@@ -306,6 +306,8 @@ select.form-input{cursor:pointer}
   <div class="section">
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px" id="adminStats">
     </div>
+    <div style="font-weight:700;margin:16px 0 12px">⏳ Хүлээгдэж буй зарууд</div>
+    <div id="adminPending"><div style="color:var(--m);font-size:13px">Байхгүй ✅</div></div>
     <div style="font-weight:700;margin:16px 0 12px">🚩 Мэдээллүүд</div>
     <div id="adminReports"><div style="color:var(--m);font-size:13px">Мэдээлэл байхгүй</div></div>
     <div style="font-weight:700;margin:16px 0 12px">📋 Зарууд</div>
@@ -788,7 +790,7 @@ async function loadListings() {
   var grid = document.getElementById('listingsGrid');
   grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
   await sb.rpc('check_featured_expiry');
-  var r = await sb.from('listings').select('*, users(name,rating)').eq('is_active',true).order('created_at',{ascending:false});
+  var r = await sb.from('listings').select('*, users(name,rating,is_verified)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false});
   if (r.error) { grid.innerHTML = '<div class="empty"><div class="empty-icon">😕</div><p>Алдаа гарлаа</p></div>'; return; }
   AL = r.data || [];
   AL.sort(function(a, b) { return (b.is_featured?1:0) - (a.is_featured?1:0); });
@@ -1076,6 +1078,23 @@ async function loadAdmin() {
 
   loadAdminAds();
 
+  // Pending listings
+  var pending = await sb.from('listings').select('*, users(name)').eq('status','pending').order('created_at',{ascending:false});
+  var pendingBox = document.getElementById('adminPending');
+  if (pendingBox) {
+    var pd = pending.data || [];
+    pendingBox.innerHTML = pd.length ? pd.map(function(l) {
+      return '<div style="background:var(--s);border:2px solid #FFD700;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">'+
+        '<div style="flex:1">'+
+        '<div style="font-weight:600;font-size:13px">'+l.title+'</div>'+
+        '<div style="font-size:11px;color:var(--m)">'+(l.users&&l.users.name||'?')+' • '+l.category+' • ₮'+Number(l.price).toLocaleString()+'</div>'+
+        '</div>'+
+        '<button onclick="approveListing(\''+l.id+'\')" style="background:#00C96B;color:white;border:none;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">✓ Зөвшөөрөх</button>'+
+        '<button onclick="adminDeleteListing(\''+l.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
+        '</div>';
+    }).join('') : '<div style="color:var(--m);font-size:13px">Хүлээгдэж буй зар байхгүй ✅</div>';
+  }
+
   // Reports
   var rep = await sb.from('reports').select('*, listings(title), users!reporter_id(name)').order('created_at', {ascending:false}).limit(20);
   var reports = rep.data || [];
@@ -1262,6 +1281,12 @@ async function toggleVerified(id, current) {
 async function toggleAdmin(id, current) {
   await sb.from('users').update({is_admin: !current}).eq('id', id);
   loadAdmin();
+}
+
+async function approveListing(id) {
+  await sb.from('listings').update({status:'active'}).eq('id', id);
+  showToast('Зар зөвшөөрөгдлөө! ✅');
+  loadAdmin(); loadListings();
 }
 
 async function dismissReport(id) {
@@ -1624,7 +1649,7 @@ async function postListing() {
   if (editId) {
     r = await sb.from('listings').update(data).eq('id', editId);
   } else {
-    data.user_id = CU.id; data.is_active = true;
+    data.user_id = CU.id; data.is_active = true; data.status = 'pending';
     r = await sb.from('listings').insert(data);
   }
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
@@ -1640,7 +1665,7 @@ async function postListing() {
   document.getElementById('postNegotiable').checked=false;
   document.getElementById('postDistrict').value='';
   document.getElementById('postKhoroo').innerHTML='<option value="">Хороо сонгох</option>';
-  showToast(editId?'Зар засагдлаа! ✅':'Зар амжилттай байршлаа! 🎉');
+  showToast(editId?'Зар засагдлаа! ✅':'Зар илгээгдлээ! Admin шалгаад зөвшөөрнө 🎉');
   loadListings(); loadStats();
 }
 
