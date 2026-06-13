@@ -281,7 +281,6 @@ select.form-input{cursor:pointer}
       <!-- Active orders -->
       <div style="font-weight:700;font-size:15px;margin:16px 0 10px">🚚 Миний захиалгууд</div>
       <div id="courierOrders"><div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div></div>
-    </div>
   </div>
 </div>
 
@@ -1638,7 +1637,7 @@ function showPage(name) {
   if (name === 'chats') { loadMyChats(); clearChatBadge(); }
   if (name === 'admin') loadAdmin();
   if (name === 'deliveries') loadDeliveriesPage();
-  if (name === 'profile') loadProfile();
+  if (name === 'profile') { loadProfile(); }
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
