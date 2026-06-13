@@ -166,40 +166,41 @@ select.form-input{cursor:pointer}
     <!-- FILTER PANEL -->
     <div id="filterPanel" style="display:none;background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:16px;margin-top:8px">
       <div style="font-weight:700;margin-bottom:12px;font-size:14px">🔍 Дэвшилтэт шүүлтүүр</div>
+
+      <!-- Үнэ -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div>
-          <label class="form-label">Доод үнэ (₮)</label>
-          <input class="form-input" type="number" id="filterMinPrice" placeholder="0" oninput="doSearch()">
-        </div>
-        <div>
-          <label class="form-label">Дээд үнэ (₮)</label>
-          <input class="form-input" type="number" id="filterMaxPrice" placeholder="∞" oninput="doSearch()">
-        </div>
+        <div><label class="form-label">Доод үнэ (₮)</label><input class="form-input" type="number" id="filterMinPrice" placeholder="0" oninput="doSearch()"></div>
+        <div><label class="form-label">Дээд үнэ (₮)</label><input class="form-input" type="number" id="filterMaxPrice" placeholder="∞" oninput="doSearch()"></div>
       </div>
+
+      <!-- Байршил -->
       <div style="margin-bottom:12px">
         <label class="form-label">Дүүрэг</label>
         <select class="form-input" id="filterDistrict" onchange="doSearch()">
           <option value="">Бүгд</option>
-          <option>Баянгол</option>
-          <option>Баянзүрх</option>
-          <option>Сүхбаатар</option>
-          <option>Хан-Уул</option>
-          <option>Чингэлтэй</option>
-          <option>Сонгинохайрхан</option>
-          <option>Налайх</option>
-          <option>Багануур</option>
-          <option>Багахангай</option>
+          <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
+          <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
+          <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
         </select>
       </div>
-      <div style="display:flex;gap:10px">
+
+      <!-- Ангилалын нэмэлт шүүлтүүр -->
+      <div id="catFilters"></div>
+
+      <!-- Нийтлэг -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
           <input type="checkbox" id="filterDelivery" onchange="doSearch()"> 🚚 Хүргэлттэй
         </label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
           <input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохиролцооны
         </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+          <input type="checkbox" id="filterVerified" onchange="doSearch()"> ✅ Баталгаажсан
+        </label>
       </div>
-      <button class="btn btn-ghost" style="margin-top:12px;width:100%" onclick="clearFilter()">Шүүлтүүр цэвэрлэх</button>
+
+      <button class="btn btn-ghost" style="width:100%" onclick="clearFilter()">Шүүлтүүр цэвэрлэх</button>
     </div>
   </div>
   <div class="stats">
@@ -594,7 +595,75 @@ document.getElementById('catList').addEventListener('click', function(e) {
   applyFilter();
 });
 
-function toggleFilter() {
+var CAT_FILTERS = {
+  'Авто': [
+    {id:'cf_brand', label:'Марк', type:'select', options:['','Toyota','Hyundai','Kia','Lexus','BMW','Mercedes','Honda','Nissan','Mitsubishi','Subaru','Бусад']},
+    {id:'cf_year_min', label:'Он (доод)', type:'number', placeholder:'2000'},
+    {id:'cf_year_max', label:'Он (дээд)', type:'number', placeholder:'2024'},
+    {id:'cf_mileage', label:'Гүйлт хүртэл (км)', type:'number', placeholder:'100000'},
+    {id:'cf_color', label:'Өнгө', type:'select', options:['','Цагаан','Хар','Мөнгөн','Улаан','Цэнхэр','Саарал','Бусад']}
+  ],
+  'Үл хөдлөх': [
+    {id:'cf_rooms', label:'Өрөөний тоо', type:'select', options:['','1 өрөө','2 өрөө','3 өрөө','4 өрөө','5+ өрөө']},
+    {id:'cf_floor_min', label:'Давхар (доод)', type:'number', placeholder:'1'},
+    {id:'cf_floor_max', label:'Давхар (дээд)', type:'number', placeholder:'20'},
+    {id:'cf_area_min', label:'Талбай доод (м²)', type:'number', placeholder:'20'},
+    {id:'cf_area_max', label:'Талбай дээд (м²)', type:'number', placeholder:'200'},
+    {id:'cf_condition', label:'Нөхцөл', type:'select', options:['','Шинэ','Засварласан','Засвар хийгдээгүй']}
+  ],
+  'Техник': [
+    {id:'cf_brand', label:'Марк', type:'select', options:['','Apple','Samsung','Xiaomi','Huawei','Sony','LG','Dell','HP','Lenovo','Бусад']},
+    {id:'cf_condition', label:'Нөхцөл', type:'select', options:['','Шинэ','Маш сайн','Сайн','Дунд']}
+  ],
+  'Хувцас': [
+    {id:'cf_size', label:'Хэмжээ', type:'select', options:['','XS','S','M','L','XL','XXL','XXXL']},
+    {id:'cf_gender', label:'Хэн', type:'select', options:['','Эрэгтэй','Эмэгтэй','Хүүхэд','Унисекс']},
+    {id:'cf_brand', label:'Брэнд', type:'text', placeholder:'Nike, Adidas...'}
+  ],
+  'Гутал': [
+    {id:'cf_size', label:'Дугаар', type:'select', options:['','35','36','37','38','39','40','41','42','43','44','45','46']},
+    {id:'cf_gender', label:'Хэн', type:'select', options:['','Эрэгтэй','Эмэгтэй','Хүүхэд']},
+    {id:'cf_brand', label:'Брэнд', type:'text', placeholder:'Nike, Adidas...'}
+  ],
+  'Ажлын байр': [
+    {id:'cf_schedule', label:'Цагийн хуваарь', type:'select', options:['','Бүтэн цагийн','Хагас цагийн','Чөлөөт цагийн']},
+    {id:'cf_salary_min', label:'Цалин доод (₮)', type:'number', placeholder:'500000'},
+    {id:'cf_salary_max', label:'Цалин дээд (₮)', type:'number', placeholder:'5000000'}
+  ],
+  'Тавилга': [
+    {id:'cf_condition', label:'Нөхцөл', type:'select', options:['','Шинэ','Маш сайн','Сайн','Дунд']},
+    {id:'cf_material', label:'Материал', type:'select', options:['','Мод','Металл','Шил','Хавтан','Бусад']}
+  ],
+  'Гоо сайхан': [
+    {id:'cf_type', label:'Төрөл', type:'select', options:['','Арьс халамж','Үс засал','Хумс','Нүүр будалт','Үнэр','Бусад']}
+  ],
+  'Амьтад': [
+    {id:'cf_type', label:'Амьтны төрөл', type:'select', options:['','Нохой','Муур','Шувуу','Загас','Туулай','Бусад']},
+    {id:'cf_age', label:'Нас (сар)', type:'number', placeholder:'6'}
+  ],
+  'Спорт': [
+    {id:'cf_type', label:'Спортын төрөл', type:'select', options:['','Фитнесс','Хөл бөмбөг','Сагсан бөмбөг','Теннис','Гольф','Дугуй','Бусад']},
+    {id:'cf_condition', label:'Нөхцөл', type:'select', options:['','Шинэ','Маш сайн','Сайн','Дунд']}
+  ]
+};
+
+function loadCatFilters(cat) {
+  var box = document.getElementById('catFilters');
+  if (!box) return;
+  var filters = CAT_FILTERS[cat] || [];
+  if (!filters.length) { box.innerHTML = ''; return; }
+  box.innerHTML = '<div style="font-weight:600;font-size:13px;margin-bottom:8px;color:var(--a)">'+cat+' шүүлтүүр</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
+    filters.map(function(f) {
+      var input = f.type === 'select' ?
+        '<select class="form-input" id="'+f.id+'" onchange="doSearch()" style="font-size:12px">'+
+        f.options.map(function(o){ return '<option value="'+o+'">'+( o||'Бүгд')+'</option>'; }).join('')+'</select>' :
+        '<input class="form-input" type="'+f.type+'" id="'+f.id+'" placeholder="'+(f.placeholder||'')+'" oninput="doSearch()" style="font-size:12px">';
+      return '<div><label class="form-label" style="font-size:11px">'+f.label+'</label>'+input+'</div>';
+    }).join('')+'</div>';
+}
+
+
   var panel = document.getElementById('filterPanel');
   panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
 }
@@ -605,6 +674,12 @@ function clearFilter() {
   document.getElementById('filterDistrict').value = '';
   document.getElementById('filterDelivery').checked = false;
   document.getElementById('filterNegotiable').checked = false;
+  if (document.getElementById('filterVerified')) document.getElementById('filterVerified').checked = false;
+  var catFilters = CAT_FILTERS[CC] || [];
+  catFilters.forEach(function(f) {
+    var el = document.getElementById(f.id);
+    if (el) el.value = '';
+  });
   doSearch();
 }
 
@@ -615,23 +690,36 @@ function doSearch() {
   var district = document.getElementById('filterDistrict').value;
   var delivery = document.getElementById('filterDelivery').checked;
   var negotiable = document.getElementById('filterNegotiable').checked;
+  var verified = document.getElementById('filterVerified') && document.getElementById('filterVerified').checked;
   var arr = AL.slice();
+  if (CC) arr = arr.filter(function(l){ return l.category === CC; });
   if (q) arr = arr.filter(function(l){ return (l.title||'').toLowerCase().indexOf(q) > -1 || (l.description||'').toLowerCase().indexOf(q) > -1; });
   if (minP) arr = arr.filter(function(l){ return l.price >= minP; });
   if (maxP < Infinity) arr = arr.filter(function(l){ return l.price <= maxP; });
   if (district) arr = arr.filter(function(l){ return (l.location||'').indexOf(district) > -1; });
   if (delivery) arr = arr.filter(function(l){ return l.has_delivery; });
   if (negotiable) arr = arr.filter(function(l){ return l.is_negotiable; });
-  if (CC) arr = arr.filter(function(l){ return l.category === CC; });
+  if (verified) arr = arr.filter(function(l){ return l.users && l.users.is_verified; });
+  // Apply category-specific filters
+  var catFilters = CAT_FILTERS[CC] || [];
+  catFilters.forEach(function(f) {
+    var el = document.getElementById(f.id);
+    if (!el || !el.value) return;
+    var val = el.value.toLowerCase();
+    arr = arr.filter(function(l) {
+      var extra = l.extra_data || {};
+      var fieldKey = f.id.replace('cf_', '');
+      return (extra[fieldKey]||'').toLowerCase().indexOf(val) > -1 ||
+             (l.title||'').toLowerCase().indexOf(val) > -1 ||
+             (l.description||'').toLowerCase().indexOf(val) > -1;
+    });
+  });
   renderListings(arr);
 }
 
 function applyFilter() {
-  var q = document.getElementById('searchInput').value.toLowerCase();
-  var arr = AL.slice();
-  if (CC) arr = arr.filter(function(l){ return l.category === CC; });
-  if (q) arr = arr.filter(function(l){ return (l.title||'').toLowerCase().indexOf(q) > -1 || (l.description||'').toLowerCase().indexOf(q) > -1; });
-  renderListings(arr);
+  loadCatFilters(CC);
+  doSearch();
 }
 
 async function init() {
