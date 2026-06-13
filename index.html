@@ -306,7 +306,9 @@ select.form-input{cursor:pointer}
   <div class="section">
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px" id="adminStats">
     </div>
-    <div style="font-weight:700;margin-bottom:12px">Зарууд</div>
+    <div style="font-weight:700;margin:16px 0 12px">🚩 Мэдээллүүд</div>
+    <div id="adminReports"><div style="color:var(--m);font-size:13px">Мэдээлэл байхгүй</div></div>
+    <div style="font-weight:700;margin:16px 0 12px">📋 Зарууд</div>
     <div id="adminListings"></div>
     <div style="font-weight:700;margin:16px 0 12px">📺 Рекламууд</div>
     <div id="adminAds"></div>
@@ -851,6 +853,7 @@ async function showDetail(id) {
     '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none"><button class="btn btn-ghost btn-full" style="width:100%">📞 Холбоо барих</button></a>'+
     '<button class="btn btn-ghost btn-full" onclick="openChat(\''+l.id+'\',\''+l.user_id+'\')">💬 Чат</button>'+
     '</div>'+
+    (CU&&l.user_id!==CU.id?'<button style="background:none;border:none;color:var(--m);font-size:12px;cursor:pointer;margin-top:8px;display:block;width:100%;text-align:right" onclick="reportListing(\''+l.id+'\')">🚩 Мэдээлэх</button>':'')+
     (CU&&l.user_id===CU.id?
     '<div style="margin-top:10px">'+
     (l.has_delivery?'<button class="btn btn-primary btn-full" onclick="openDelivery(\''+l.id+'\')">🚚 Хүргэлт захиалах</button>':'<button class="btn btn-ghost btn-full" onclick="enableDelivery(\''+l.id+'\')">🚚 Хүргэлт нэмэх</button>')+
@@ -1072,6 +1075,24 @@ async function loadAdmin() {
     '<div class="stat"><div class="stat-num">'+mCount+'</div><div class="stat-label">Мессеж</div></div>';
 
   loadAdminAds();
+
+  // Reports
+  var rep = await sb.from('reports').select('*, listings(title), users!reporter_id(name)').order('created_at', {ascending:false}).limit(20);
+  var reports = rep.data || [];
+  var repBox = document.getElementById('adminReports');
+  if (repBox) {
+    repBox.innerHTML = reports.length ? reports.map(function(r) {
+      return '<div style="background:var(--s);border:1px solid #e53e3e;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">'+
+        '<div style="flex:1">'+
+        '<div style="font-weight:600;font-size:13px;color:#e53e3e">🚩 '+r.reason+'</div>'+
+        '<div style="font-size:12px;color:var(--m)">'+(r.listings&&r.listings.title||'Зар')+' • '+(r.users&&r.users.name||'?')+'</div>'+
+        '</div>'+
+        '<button onclick="adminDeleteListing(\''+r.listing_id+'\')" style="background:#e53e3e;color:white;border:none;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">Зар устгах</button>'+
+        '<button onclick="dismissReport(\''+r.id+'\')" style="background:var(--s2);border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">Үл тоох</button>'+
+        '</div>';
+    }).join('') : '<div style="color:var(--m);font-size:13px">Мэдээлэл байхгүй ✅</div>';
+  }
+
   // Listings
   var ls = await sb.from('listings').select('*, users(name)').order('created_at', {ascending:false}).limit(50);
   document.getElementById('adminListings').innerHTML = (ls.data||[]).map(function(l) {
@@ -1243,6 +1264,12 @@ async function toggleAdmin(id, current) {
   loadAdmin();
 }
 
+async function dismissReport(id) {
+  await sb.from('reports').delete().eq('id', id);
+  showToast('Мэдээлэл үл тооцогдлоо');
+  loadAdmin();
+}
+
 async function adminDeleteListing(id) {
   if (!confirm('Зарыг бүрмөсөн устгах уу?')) return;
   var r = await sb.rpc('admin_delete_listing', {p_listing_id: id});
@@ -1259,7 +1286,30 @@ async function cancelDelivery(id) {
   loadMyDeliveries();
 }
 
-async function enableDelivery(id) {
+// Хориотой үгс
+var BANNED_WORDS = ['хулгай','луйвар','луйварч','залилан','porn','бэлгийн','хар тамхи','мансууруулах','скам','scam'];
+
+function checkBannedWords(text) {
+  var lower = (text||'').toLowerCase();
+  for (var i=0; i<BANNED_WORDS.length; i++) {
+    if (lower.indexOf(BANNED_WORDS[i]) > -1) return BANNED_WORDS[i];
+  }
+  return null;
+}
+
+async function reportListing(id) {
+  if (!CU) { openAuth('login'); return; }
+  var reasons = ['Хуурамч зар','Хориотой бараа','Луйвар','Зохисгүй зураг','Бусад'];
+  var reason = prompt('Мэдээлэх шалтгаан:\n1. Хуурамч зар\n2. Хориотой бараа\n3. Луйвар\n4. Зохисгүй зураг\n5. Бусад\n\nДугаар оруулах (1-5):');
+  if (!reason) return;
+  var idx = parseInt(reason) - 1;
+  var reasonText = reasons[idx] || reasons[4];
+  var r = await sb.from('reports').insert({listing_id: id, reporter_id: CU.id, reason: reasonText});
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Мэдээлэл хүлээн авлаа! Admin шалгана. 🚩');
+}
+
+
   var r = await sb.from('listings').update({has_delivery:true}).eq('id',id);
   if (!r.error) { showToast('Хүргэлт нэмэгдлээ!'); showDetail(id); }
 }
@@ -1548,6 +1598,9 @@ async function postListing() {
   if (!title) { showToast('Гарчиг оруулна уу', true); return; }
   if (!negotiable && !price) { showToast('Үнэ оруулна уу', true); return; }
   if (!cat) { showToast('Ангилал сонгоно уу', true); return; }
+  // Хориотой үг шалгах
+  var banned = checkBannedWords(title) || checkBannedWords(desc);
+  if (banned) { showToast('Зар нь хориотой үг агуулж байна: "'+banned+'"', true); return; }
   // Collect dynamic fields
   var extra = {};
   var dynFields = DYNAMIC_FIELDS[cat] || [];
