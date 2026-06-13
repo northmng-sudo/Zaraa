@@ -1759,12 +1759,16 @@ async function orderDelivery() {
 }
 
 async function loadProfile() {
-  if (!CU) return;
+  if (!CU) { 
+    document.getElementById('profileContent').innerHTML = '<div class="empty" style="padding-top:80px"><div class="empty-icon">👤</div><p>Нэвтэрч профайлаа харна уу</p><br><button class="btn btn-primary" onclick="openAuth(\'login\')">Нэвтрэх</button></div>';
+    return; 
+  }
   document.getElementById('profileContent').innerHTML = '<div style="text-align:center;padding:40px;color:var(--m)">⏳ Уншиж байна...</div>';
   var u = await sb.from('users').select('*').eq('id',CU.id).single();
+  if (!u.data) { showToast('Профайл олдсонгүй: '+CU.id.substring(0,8), true); return; }
   var ls = await sb.from('listings').select('*').eq('user_id',CU.id);
   var ds = await sb.from('deliveries').select('*, listings(title)').eq('buyer_id',CU.id);
-  var user = u.data; if (!user) return;
+  var user = u.data;
   document.getElementById('profileContent').innerHTML =
     '<div class="profile-header"><div class="profile-avatar">'+(user.name||'?')[0].toUpperCase()+'</div>'+
     '<div class="profile-name">'+(user.name||'Хэрэглэгч')+'</div><div class="profile-email">'+user.email+'</div></div>'+
