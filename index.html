@@ -900,7 +900,7 @@ async function showDetail(id) {
     '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.name?l.users.name:'Хэрэглэгч')+(l.users&&l.users.is_verified?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+'</div>'+
     '<div class="seller-rating">⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+' • Найдвартай</div></div></div>'+
     '<div class="action-btns">'+
-    '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none"><button class="btn btn-ghost btn-full" style="width:100%">📞 Холбоо барих</button></a>'+
+    '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none" onclick="return confirmCall(\''+( l.users&&l.users.phone?l.users.phone:'')+'\')"><button class="btn btn-ghost btn-full" style="width:100%">📞 '+(l.users&&l.users.phone?l.users.phone:'Холбоо барих')+'</button></a>'+
     '<button class="btn btn-ghost btn-full" onclick="openChat(\''+l.id+'\',\''+l.user_id+'\')">💬 Чат</button>'+
     '</div>'+
     (CU&&l.user_id!==CU.id?'<button style="background:none;border:none;color:var(--m);font-size:12px;cursor:pointer;margin-top:8px;display:block;width:100%;text-align:right" onclick="reportListing(\''+l.id+'\')">🚩 Мэдээлэх</button>':'')+
@@ -1230,7 +1230,12 @@ async function adminDeleteUser(id) {
   loadAdmin();
 }
 
-function toggleAdSound(i) {
+function confirmCall(phone) {
+  if (!phone) { showToast('Утасны дугаар байхгүй байна', true); return false; }
+  return true;
+}
+
+
   var video = document.getElementById('adVideo_'+i);
   var btn = document.getElementById('adMuteBtn_'+i);
   if (!video) return;
