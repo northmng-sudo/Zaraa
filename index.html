@@ -1022,7 +1022,7 @@ function useCurrentLocation() {
   });
 }
 
-
+function updateKhoroo() {
   var d = document.getElementById('postDistrict').value;
   var sel = document.getElementById('postKhoroo');
   sel.innerHTML = '<option value="">Хороо сонгох</option>';
@@ -1276,6 +1276,7 @@ function confirmCall(phone) {
 }
 
 
+function toggleAdSound(i) {
   var video = document.getElementById('adVideo_'+i);
   var btn = document.getElementById('adMuteBtn_'+i);
   if (!video) return;
