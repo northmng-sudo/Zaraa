@@ -896,26 +896,39 @@ async function showDetail(id) {
     '</div>' :
     '<div class="detail-img">'+(EMOJIS[l.category]||'📦')+'</div>';
   document.getElementById('detailContent').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr;gap:0">'+
     imgHtml+
-    '<div class="detail-body">'+
+    (imgs&&imgs.length>1?'<div style="display:flex;gap:6px;padding:8px;overflow-x:auto;background:var(--s2)">'+
+    imgs.map(function(url,i){ return '<img src="'+url+'" onclick="slideImg('+i+')" style="width:70px;height:70px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid '+(i===0?'var(--a)':'transparent')+'" id="thumb'+i+'">'; }).join('')+
+    '</div>':'')+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr auto;gap:12px;padding:0 16px;margin-top:12px">'+
+    '<div style="min-width:0">'+
     '<div class="detail-title">'+l.title+'</div>'+
-    '<div class="detail-price">₮'+Number(l.price).toLocaleString()+'</div>'+
-    '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'</div>'+
+    (l.is_negotiable&&l.price?'<div class="detail-price">₮'+Number(l.price).toLocaleString()+' <span style="font-size:13px;color:#00C96B;font-weight:600">• Тохиролцооны</span></div>':
+    l.is_negotiable?'<div class="detail-price" style="color:#00C96B">Тохиролцооны</div>':
+    '<div class="detail-price">₮'+Number(l.price||0).toLocaleString()+'</div>')+
+    '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--g);border-color:var(--g)">🚚 Хүргэлт</span>':'')+'</div>'+
+    '</div>'+
+    // Баруун талын реклам
+    '<div id="sideAdBox" style="width:80px;flex-shrink:0"></div>'+
+    '</div>'+
+    '<div class="detail-body" style="padding-top:0">'+
     '<div class="detail-desc">'+(l.description||'Тайлбар байхгүй')+'</div>'+
     (l.video_url?'<div style="margin-bottom:16px"><video src="'+l.video_url+'" controls style="width:100%;border-radius:10px;max-height:220px;background:#333"></video></div>':'')+
     '<div class="seller-card"><div class="seller-avatar">'+((l.users&&l.users.name?l.users.name:'?')[0].toUpperCase())+'</div>'+
     '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.name?l.users.name:'Хэрэглэгч')+(l.users&&l.users.is_verified?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+'</div>'+
     '<div class="seller-rating">⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+' • Найдвартай</div></div></div>'+
     '<div class="action-btns">'+
-    '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none" onclick="return confirmCall(\''+( l.users&&l.users.phone?l.users.phone:'')+'\')"><button class="btn btn-ghost btn-full" style="width:100%">📞 '+(l.users&&l.users.phone?l.users.phone:'Холбоо барих')+'</button></a>'+
+    '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none" onclick="return confirmCall(\''+(l.users&&l.users.phone?l.users.phone:'')+'\')"><button class="btn btn-ghost btn-full" style="width:100%">📞 '+(l.users&&l.users.phone?l.users.phone:'Холбоо барих')+'</button></a>'+
     '<button class="btn btn-ghost btn-full" onclick="openChat(\''+l.id+'\',\''+l.user_id+'\')">💬 Чат</button>'+
     '</div>'+
     (CU&&l.user_id!==CU.id?'<button style="background:none;border:none;color:var(--m);font-size:12px;cursor:pointer;margin-top:8px;display:block;width:100%;text-align:right" onclick="reportListing(\''+l.id+'\')">🚩 Мэдээлэх</button>':'')+
-    (CU&&l.user_id===CU.id?
-    '<div style="margin-top:10px">'+
+    (CU&&l.user_id===CU.id?'<div style="margin-top:10px">'+
     (l.has_delivery?'<button class="btn btn-primary btn-full" onclick="openDelivery(\''+l.id+'\')">🚚 Хүргэлт захиалах</button>':'<button class="btn btn-ghost btn-full" onclick="enableDelivery(\''+l.id+'\')">🚚 Хүргэлт нэмэх</button>')+
     '</div>':'')+
-    (l.location?'<div id="mapBox" style="margin-top:16px;border-radius:12px;overflow:hidden;height:200px"><iframe width="100%" height="200" frameborder="0" src="https://maps.google.com/maps?q='+encodeURIComponent((l.location||'Улаанбаатар')+', Улаанбаатар, Монгол')+'&output=embed&z=14" style="border:none"></iframe></div>':'')+'<div style="margin-top:16px" id="reviewSection"></div>'+
+    (l.location?'<div id="mapBox" style="margin-top:16px;border-radius:12px;overflow:hidden;height:200px"><iframe width="100%" height="200" frameborder="0" src="https://maps.google.com/maps?q='+encodeURIComponent((l.location||'Улаанбаатар')+', Улаанбаатар, Монгол')+'&output=embed&z=14" style="border:none"></iframe></div>':'')+
+    '<div style="margin-top:16px" id="reviewSection"></div>'+
     (CU&&l.user_id===CU.id?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><button class="btn btn-ghost btn-full" style="color:#e53e3e;border-color:#e53e3e" onclick="deleteListing(\''+l.id+'\')">🗑️ Устгах</button><button class="btn btn-ghost btn-full" onclick="editListing(\''+l.id+'\')">✏️ Засах</button></div>':'')+
     '</div>';
   window._slideIdx = 0;
@@ -923,6 +936,7 @@ async function showDetail(id) {
   window._currentListingId = l.id;
   window._currentSellerId = l.user_id;
   loadReviews(l.id);
+  loadSideAd();
 }
 
 function slideImg(n, isRelative) {
@@ -935,10 +949,33 @@ function slideImg(n, isRelative) {
   for (var i=0; i<total; i++) {
     var dot = document.getElementById('dot'+i);
     if (dot) dot.style.background = i===window._slideIdx ? 'white' : 'rgba(255,255,255,0.5)';
+    var thumb = document.getElementById('thumb'+i);
+    if (thumb) thumb.style.border = i===window._slideIdx ? '2px solid var(--a)' : '2px solid transparent';
   }
 }
 
-async function loadReviews(listingId) {
+async function loadSideAd() {
+  var box = document.getElementById('sideAdBox');
+  if (!box) return;
+  var ads = await loadAds();
+  if (!ads.length) { box.innerHTML = ''; return; }
+  var ad = ads[Math.floor(Math.random()*ads.length)];
+  var adLink = ad.link_url ? (ad.link_url.startsWith('http') ? ad.link_url : 'https://'+ad.link_url) : '';
+  var content = '';
+  if (ad.image_url) {
+    content = '<img src="'+ad.image_url+'" style="width:80px;height:160px;object-fit:cover;border-radius:8px">';
+  } else if (ad.video_url) {
+    content = '<video src="'+ad.video_url+'" autoplay muted loop playsinline style="width:80px;height:160px;object-fit:cover;border-radius:8px"></video>';
+  } else {
+    content = '<div style="width:80px;height:160px;background:var(--s2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--m);text-align:center;padding:6px">📺 Реклам</div>';
+  }
+  box.innerHTML = '<div style="cursor:pointer;position:relative" onclick="'+(adLink?'window.open(\''+adLink+'\',\'_blank\')':'')+'">' +
+    content +
+    '<div style="font-size:9px;color:var(--m);text-align:center;margin-top:2px">Реклам</div>' +
+    '</div>';
+}
+
+
   var sec = document.getElementById('reviewSection');
   if (!sec) return;
   var r = await sb.from('reviews').select('*, users(name)').eq('listing_id', listingId).order('created_at', {ascending:false});
