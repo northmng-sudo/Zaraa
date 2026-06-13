@@ -1793,6 +1793,19 @@ async function postListing() {
     r = await sb.from('listings').insert(data);
   }
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  // Admin-д мэдэгдэл илгээх
+  var newId = editId || (r.data && r.data[0] && r.data[0].id);
+  var admins = await sb.from('users').select('id').eq('is_admin', true);
+  if (admins.data) {
+    for (var ai=0; ai<admins.data.length; ai++) {
+      await sb.from('notifications').insert({
+        user_id: admins.data[ai].id,
+        title: editId ? '✏️ Зар засагдлаа' : '📋 Шинэ зар ирлээ',
+        body: '"'+title+'" зар '+(editId?'засагдаж':'шинээр')+' зөвшөөрөл хүлээж байна',
+        listing_id: newId || null
+      });
+    }
+  }
   closeModal('postModal');
   document.getElementById('postModal').removeAttribute('data-edit-id');
   document.getElementById('postTitle').value='';
