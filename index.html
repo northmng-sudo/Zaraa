@@ -1335,11 +1335,12 @@ async function approveListing(id) {
   var listing = await sb.from('listings').select('user_id, title').eq('id', id).single();
   await sb.from('listings').update({status:'active'}).eq('id', id);
   if (listing.data) {
-    await sendNotifToUser(
-      listing.data.user_id,
-      '✅ Таны зар нийтлэгдлээ!',
-      '"'+listing.data.title+'" зар амжилттай нийтлэгдлээ. Одоо хүн бүр харах боломжтой!'
-    );
+    await sb.from('notifications').insert({
+      user_id: listing.data.user_id,
+      title: '✅ Таны зар нийтлэгдлээ!',
+      body: '"'+listing.data.title+'" зар амжилттай нийтлэгдлээ. Одоо хүн бүр харах боломжтой!',
+      listing_id: id
+    });
   }
   showToast('Зар зөвшөөрөгдлөө! ✅');
   loadAdmin(); loadListings();
@@ -1866,7 +1867,8 @@ async function loadNotifications() {
   if (!notifs.length) { box.innerHTML = '<div class="empty"><div class="empty-icon">🔔</div><p>Мэдэгдэл байхгүй</p></div>'; return; }
   box.innerHTML = notifs.map(function(n) {
     var onclick = '';
-    if (n.title.includes('Шинэ зар') || n.title.includes('зар')) onclick = 'showPage(\'admin\')';
+    if (n.listing_id) onclick = 'showDetail(\''+n.listing_id+'\')';
+    else if (n.title.includes('Шинэ зар') || n.title.includes('зар')) onclick = 'showPage(\'admin\')';
     else if (n.title.includes('мэдээлэл') || n.title.includes('🚩')) onclick = 'showPage(\'admin\')';
     else if (n.title.includes('мессеж') || n.title.includes('💬')) onclick = 'showPage(\'chats\')';
     else if (n.title.includes('захиалга') || n.title.includes('🚚') || n.title.includes('📦')) onclick = 'showPage(\'deliveries\')';
