@@ -1309,7 +1309,7 @@ async function reportListing(id) {
   showToast('Мэдээлэл хүлээн авлаа! Admin шалгана. 🚩');
 }
 
-
+async function enableDelivery(id) {
   var r = await sb.from('listings').update({has_delivery:true}).eq('id',id);
   if (!r.error) { showToast('Хүргэлт нэмэгдлээ!'); showDetail(id); }
 }
