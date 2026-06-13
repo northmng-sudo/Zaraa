@@ -1075,7 +1075,7 @@ async function deleteAd(id) {
   updateAdSpace(false);
 }
 
-
+async function toggleVerified(id, current) {
   await sb.from('users').update({is_verified: !current}).eq('id', id);
   loadAdmin();
 }
