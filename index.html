@@ -486,7 +486,7 @@ select.form-input{cursor:pointer}
       <!-- LOCATION -->
       <div class="form-group">
         <label class="form-label">Байршил *</label>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
           <select class="form-input" id="postDistrict" onchange="updateKhoroo()" style="flex:1">
             <option value="">Дүүрэг сонгох</option>
             <option>Баянгол</option>
@@ -503,6 +503,13 @@ select.form-input{cursor:pointer}
             <option value="">Хороо сонгох</option>
           </select>
         </div>
+        <input class="form-input" id="postAddress" placeholder="Дэлгэрэнгүй хаяг (байр, тоот...)" style="margin-bottom:8px">
+        <button type="button" class="btn btn-ghost btn-full" onclick="openMapPicker()" style="font-size:13px">📍 Газрын зураг дээр байршил тэмдэглэх</button>
+        <div id="mapPickerBox" style="display:none;margin-top:8px;border-radius:12px;overflow:hidden;height:250px;position:relative">
+          <iframe id="mapPickerFrame" width="100%" height="250" frameborder="0" style="border:none" src="https://maps.google.com/maps?q=Улаанбаатар&output=embed&z=12"></iframe>
+          <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:var(--a);color:white;border-radius:50px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer" onclick="useCurrentLocation()">📍 Одоогийн байршил ашиглах</div>
+        </div>
+        <div id="selectedLocation" style="display:none;margin-top:6px;font-size:12px;color:#00C96B;font-weight:600"></div>
       </div>
 
       <button class="btn btn-primary btn-full" onclick="goStep(3)">Үргэлжлүүлэх →</button>
@@ -982,7 +989,40 @@ var KHOROO = {
   'Чингэлтэй': 12, 'Сонгинохайрхан': 32, 'Налайх': 5, 'Багануур': 5, 'Багахангай': 3
 };
 
-function updateKhoroo() {
+function openMapPicker() {
+  var box = document.getElementById('mapPickerBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function useCurrentLocation() {
+  if (!navigator.geolocation) { showToast('Байршил авах боломжгүй', true); return; }
+  showToast('Байршил тодорхойлж байна...', false, 10000);
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var lat = pos.coords.latitude;
+    var lng = pos.coords.longitude;
+    // Reverse geocode
+    fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lng+'&format=json&accept-language=mn')
+      .then(function(r){ return r.json(); })
+      .then(function(data) {
+        var addr = data.display_name || (lat.toFixed(4)+', '+lng.toFixed(4));
+        var short = addr.split(',').slice(0,3).join(',');
+        document.getElementById('postAddress').value = short;
+        document.getElementById('selectedLocation').style.display = 'block';
+        document.getElementById('selectedLocation').textContent = '📍 '+short;
+        // Update map
+        var frame = document.getElementById('mapPickerFrame');
+        frame.src = 'https://maps.google.com/maps?q='+lat+','+lng+'&output=embed&z=16';
+        showToast('Байршил олдлоо! ✅');
+      }).catch(function() {
+        document.getElementById('postAddress').value = lat.toFixed(4)+', '+lng.toFixed(4);
+        showToast('Байршил олдлоо! ✅');
+      });
+  }, function() {
+    showToast('Байршил авах зөвшөөрөл байхгүй', true);
+  });
+}
+
+
   var d = document.getElementById('postDistrict').value;
   var sel = document.getElementById('postKhoroo');
   sel.innerHTML = '<option value="">Хороо сонгох</option>';
@@ -1702,7 +1742,8 @@ async function postListing() {
   var negotiable = document.getElementById('postNegotiable').checked;
   var district = document.getElementById('postDistrict').value;
   var khoroo = document.getElementById('postKhoroo').value;
-  var loc = [district, khoroo].filter(Boolean).join(', ');
+  var address = document.getElementById('postAddress').value;
+  var loc = [district, khoroo, address].filter(Boolean).join(', ');
   var cat = document.getElementById('postCategory').value;
   var hasD = document.getElementById('postDelivery').checked;
   var imgFiles = document.getElementById('postImages').files;
@@ -1754,7 +1795,10 @@ async function postListing() {
   document.getElementById('videoPreview').innerHTML='';
   document.getElementById('postNegotiable').checked=false;
   document.getElementById('postDistrict').value='';
+  document.getElementById('postAddress').value='';
   document.getElementById('postKhoroo').innerHTML='<option value="">Хороо сонгох</option>';
+  document.getElementById('selectedLocation').style.display='none';
+  document.getElementById('mapPickerBox').style.display='none';
   showToast(editId?'Зар засагдлаа! ✅':'⏳ Зар илгээгдлээ! Admin шалгаад удахгүй нийтэлнэ', false, 6000);
   loadListings(); loadStats();
 }
