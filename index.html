@@ -1332,7 +1332,15 @@ async function toggleAdmin(id, current) {
 }
 
 async function approveListing(id) {
+  var listing = await sb.from('listings').select('user_id, title').eq('id', id).single();
   await sb.from('listings').update({status:'active'}).eq('id', id);
+  if (listing.data) {
+    await sendNotifToUser(
+      listing.data.user_id,
+      '✅ Таны зар нийтлэгдлээ!',
+      '"'+listing.data.title+'" зар амжилттай нийтлэгдлээ. Одоо хүн бүр харах боломжтой!'
+    );
+  }
   showToast('Зар зөвшөөрөгдлөө! ✅');
   loadAdmin(); loadListings();
 }
