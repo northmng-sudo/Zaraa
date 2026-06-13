@@ -1078,10 +1078,8 @@ function previewAd(input) {
 }
 
 
+async function addAd() {
   var title = document.getElementById('adTitle').value;
-  var link = document.getElementById('adLink').value;
-  var file = document.getElementById('adImageFile').files[0];
-  if (!title) { showToast('Нэр оруулна уу', true); return; }
   showToast('Байршуулж байна...');
   var imageUrl = null;
   var videoUrl = null;
