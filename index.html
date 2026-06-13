@@ -1638,7 +1638,7 @@ async function postListing() {
   var vidUrl = vidFile ? await uploadVideo(vidFile) : null;
   var data = {
     title: title, description: desc,
-    price: negotiable ? 0 : Number(price),
+    price: negotiable ? null : Number(price),
     location: loc, category: cat, has_delivery: hasD,
     extra_data: Object.keys(extra).length ? extra : null,
     is_negotiable: negotiable
