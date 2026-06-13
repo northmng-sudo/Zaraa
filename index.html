@@ -1716,9 +1716,11 @@ async function postListing() {
     var el = document.getElementById('df_'+f.id);
     if (el && el.value) extra[f.id] = el.value;
   });
-  showToast('Байршуулж байна...');
+  showToast('🖼️ Зураг байршуулж байна...', false, 60000);
   var imgUrls = imgFiles.length ? await uploadImages(imgFiles) : [];
+  if (vidFile) showToast('🎥 Бичлэг байршуулж байна...', false, 60000);
   var vidUrl = vidFile ? await uploadVideo(vidFile) : null;
+  showToast('📋 Зар илгээж байна...', false, 60000);
   var data = {
     title: title, description: desc,
     price: price ? Number(price) : null,
@@ -1748,7 +1750,7 @@ async function postListing() {
   document.getElementById('postNegotiable').checked=false;
   document.getElementById('postDistrict').value='';
   document.getElementById('postKhoroo').innerHTML='<option value="">Хороо сонгох</option>';
-  showToast(editId?'Зар засагдлаа! ✅':'Зар илгээгдлээ! Admin шалгаад зөвшөөрнө 🎉');
+  showToast(editId?'Зар засагдлаа! ✅':'⏳ Зар илгээгдлээ! Admin шалгаад удахгүй нийтэлнэ', false, 6000);
   loadListings(); loadStats();
 }
 
@@ -2159,11 +2161,12 @@ document.querySelectorAll('.modal-overlay').forEach(function(m){
   m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
 });
 
-function showToast(msg, isError) {
+function showToast(msg, isError, duration) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast'+(isError?' error':'')+' show';
-  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  if (window._toastTimer) clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function(){ t.classList.remove('show'); }, duration||3000);
 }
 
 init();
