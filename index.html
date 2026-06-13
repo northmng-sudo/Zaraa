@@ -299,6 +299,14 @@ select.form-input{cursor:pointer}
 </div>
 
 <!-- ADMIN PAGE -->
+<div class="page" id="page-notifications">
+  <div style="padding:20px 16px 10px;display:flex;align-items:center;justify-content:space-between">
+    <div class="section-title">🔔 Мэдэгдлүүд</div>
+    <button class="btn btn-ghost" style="font-size:12px" onclick="markAllRead()">Бүгдийг уншсан</button>
+  </div>
+  <div class="section"><div id="notifList"><div class="empty"><div class="empty-icon">🔔</div><p>Мэдэгдэл байхгүй</p></div></div></div>
+</div>
+
 <div class="page" id="page-admin">
   <div style="padding:20px 16px 10px;display:flex;align-items:center;justify-content:space-between">
     <div class="section-title">🛡️ Admin Panel</div>
@@ -733,7 +741,8 @@ async function init() {
     CU = s.data.session.user; 
     await updateNav(); 
     await loadProfile(); 
-    startGlobalNotifications(); 
+    startGlobalNotifications();
+    loadNotifications(); 
   }
   loadListings();
   loadStats();
@@ -1297,8 +1306,18 @@ async function dismissReport(id) {
 
 async function adminDeleteListing(id) {
   if (!confirm('Зарыг бүрмөсөн устгах уу?')) return;
+  // Эхлээд зарын эзний ID-г авна
+  var listing = await sb.from('listings').select('user_id, title').eq('id', id).single();
   var r = await sb.rpc('admin_delete_listing', {p_listing_id: id});
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  // Хэрэглэгчид мэдэгдэл илгээх
+  if (listing.data) {
+    await sendNotifToUser(
+      listing.data.user_id,
+      '⚠️ Таны зар устгагдлаа',
+      '"'+listing.data.title+'" зар нь дүрэм зөрчсөн тул Admin устгалаа. Дэлгэрэнгүй мэдээлэл авахыг хүсвэл холбоо барина уу.'
+    );
+  }
   showToast('Зар устгагдлаа!');
   loadAdmin(); loadListings();
 }
@@ -1483,6 +1502,9 @@ async function logout() {
 
 async function updateNav() {
   document.getElementById('navRight').innerHTML = CU ?
+    '<button class="btn btn-ghost" style="position:relative" onclick="showPage(\'notifications\')">'+
+    '🔔<span id="notifBadge" style="display:none;position:absolute;top:2px;right:2px;background:#e53e3e;color:white;border-radius:50%;width:14px;height:14px;font-size:9px;font-weight:700;align-items:center;justify-content:center">0</span>'+
+    '</button>'+
     '<button class="btn btn-ghost" onclick="showPage(\'profile\')">👤 Профайл</button>' :
     '<button class="btn btn-ghost" onclick="openAuth(\'login\')">Нэвтрэх</button><button class="btn btn-primary" onclick="openAuth(\'register\')">Бүртгүүлэх</button>';
   if (!CU) return;
@@ -1778,9 +1800,42 @@ async function loadDeliveriesPage() {
   }
 }
 
+async function loadNotifications() {
+  if (!CU) return;
+  var r = await sb.from('notifications').select('*').eq('user_id', CU.id).order('created_at', {ascending:false}).limit(30);
+  var notifs = r.data || [];
+  var unread = notifs.filter(function(n){ return !n.is_read; }).length;
+  var badge = document.getElementById('notifBadge');
+  if (badge) { badge.textContent = unread; badge.style.display = unread ? 'flex' : 'none'; }
+  var box = document.getElementById('notifList');
+  if (!box) return;
+  if (!notifs.length) { box.innerHTML = '<div class="empty"><div class="empty-icon">🔔</div><p>Мэдэгдэл байхгүй</p></div>'; return; }
+  box.innerHTML = notifs.map(function(n) {
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:8px;'+(n.is_read?'':'border-left:3px solid var(--a)')+'" onclick="markRead(\''+n.id+'\')">'+
+      '<div style="font-weight:600;font-size:13px;margin-bottom:4px">'+(n.is_read?'':'🔴 ')+n.title+'</div>'+
+      '<div style="font-size:12px;color:var(--m)">'+n.body+'</div>'+
+      '<div style="font-size:10px;color:var(--m);margin-top:4px">'+new Date(n.created_at).toLocaleString('mn-MN')+'</div>'+
+      '</div>';
+  }).join('');
+}
+
+async function markRead(id) {
+  await sb.from('notifications').update({is_read:true}).eq('id', id);
+  loadNotifications();
+}
+
+async function markAllRead() {
+  if (!CU) return;
+  await sb.from('notifications').update({is_read:true}).eq('user_id', CU.id);
+  loadNotifications();
+}
+
+async function sendNotifToUser(userId, title, body) {
+  await sb.from('notifications').insert({user_id: userId, title: title, body: body});
+}
+
 function startBuyerTracking() {
   if (!CU) return;
-  if (window._buyerChannel) sb.removeChannel(window._buyerChannel);
   window._buyerChannel = sb.channel('buyer_'+CU.id)
     .on('postgres_changes', {
       event: 'UPDATE',
@@ -2007,6 +2062,7 @@ function showPage(name) {
   if (name === 'admin') loadAdmin();
   if (name === 'deliveries') loadDeliveriesPage();
   if (name === 'profile') { loadProfile(); }
+  if (name === 'notifications') loadNotifications();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
