@@ -801,12 +801,13 @@ function startGlobalNotifications() {
   // Admin бол шинэ зар ирэхэд мэдэгдэл
   sb.from('users').select('is_admin').eq('id', CU.id).single().then(function(u) {
     if (u.data && u.data.is_admin) {
-      sb.channel('admin_listings')
+      sb.channel('admin_listings_'+CU.id)
         .on('postgres_changes', {
           event: 'INSERT', schema: 'public', table: 'listings'
         }, function(payload) {
           sendNotification('📋 Шинэ зар', '"'+payload.new.title+'" зар зөвшөөрөл хүлээж байна');
-          showToast('📋 Шинэ зар ирлээ! Admin шалгана уу');
+          showToast('📋 Шинэ зар ирлээ!');
+          sendNotifToUser(CU.id, '📋 Шинэ зар', '"'+payload.new.title+'" зар зөвшөөрөл хүлээж байна');
           loadNotifications();
         })
         .on('postgres_changes', {
@@ -814,6 +815,8 @@ function startGlobalNotifications() {
         }, function(payload) {
           sendNotification('🚩 Шинэ мэдээлэл', 'Зар мэдээлэгдлээ: '+payload.new.reason);
           showToast('🚩 Зар мэдээлэгдлээ!');
+          sendNotifToUser(CU.id, '🚩 Шинэ мэдээлэл', 'Зар мэдээлэгдлээ: '+payload.new.reason);
+          loadNotifications();
         })
         .subscribe();
     }
