@@ -976,6 +976,7 @@ async function loadSideAd() {
 }
 
 
+async function loadReviews(listingId) {
   var sec = document.getElementById('reviewSection');
   if (!sec) return;
   var r = await sb.from('reviews').select('*, users(name)').eq('listing_id', listingId).order('created_at', {ascending:false});
