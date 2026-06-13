@@ -415,143 +415,151 @@ select.form-input{cursor:pointer}
   </div>
 </div>
 
-<!-- POST MODAL -->
-<div class="modal-overlay" id="postModal">
-  <div class="modal" style="position:relative;padding-bottom:30px">
-    <button class="close-btn" onclick="closeModal('postModal')">×</button>
-
-    <!-- STEP INDICATOR -->
-    <div style="display:flex;gap:4px;margin-bottom:20px" id="stepIndicator">
-      <div style="flex:1;height:3px;border-radius:2px;background:var(--a)" id="step1bar"></div>
-      <div style="flex:1;height:3px;border-radius:2px;background:var(--b)" id="step2bar"></div>
-      <div style="flex:1;height:3px;border-radius:2px;background:var(--b)" id="step3bar"></div>
+<!-- POST PAGE - FULLSCREEN -->
+<div class="page" id="page-post" style="padding-bottom:80px">
+  <!-- HEADER -->
+  <div style="position:sticky;top:56px;z-index:50;background:var(--bg);padding:12px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:12px">
+    <button onclick="showPage('home')" style="background:none;border:none;cursor:pointer;color:var(--t);font-size:20px">←</button>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:16px" id="postPageTitle">Зар байршуулах</div>
+      <div style="font-size:11px;color:var(--m)" id="postPageSub">3 алхамт процесс</div>
     </div>
-
-    <!-- STEP 1: CATEGORY -->
-    <div id="postStep1">
-      <div class="modal-title">Ангилал сонгох</div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" id="catGrid">
-        <div class="cat-card" onclick="selectCategory('Техник','📱')">📱<div>Техник</div></div>
-        <div class="cat-card" onclick="selectCategory('Хувцас','👗')">👗<div>Хувцас</div></div>
-        <div class="cat-card" onclick="selectCategory('Гутал','👟')">👟<div>Гутал</div></div>
-        <div class="cat-card" onclick="selectCategory('Гоо сайхан','💄')">💄<div>Гоо сайхан</div></div>
-        <div class="cat-card" onclick="selectCategory('Тавилга','🪑')">🪑<div>Тавилга</div></div>
-        <div class="cat-card" onclick="selectCategory('Гэр ахуй','🏡')">🏡<div>Гэр ахуй</div></div>
-        <div class="cat-card" onclick="selectCategory('Авто','🚗')">🚗<div>Авто</div></div>
-        <div class="cat-card" onclick="selectCategory('Үл хөдлөх','🏠')">🏠<div>Үл хөдлөх</div></div>
-        <div class="cat-card" onclick="selectCategory('Тоглоом','🎮')">🎮<div>Тоглоом</div></div>
-        <div class="cat-card" onclick="selectCategory('Спорт','⚽')">⚽<div>Спорт</div></div>
-        <div class="cat-card" onclick="selectCategory('Хүүхдийн бараа','🧸')">🧸<div>Хүүхэд</div></div>
-        <div class="cat-card" onclick="selectCategory('Эрүүл мэнд','💊')">💊<div>Эрүүл мэнд</div></div>
-        <div class="cat-card" onclick="selectCategory('Хоол хүнс','🍎')">🍎<div>Хоол хүнс</div></div>
-        <div class="cat-card" onclick="selectCategory('Амьтад','🐾')">🐾<div>Амьтад</div></div>
-        <div class="cat-card" onclick="selectCategory('Ном','📚')">📚<div>Ном</div></div>
-        <div class="cat-card" onclick="selectCategory('Ажлын байр','💼')">💼<div>Ажлын байр</div></div>
-        <div class="cat-card" onclick="selectCategory('Үйлчилгээ','🔧')">🔧<div>Үйлчилгээ</div></div>
-        <div class="cat-card" onclick="selectCategory('Бусад','📦')">📦<div>Бусад</div></div>
-      </div>
+    <div style="display:flex;gap:4px">
+      <div style="width:24px;height:4px;border-radius:2px;background:var(--a)" id="step1bar"></div>
+      <div style="width:24px;height:4px;border-radius:2px;background:var(--b)" id="step2bar"></div>
+      <div style="width:24px;height:4px;border-radius:2px;background:var(--b)" id="step3bar"></div>
     </div>
-
-    <!-- STEP 2: DETAILS -->
-    <div id="postStep2" style="display:none">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <button onclick="goStep(1)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
-        <div class="modal-title" style="margin:0" id="step2Title">Мэдээлэл оруулах</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Гарчиг *</label>
-        <input class="form-input" id="postTitle" placeholder="Барааны нэрийг бичнэ үү">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Тайлбар</label>
-        <textarea class="form-input" id="postDesc" placeholder="Барааны нөхцөл байдал, онцлог, нэмэлт мэдээлэл..." style="min-height:100px"></textarea>
-      </div>
-
-      <!-- Dynamic fields by category -->
-      <div id="dynamicFields"></div>
-
-      <div class="form-group">
-        <label class="form-label">Үнэ (₮) *</label>
-        <div style="display:flex;gap:10px;align-items:center">
-          <input class="form-input" type="number" id="postPrice" placeholder="0" style="flex:1">
-          <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="postNegotiable">
-            Тохиролцооны
-          </label>
-        </div>
-      </div>
-
-      <!-- LOCATION -->
-      <div class="form-group">
-        <label class="form-label">Байршил *</label>
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <select class="form-input" id="postDistrict" onchange="updateKhoroo()" style="flex:1">
-            <option value="">Дүүрэг сонгох</option>
-            <option>Баянгол</option>
-            <option>Баянзүрх</option>
-            <option>Сүхбаатар</option>
-            <option>Хан-Уул</option>
-            <option>Чингэлтэй</option>
-            <option>Сонгинохайрхан</option>
-            <option>Налайх</option>
-            <option>Багануур</option>
-            <option>Багахангай</option>
-          </select>
-          <select class="form-input" id="postKhoroo" style="flex:1">
-            <option value="">Хороо сонгох</option>
-          </select>
-        </div>
-        <input class="form-input" id="postAddress" placeholder="Дэлгэрэнгүй хаяг (байр, тоот...)" style="margin-bottom:8px">
-        <button type="button" class="btn btn-ghost btn-full" onclick="openMapPicker()" style="font-size:13px">📍 Газрын зураг дээр байршил тэмдэглэх</button>
-        <div id="mapPickerBox" style="display:none;margin-top:8px;border-radius:12px;overflow:hidden;height:250px;position:relative">
-          <iframe id="mapPickerFrame" width="100%" height="250" frameborder="0" style="border:none" src="https://maps.google.com/maps?q=Улаанбаатар&output=embed&z=12"></iframe>
-          <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:var(--a);color:white;border-radius:50px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer" onclick="useCurrentLocation()">📍 Одоогийн байршил ашиглах</div>
-        </div>
-        <div id="selectedLocation" style="display:none;margin-top:6px;font-size:12px;color:#00C96B;font-weight:600"></div>
-      </div>
-
-      <button class="btn btn-primary btn-full" onclick="goStep(3)">Үргэлжлүүлэх →</button>
-    </div>
-
-    <!-- STEP 3: MEDIA -->
-    <div id="postStep3" style="display:none">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <button onclick="goStep(2)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
-        <div class="modal-title" style="margin:0">Зураг & Бичлэг</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Зурагнууд (макс 10)</label>
-        <div id="imgPreview" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"></div>
-        <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px;text-align:center">
-          📷 Зураг сонгох
-          <input type="file" id="postImages" accept="image/*" multiple style="display:none" onchange="previewImages(this)">
-        </label>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Бичлэг (макс 100MB)</label>
-        <div id="videoPreview" style="margin-bottom:8px"></div>
-        <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px">
-          🎥 Бичлэг сонгох
-          <input type="file" id="postVideo" style="display:none" onchange="previewVideo(this)">
-        </label>
-      </div>
-
-      <div class="form-group">
-        <div class="toggle-row">
-          <span class="toggle-label">🚚 Хүргэлт боломжтой</span>
-          <label class="toggle"><input type="checkbox" id="postDelivery"><span class="toggle-slider"></span></label>
-        </div>
-      </div>
-
-      <button class="btn btn-primary btn-full" onclick="postListing()">✅ Зар байршуулах</button>
-    </div>
-
-    <input type="hidden" id="postCategory" value="">
   </div>
+
+  <!-- STEP 1: CATEGORY -->
+  <div id="postStep1" style="padding:20px 16px">
+    <div style="font-size:18px;font-weight:800;margin-bottom:6px">Ангилал сонгох</div>
+    <div style="font-size:13px;color:var(--m);margin-bottom:20px">Барааны ангилалаа сонгоно уу</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="catGrid">
+      <div class="cat-card" onclick="selectCategory('Техник','📱')"><div style="font-size:28px">📱</div><div>Техник</div></div>
+      <div class="cat-card" onclick="selectCategory('Хувцас','👗')"><div style="font-size:28px">👗</div><div>Хувцас</div></div>
+      <div class="cat-card" onclick="selectCategory('Гутал','👟')"><div style="font-size:28px">👟</div><div>Гутал</div></div>
+      <div class="cat-card" onclick="selectCategory('Гоо сайхан','💄')"><div style="font-size:28px">💄</div><div>Гоо сайхан</div></div>
+      <div class="cat-card" onclick="selectCategory('Тавилга','🪑')"><div style="font-size:28px">🪑</div><div>Тавилга</div></div>
+      <div class="cat-card" onclick="selectCategory('Гэр ахуй','🏡')"><div style="font-size:28px">🏡</div><div>Гэр ахуй</div></div>
+      <div class="cat-card" onclick="selectCategory('Авто','🚗')"><div style="font-size:28px">🚗</div><div>Авто</div></div>
+      <div class="cat-card" onclick="selectCategory('Үл хөдлөх','🏠')"><div style="font-size:28px">🏠</div><div>Үл хөдлөх</div></div>
+      <div class="cat-card" onclick="selectCategory('Тоглоом','🎮')"><div style="font-size:28px">🎮</div><div>Тоглоом</div></div>
+      <div class="cat-card" onclick="selectCategory('Спорт','⚽')"><div style="font-size:28px">⚽</div><div>Спорт</div></div>
+      <div class="cat-card" onclick="selectCategory('Хүүхдийн бараа','🧸')"><div style="font-size:28px">🧸</div><div>Хүүхэд</div></div>
+      <div class="cat-card" onclick="selectCategory('Эрүүл мэнд','💊')"><div style="font-size:28px">💊</div><div>Эрүүл мэнд</div></div>
+      <div class="cat-card" onclick="selectCategory('Хоол хүнс','🍎')"><div style="font-size:28px">🍎</div><div>Хоол хүнс</div></div>
+      <div class="cat-card" onclick="selectCategory('Амьтад','🐾')"><div style="font-size:28px">🐾</div><div>Амьтад</div></div>
+      <div class="cat-card" onclick="selectCategory('Ном','📚')"><div style="font-size:28px">📚</div><div>Ном</div></div>
+      <div class="cat-card" onclick="selectCategory('Ажлын байр','💼')"><div style="font-size:28px">💼</div><div>Ажлын байр</div></div>
+      <div class="cat-card" onclick="selectCategory('Үйлчилгээ','🔧')"><div style="font-size:28px">🔧</div><div>Үйлчилгээ</div></div>
+      <div class="cat-card" onclick="selectCategory('Бусад','📦')"><div style="font-size:28px">📦</div><div>Бусад</div></div>
+    </div>
+  </div>
+
+  <!-- STEP 2: DETAILS -->
+  <div id="postStep2" style="display:none;padding:20px 16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <button onclick="goStep(1)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
+      <div>
+        <div style="font-size:18px;font-weight:800" id="step2Title">Мэдээлэл</div>
+        <div style="font-size:12px;color:var(--m)">Барааны мэдээллийг оруулна уу</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Гарчиг *</label>
+      <input class="form-input" id="postTitle" placeholder="Барааны нэрийг бичнэ үү" style="font-size:16px">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Тайлбар</label>
+      <textarea class="form-input" id="postDesc" placeholder="Барааны нөхцөл, онцлог, нэмэлт мэдээлэл..." style="min-height:120px;font-size:14px;resize:none"></textarea>
+    </div>
+
+    <div id="dynamicFields"></div>
+
+    <div class="form-group">
+      <label class="form-label">Үнэ *</label>
+      <div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px">
+        <input class="form-input" type="number" id="postPrice" placeholder="₮ Үнэ оруулах" style="font-size:18px;font-weight:700;border:none;padding:0;background:transparent;margin-bottom:10px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="postNegotiable" style="width:18px;height:18px">
+          <span style="font-size:14px">💬 Тохиролцооны үнэ</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Байршил *</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <select class="form-input" id="postDistrict" onchange="updateKhoroo()" style="flex:1">
+          <option value="">Дүүрэг</option>
+          <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
+          <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
+          <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
+        </select>
+        <select class="form-input" id="postKhoroo" style="flex:1">
+          <option value="">Хороо</option>
+        </select>
+      </div>
+      <input class="form-input" id="postAddress" placeholder="Дэлгэрэнгүй хаяг..." style="margin-bottom:8px">
+      <button type="button" class="btn btn-ghost btn-full" onclick="openMapPicker()" style="font-size:13px">📍 Одоогийн байршил ашиглах</button>
+      <div id="mapPickerBox" style="display:none;margin-top:8px;border-radius:12px;overflow:hidden;height:200px">
+        <iframe id="mapPickerFrame" width="100%" height="200" frameborder="0" style="border:none" src="https://maps.google.com/maps?q=Улаанбаатар&output=embed&z=12"></iframe>
+      </div>
+      <div id="selectedLocation" style="display:none;margin-top:6px;font-size:12px;color:#00C96B;font-weight:600"></div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="goStep(3)" style="height:52px;font-size:16px">Үргэлжлүүлэх →</button>
+  </div>
+
+  <!-- STEP 3: MEDIA -->
+  <div id="postStep3" style="display:none;padding:20px 16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <button onclick="goStep(2)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
+      <div>
+        <div style="font-size:18px;font-weight:800">Зураг & Бичлэг</div>
+        <div style="font-size:12px;color:var(--m)">Барааны зурагнуудыг оруулна уу</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Зурагнууд (макс 10)</label>
+      <div id="imgPreview" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px"></div>
+      <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:24px;cursor:pointer;color:var(--m);font-size:14px;text-align:center">
+        <span style="font-size:32px">📷</span>
+        <span>Зураг сонгох</span>
+        <span style="font-size:11px">JPG, PNG, HEIC • Макс 10 зураг</span>
+        <input type="file" id="postImages" accept="image/*" multiple style="display:none" onchange="previewImages(this)">
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Бичлэг (заавал биш)</label>
+      <div id="videoPreview" style="margin-bottom:8px"></div>
+      <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px">
+        <span style="font-size:28px">🎥</span>
+        <span>Бичлэг сонгох</span>
+        <input type="file" id="postVideo" style="display:none" onchange="previewVideo(this)">
+      </label>
+    </div>
+
+    <div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:16px">
+      <div class="toggle-row">
+        <div>
+          <div style="font-weight:600;font-size:14px">🚚 Хүргэлт боломжтой</div>
+          <div style="font-size:12px;color:var(--m)">Хүргэгч барааг хүргэж өгнө</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="postDelivery"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="postListing()" style="height:56px;font-size:16px;font-weight:700">✅ Зар байршуулах</button>
+  </div>
+
+  <input type="hidden" id="postCategory" value="">
+  <input type="hidden" id="postModal" data-edit-id="">
 </div>
 
 <!-- CHAT MODAL -->
@@ -1020,7 +1028,7 @@ function goStep(n) {
   ['step1bar','step2bar','step3bar'].forEach(function(id, i) {
     document.getElementById(id).style.background = (i < n) ? 'var(--a)' : 'var(--b)';
   });
-  document.querySelector('#postModal .modal').scrollTop = 0;
+  window.scrollTo(0,0);
 }
 
 var KHOROO = {
@@ -1532,7 +1540,7 @@ async function editListing(id) {
   }
   document.getElementById('step2Title').textContent = (l.category||'Зар засах');
   document.getElementById('postModal').setAttribute('data-edit-id', id);
-  openModal('postModal');
+  showPage('post');
 }
 
 async function updateAdSpace(isCourier) {
@@ -1722,7 +1730,7 @@ async function showPostModal() {
   var u = await sb.from('users').select('is_courier').eq('id', CU.id).single();
   if (u.data && u.data.is_courier) { showToast('Хүргэгч зар байршуулах боломжгүй',true); return; }
   goStep(1);
-  openModal('postModal');
+  showPage('post');
 }
 
 function previewImages(input) {
@@ -1796,7 +1804,6 @@ async function postListing() {
   var imgFiles = document.getElementById('postImages').files;
   var vidFile = document.getElementById('postVideo').files[0];
   var editId = document.getElementById('postModal').getAttribute('data-edit-id');
-  if (!title) { showToast('Гарчиг оруулна уу', true); return; }
   if (!negotiable && !price) { showToast('Үнэ оруулна уу', true); return; }
   if (!cat) { showToast('Ангилал сонгоно уу', true); return; }
   // Хориотой үг шалгах
@@ -1845,7 +1852,7 @@ async function postListing() {
       });
     }
   }
-  closeModal('postModal');
+  showPage('home');
   document.getElementById('postModal').removeAttribute('data-edit-id');
   document.getElementById('postTitle').value='';
   document.getElementById('postDesc').value='';
@@ -2256,6 +2263,7 @@ function showPage(name) {
   if (name === 'deliveries') loadDeliveriesPage();
   if (name === 'profile') { loadProfile(); }
   if (name === 'notifications') loadNotifications();
+  if (name === 'post') { document.getElementById('postModal').removeAttribute('data-edit-id'); }
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
