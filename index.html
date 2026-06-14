@@ -840,10 +840,10 @@ function startGlobalNotifications() {
       if (badge) { var c=(parseInt(badge.textContent)||0)+1; badge.textContent=c; badge.style.display='flex'; }
     })
     .on('postgres_changes', {
-      event: 'INSERT', schema: 'public', table: 'notifications',
-      filter: 'user_id=eq.'+CU.id
+      event: 'INSERT', schema: 'public', table: 'notifications'
     }, function(payload) {
       var n = payload.new;
+      if (n.user_id !== CU.id) return;
       sendNotification(n.title, n.body);
       showToast(n.title);
       loadNotifications();
