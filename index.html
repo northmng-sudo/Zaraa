@@ -9,72 +9,74 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 :root{--bg:#F5F5F7;--s:#FFFFFF;--s2:#F0F0F3;--b:#E0E0E8;--a:#FF5C00;--a2:#FF8A3D;--t:#1A1A2E;--m:#6A6A7A;--g:#00C96B;--r:14px}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#f0f0f0;color:var(--t);min-height:100vh;overflow-x:hidden}
-.app-wrap{max-width:480px;margin:0 auto;background:var(--bg);min-height:100vh;position:relative;box-shadow:0 0 40px rgba(0,0,0,0.15)}
-nav{position:sticky;top:0;z-index:100;background:var(--a);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;max-width:480px;width:100%}
-.logo{font-size:20px;font-weight:900;letter-spacing:-1px;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none;color:white}
-.logo-icon{width:32px;height:32px;background:white;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--a);font-size:18px;font-weight:900;line-height:1}
-.logo span{color:white;opacity:0.9}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
+nav{position:sticky;top:0;z-index:100;background:#E62B05;padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:20px;font-weight:900;letter-spacing:-1px;cursor:pointer;display:flex;align-items:center;gap:6px;color:white}
+.logo span{color:rgba(255,255,255,0.85)}
+.nav-right .btn-ghost{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)}
+.nav-right .btn-primary{background:white;color:#E62B05}
+.logo{font-size:22px;font-weight:900;letter-spacing:-1px;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--t)}
+.logo-icon{width:36px;height:36px;background:var(--a);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:22px;font-weight:900;line-height:1}
+.logo span{color:var(--a)}
 .nav-right{display:flex;gap:8px;align-items:center}
-.btn{padding:7px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:'Inter',sans-serif}
-.btn-ghost{background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4)}
-.btn-ghost:hover{background:rgba(255,255,255,0.3)}
-.btn-primary{background:white;color:var(--a)}
-.btn-primary:hover{background:rgba(255,255,255,0.9)}
+.btn{padding:8px 16px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:'Inter',sans-serif}
+.btn-ghost{background:transparent;color:var(--m);border:1px solid var(--b)}
+.btn-ghost:hover{color:var(--t)}
+.btn-primary{background:var(--a);color:white}
+.btn-primary:hover{background:var(--a2)}
 .page{display:none;padding-bottom:80px}
 .page.active{display:block}
-.hero{display:none}
+.hero{padding:40px 16px 24px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--b);border-radius:50px;padding:5px 12px;font-size:11px;font-weight:600;color:var(--a);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.5px}
+.hero-badge::before{content:'';width:6px;height:6px;background:var(--a);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+.hero h1{font-size:clamp(32px,8vw,56px);font-weight:900;line-height:1.05;letter-spacing:-2px;margin-bottom:12px}
+.hero h1 .hl{color:var(--a)}
+.hero p{font-size:14px;color:var(--m);margin-bottom:24px;line-height:1.6}
+.hero-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .btn-lg{padding:12px 24px;font-size:15px}
-.search-wrap{padding:10px 16px 12px;background:var(--a)}
-.search-bar{background:white;border:none;border-radius:8px;display:flex;align-items:center;padding:6px 6px 6px 14px;gap:8px}
-.search-bar:focus-within{border-color:transparent}
+.search-wrap{background:#E62B05;padding:8px 12px 12px}
+.search-bar{background:white;border:none;border-radius:6px;display:flex;align-items:center;padding:6px 6px 6px 12px;gap:8px}
+.search-bar:focus-within{border:none}
 .search-bar input{flex:1;background:none;border:none;outline:none;color:var(--t);font-size:14px;font-family:'Inter',sans-serif}
 .search-bar input::placeholder{color:var(--m)}
-.search-bar button{background:var(--a);color:white;border:none;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.search-bar button{background:#E62B05;color:white;border:none;border-radius:4px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 24px}
 .stat{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px 10px;text-align:center}
 .stat-num{font-size:20px;font-weight:900;color:var(--a);letter-spacing:-0.5px}
 .stat-label{font-size:10px;color:var(--m);margin-top:3px}
-.section{padding:0 0 16px}
-.section-title{font-size:14px;font-weight:700;margin-bottom:10px;padding:10px 12px 0;color:var(--t)}
-.cats{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;scrollbar-width:none;background:white;border-bottom:1px solid var(--b)}
+.section{padding:0 16px 24px}
+.section-title{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px}
+.cats{display:flex;gap:0;overflow-x:auto;padding:0;scrollbar-width:none;background:white;border-bottom:1px solid var(--b)}
 .cats::-webkit-scrollbar{display:none}
-.cat{flex-shrink:0;background:var(--s2);border:1px solid var(--b);border-radius:4px;padding:5px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m)}
-.cat:hover,.cat.active{background:var(--a);border-color:var(--a);color:white}
+.cat{flex-shrink:0;background:white;border:none;border-bottom:2px solid transparent;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m)}
+.cat:hover,.cat.active{color:#E62B05;border-bottom-color:#E62B05;font-weight:600}
 .cat-card{background:var(--s2);border:2px solid var(--b);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:28px}
 .cat-card div{font-size:12px;font-weight:600;margin-top:6px;color:var(--t)}
 .card-featured{border:2px solid #FFD700!important;box-shadow:0 4px 20px rgba(255,215,0,0.3)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 12px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#f0f0f0;border-top:1px solid #f0f0f0}
 @media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:1024px){.grid{grid-template-columns:repeat(5,1fr)}}
-.card{background:var(--s);border:1px solid var(--b);border-radius:8px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;position:relative}
-.card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.1);border-color:var(--a)}
-.card-img{width:100%;aspect-ratio:1;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;overflow:hidden}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:white;border:1px solid #f0f0f0;border-radius:4px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;position:relative}
+.card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.1)}
+.card-img{width:100%;aspect-ratio:1;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;overflow:hidden}
 .card-img img{width:100%;height:100%;object-fit:cover}
+.delivery-badge{position:absolute;top:6px;left:6px;background:#00b96b;color:white;border-radius:2px;padding:2px 6px;font-size:10px;font-weight:700}
+.video-badge{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.5);color:white;border-radius:2px;padding:2px 6px;font-size:10px;font-weight:600}
 .card-body{padding:8px}
-.card-title{font-size:12px;font-weight:500;color:var(--t);margin-bottom:4px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-price{font-size:14px;font-weight:700;color:var(--a);margin-bottom:2px}
-.card-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--m)}
-.card:hover{transform:translateY(-2px);border-color:var(--a)}
-.card-img{width:100%;aspect-ratio:1;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;overflow:hidden}
-.card-img img{width:100%;height:100%;object-fit:cover}
-.delivery-badge{position:absolute;top:7px;left:7px;background:var(--g);color:white;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:700}
-.video-badge{position:absolute;bottom:7px;right:7px;background:rgba(0,0,0,0.5);color:white;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:600}
-.card-body{padding:10px}
-.card-title{font-size:12px;font-weight:600;margin-bottom:4px;line-height:1.3}
-.card-price{font-size:14px;font-weight:800;color:var(--a)}
-.card-meta{font-size:10px;color:var(--m);margin-top:4px;display:flex;justify-content:space-between}
+.card-title{font-size:12px;font-weight:400;color:#333;margin-bottom:6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-price{font-size:14px;font-weight:700;color:#E62B05}
+.card-meta{font-size:10px;color:#999;margin-top:4px;display:flex;justify-content:space-between}
 .delivery-cta{margin:0 16px 24px;background:linear-gradient(135deg,var(--a),#FF8A3D);border-radius:18px;padding:24px 20px;position:relative;overflow:hidden}
 .delivery-cta::after{content:'🚀';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:56px;opacity:0.25}
 .delivery-cta h2{font-size:20px;font-weight:900;margin-bottom:6px}
 .delivery-cta p{font-size:12px;opacity:0.85;margin-bottom:16px;max-width:200px;line-height:1.5}
 .btn-white{background:white;color:var(--a);font-weight:700;padding:9px 20px;border-radius:50px;border:none;font-size:13px;cursor:pointer}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:white;border-top:1px solid var(--b);display:flex;justify-content:space-around;padding:6px 0 16px;z-index:100}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:500;color:var(--m);cursor:pointer;padding:4px 8px;border-radius:8px;transition:color 0.2s;position:relative}
-.nav-item svg{width:22px;height:22px}
-.nav-item.active{color:var(--a)}
-.post-btn{background:var(--a);color:white!important;border-radius:8px;padding:6px 16px;min-width:56px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #f0f0f0;display:flex;justify-content:space-around;padding:6px 0 16px;z-index:100}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--m);cursor:pointer;transition:color 0.2s;flex:1}
 .nav-item.active{color:var(--a)}
 .nav-item svg{width:20px;height:20px}
@@ -104,7 +106,7 @@ select.form-input{cursor:pointer}
 .auth-tabs{display:flex;gap:0;margin-bottom:20px;background:var(--s2);border-radius:10px;padding:4px}
 .auth-tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border-radius:8px;color:var(--m);transition:all 0.2s;border:none;background:none;font-family:'Inter',sans-serif}
 .auth-tab.active{background:var(--a);color:white}
-.detail-img{width:100%;aspect-ratio:16/9;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:60px;max-height:200px;overflow:hidden}
+.detail-img{width:100%;aspect-ratio:4/3;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:80px}
 .detail-img img{width:100%;height:100%;object-fit:cover}
 .detail-body{padding:16px}
 .detail-title{font-size:20px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
@@ -140,7 +142,6 @@ select.form-input{cursor:pointer}
 </style>
 </head>
 <body>
-<div class="app-wrap">
 <div class="toast" id="toast"></div>
 <nav>
   <div class="logo" onclick="showPage('home')">
@@ -154,33 +155,21 @@ select.form-input{cursor:pointer}
 </nav>
 
 <div class="page active" id="page-home">
-  <div class="hero">
-    <div class="hero-badge">Шинэ платформ • УБ</div>
-    <h1>Зар, <span class="hl">хүргэлт</span><br>нэг дор</h1>
-    <p>Зараад хүргүүл. Хурдан, найдвартай.</p>
-    <div class="hero-actions">
-      <button class="btn btn-primary btn-lg" onclick="showPostModal()">+ Зар байршуулах</button>
-      <button class="btn btn-ghost btn-lg" onclick="showPage('deliveries')">Хүргэлт захиалах</button>
-    </div>
-  </div>
+  <!-- SEARCH -->
   <div class="search-wrap">
     <div class="search-bar">
-      <svg width="16" height="16" fill="none" stroke="var(--m)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <svg width="16" height="16" fill="none" stroke="#999" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="searchInput" placeholder="Юу хайж байна вэ?" oninput="doSearch()" autocomplete="off">
-      <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px;color:var(--m)" title="Шүүлтүүр">⚙️</button>
+      <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px;color:#999">⚙️</button>
       <button onclick="doSearch()">Хайх</button>
     </div>
     <!-- FILTER PANEL -->
-    <div id="filterPanel" style="display:none;background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:16px;margin-top:8px">
-      <div style="font-weight:700;margin-bottom:12px;font-size:14px">🔍 Дэвшилтэт шүүлтүүр</div>
-
-      <!-- Үнэ -->
+    <div id="filterPanel" style="display:none;background:white;border-radius:8px;padding:16px;margin-top:8px">
+      <div style="font-weight:700;margin-bottom:12px;font-size:14px">🔍 Шүүлтүүр</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
         <div><label class="form-label">Доод үнэ (₮)</label><input class="form-input" type="number" id="filterMinPrice" placeholder="0" oninput="doSearch()"></div>
         <div><label class="form-label">Дээд үнэ (₮)</label><input class="form-input" type="number" id="filterMaxPrice" placeholder="∞" oninput="doSearch()"></div>
       </div>
-
-      <!-- Байршил -->
       <div style="margin-bottom:12px">
         <label class="form-label">Дүүрэг</label>
         <select class="form-input" id="filterDistrict" onchange="doSearch()">
@@ -190,59 +179,127 @@ select.form-input{cursor:pointer}
           <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
         </select>
       </div>
-
-      <!-- Ангилалын нэмэлт шүүлтүүр -->
       <div id="catFilters"></div>
-
-      <!-- Нийтлэг -->
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
-          <input type="checkbox" id="filterDelivery" onchange="doSearch()"> 🚚 Хүргэлттэй
-        </label>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
-          <input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохиролцооны
-        </label>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
-          <input type="checkbox" id="filterVerified" onchange="doSearch()"> ✅ Баталгаажсан
-        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterDelivery" onchange="doSearch()"> 🚚 Хүргэлттэй</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохиролцооны</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterVerified" onchange="doSearch()"> ✅ Баталгаажсан</label>
       </div>
+      <button class="btn btn-ghost" style="width:100%" onclick="clearFilter()">Цэвэрлэх</button>
+    </div>
+  </div>
 
-      <button class="btn btn-ghost" style="width:100%" onclick="clearFilter()">Шүүлтүүр цэвэрлэх</button>
+  <!-- BANNER SLIDER -->
+  <div style="position:relative;overflow:hidden;background:#f5f5f5" id="bannerSlider">
+    <div style="display:flex;transition:transform 0.5s;height:160px" id="bannerInner">
+      <div style="min-width:100%;background:linear-gradient(135deg,#E62B05,#ff6b35);display:flex;align-items:center;padding:20px 24px;color:white">
+        <div>
+          <div style="font-size:11px;opacity:0.8;margin-bottom:4px">ЗАРАА ПЛАТФОРМ</div>
+          <div style="font-size:22px;font-weight:800;line-height:1.2;margin-bottom:8px">Зар, хүргэлт<br>нэг дор</div>
+          <button onclick="showPostModal()" style="background:white;color:#E62B05;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">+ Зар байршуулах</button>
+        </div>
+        <div style="font-size:64px;margin-left:auto;opacity:0.3">🛍️</div>
+      </div>
+      <div style="min-width:100%;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:flex;align-items:center;padding:20px 24px;color:white">
+        <div>
+          <div style="font-size:11px;opacity:0.8;margin-bottom:4px">ХҮРГЭЛТ</div>
+          <div style="font-size:22px;font-weight:800;line-height:1.2;margin-bottom:8px">30 минутын<br>дотор хүргэнэ</div>
+          <button onclick="showPage('deliveries')" style="background:white;color:#1a73e8;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">Захиалах →</button>
+        </div>
+        <div style="font-size:64px;margin-left:auto;opacity:0.3">🚚</div>
+      </div>
+      <div style="min-width:100%;background:linear-gradient(135deg,#00875a,#006644);display:flex;align-items:center;padding:20px 24px;color:white">
+        <div>
+          <div style="font-size:11px;opacity:0.8;margin-bottom:4px">ХҮРГЭГЧ БОЛОХ</div>
+          <div style="font-size:22px;font-weight:800;line-height:1.2;margin-bottom:8px">Чөлөөт цагтаа<br>мөнгө ол</div>
+          <button onclick="openAuth('register');selectRole('courier')" style="background:white;color:#00875a;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">Бүртгүүлэх →</button>
+        </div>
+        <div style="font-size:64px;margin-left:auto;opacity:0.3">💰</div>
+      </div>
+    </div>
+    <!-- Banner dots -->
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px">
+      <div onclick="slideBanner(0)" id="bd0" style="width:20px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:1"></div>
+      <div onclick="slideBanner(1)" id="bd1" style="width:6px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:0.4"></div>
+      <div onclick="slideBanner(2)" id="bd2" style="width:6px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:0.4"></div>
     </div>
   </div>
-  <div class="stats">
-    <div class="stat"><div class="stat-num" id="statListings">0</div><div class="stat-label">Идэвхтэй зар</div></div>
-    <div class="stat"><div class="stat-num" id="statCouriers">0</div><div class="stat-label">Хүргэгч</div></div>
-    <div class="stat"><div class="stat-num">~30мин</div><div class="stat-label">Дундаж хүргэлт</div></div>
-  </div>
-  <div class="section">
-    <div class="section-title">Ангилал</div>
-    <div class="cats" id="catList">
-      <div class="cat active" data-cat=''>🔥 Бүгд</div>
-      <div class="cat" data-cat='Техник'>📱 Техник</div>
-      <div class="cat" data-cat='Хувцас'>👗 Хувцас</div>
-      <div class="cat" data-cat='Гутал'>👟 Гутал</div>
-      <div class="cat" data-cat='Гоо сайхан'>💄 Гоо сайхан</div>
-      <div class="cat" data-cat='Тавилга'>🪑 Тавилга</div>
-      <div class="cat" data-cat='Гэр ахуй'>🏡 Гэр ахуй</div>
-      <div class="cat" data-cat='Авто'>🚗 Авто</div>
-      <div class="cat" data-cat='Үл хөдлөх'>🏠 Үл хөдлөх</div>
-      <div class="cat" data-cat='Тоглоом'>🎮 Тоглоом</div>
-      <div class="cat" data-cat='Спорт'>⚽ Спорт</div>
-      <div class="cat" data-cat='Хүүхдийн бараа'>🧸 Хүүхэд</div>
-      <div class="cat" data-cat='Эрүүл мэнд'>💊 Эрүүл мэнд</div>
-      <div class="cat" data-cat='Хоол хүнс'>🍎 Хоол хүнс</div>
-      <div class="cat" data-cat='Амьтад'>🐾 Амьтад</div>
-      <div class="cat" data-cat='Ном'>📚 Ном</div>
-      <div class="cat" data-cat='Ажлын байр'>💼 Ажлын байр</div>
-      <div class="cat" data-cat='Үйлчилгээ'>🔧 Үйлчилгээ</div>
-      <div class="cat" data-cat='Бусад'>📦 Бусад</div>
+
+  <!-- CATEGORY ICON GRID -->
+  <div style="background:white;padding:16px 12px;border-bottom:8px solid #f5f5f5">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+      <div onclick="filterCat('Техник')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#fff5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">📱</div>
+        <div style="font-size:10px;color:#333;text-align:center">Техник</div>
+      </div>
+      <div onclick="filterCat('Хувцас')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#fff5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">👗</div>
+        <div style="font-size:10px;color:#333;text-align:center">Хувцас</div>
+      </div>
+      <div onclick="filterCat('Авто')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#fff5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">🚗</div>
+        <div style="font-size:10px;color:#333;text-align:center">Авто</div>
+      </div>
+      <div onclick="filterCat('Үл хөдлөх')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#fff5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">🏠</div>
+        <div style="font-size:10px;color:#333;text-align:center">Үл хөдлөх</div>
+      </div>
+      <div onclick="filterCat('Тавилга')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#fff5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">🪑</div>
+        <div style="font-size:10px;color:#333;text-align:center">Тавилга</div>
+      </div>
+      <div onclick="filterCat('Гутал')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#f0f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">👟</div>
+        <div style="font-size:10px;color:#333;text-align:center">Гутал</div>
+      </div>
+      <div onclick="filterCat('Спорт')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#f0f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">⚽</div>
+        <div style="font-size:10px;color:#333;text-align:center">Спорт</div>
+      </div>
+      <div onclick="filterCat('Хүүхдийн бараа')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#f0f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">🧸</div>
+        <div style="font-size:10px;color:#333;text-align:center">Хүүхэд</div>
+      </div>
+      <div onclick="filterCat('Ажлын байр')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#f0f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">💼</div>
+        <div style="font-size:10px;color:#333;text-align:center">Ажлын байр</div>
+      </div>
+      <div onclick="filterCat('')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <div style="width:48px;height:48px;background:#f0f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">📦</div>
+        <div style="font-size:10px;color:#333;text-align:center">Бүгд</div>
+      </div>
     </div>
   </div>
-  <div class="section">
-    <div class="section-title">Шинэ зарууд</div>
+
+  <!-- CATEGORY TABS -->
+  <div class="cats" id="catList">
+    <div class="cat active" data-cat=''>🔥 Бүгд</div>
+    <div class="cat" data-cat='Техник'>📱 Техник</div>
+    <div class="cat" data-cat='Хувцас'>👗 Хувцас</div>
+    <div class="cat" data-cat='Гутал'>👟 Гутал</div>
+    <div class="cat" data-cat='Гоо сайхан'>💄 Гоо сайхан</div>
+    <div class="cat" data-cat='Тавилга'>🪑 Тавилга</div>
+    <div class="cat" data-cat='Гэр ахуй'>🏡 Гэр ахуй</div>
+    <div class="cat" data-cat='Авто'>🚗 Авто</div>
+    <div class="cat" data-cat='Үл хөдлөх'>🏠 Үл хөдлөх</div>
+    <div class="cat" data-cat='Тоглоом'>🎮 Тоглоом</div>
+    <div class="cat" data-cat='Спорт'>⚽ Спорт</div>
+    <div class="cat" data-cat='Хүүхдийн бараа'>🧸 Хүүхэд</div>
+    <div class="cat" data-cat='Эрүүл мэнд'>💊 Эрүүл мэнд</div>
+    <div class="cat" data-cat='Хоол хүнс'>🍎 Хоол хүнс</div>
+    <div class="cat" data-cat='Амьтад'>🐾 Амьтад</div>
+    <div class="cat" data-cat='Ном'>📚 Ном</div>
+    <div class="cat" data-cat='Ажлын байр'>💼 Ажлын байр</div>
+    <div class="cat" data-cat='Үйлчилгээ'>🔧 Үйлчилгээ</div>
+    <div class="cat" data-cat='Бусад'>📦 Бусад</div>
+  </div>
+
+  <!-- LISTINGS -->
+  <div style="background:#f5f5f5;padding:8px 0">
+    <div style="font-size:13px;font-weight:600;padding:8px 12px;background:white;border-bottom:1px solid #f0f0f0">Шинэ зарууд</div>
     <div id="listingsGrid" class="grid"><div class="loading"><div class="spinner"></div></div></div>
   </div>
+
   <!-- AD SPACE -->
   <div id="adSpace">
     <div class="delivery-cta">
@@ -422,151 +479,136 @@ select.form-input{cursor:pointer}
   </div>
 </div>
 
-<!-- POST PAGE - FULLSCREEN -->
-<div class="page" id="page-post" style="padding-bottom:80px">
-  <!-- HEADER -->
-  <div style="position:sticky;top:56px;z-index:50;background:var(--bg);padding:12px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:12px">
-    <button onclick="showPage('home')" style="background:none;border:none;cursor:pointer;color:var(--t);font-size:20px">←</button>
-    <div style="flex:1">
-      <div style="font-weight:700;font-size:16px" id="postPageTitle">Зар байршуулах</div>
-      <div style="font-size:11px;color:var(--m)" id="postPageSub">3 алхамт процесс</div>
-    </div>
-    <div style="display:flex;gap:4px">
-      <div style="width:24px;height:4px;border-radius:2px;background:var(--a)" id="step1bar"></div>
-      <div style="width:24px;height:4px;border-radius:2px;background:var(--b)" id="step2bar"></div>
-      <div style="width:24px;height:4px;border-radius:2px;background:var(--b)" id="step3bar"></div>
-    </div>
-  </div>
+<!-- POST MODAL -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal" style="position:relative;padding-bottom:30px">
+    <button class="close-btn" onclick="closeModal('postModal')">×</button>
 
-  <!-- STEP 1: CATEGORY -->
-  <div id="postStep1" style="padding:20px 16px">
-    <div style="font-size:18px;font-weight:800;margin-bottom:6px">Ангилал сонгох</div>
-    <div style="font-size:13px;color:var(--m);margin-bottom:20px">Барааны ангилалаа сонгоно уу</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="catGrid">
-      <div class="cat-card" onclick="selectCategory('Техник','📱')"><div style="font-size:28px">📱</div><div>Техник</div></div>
-      <div class="cat-card" onclick="selectCategory('Хувцас','👗')"><div style="font-size:28px">👗</div><div>Хувцас</div></div>
-      <div class="cat-card" onclick="selectCategory('Гутал','👟')"><div style="font-size:28px">👟</div><div>Гутал</div></div>
-      <div class="cat-card" onclick="selectCategory('Гоо сайхан','💄')"><div style="font-size:28px">💄</div><div>Гоо сайхан</div></div>
-      <div class="cat-card" onclick="selectCategory('Тавилга','🪑')"><div style="font-size:28px">🪑</div><div>Тавилга</div></div>
-      <div class="cat-card" onclick="selectCategory('Гэр ахуй','🏡')"><div style="font-size:28px">🏡</div><div>Гэр ахуй</div></div>
-      <div class="cat-card" onclick="selectCategory('Авто','🚗')"><div style="font-size:28px">🚗</div><div>Авто</div></div>
-      <div class="cat-card" onclick="selectCategory('Үл хөдлөх','🏠')"><div style="font-size:28px">🏠</div><div>Үл хөдлөх</div></div>
-      <div class="cat-card" onclick="selectCategory('Тоглоом','🎮')"><div style="font-size:28px">🎮</div><div>Тоглоом</div></div>
-      <div class="cat-card" onclick="selectCategory('Спорт','⚽')"><div style="font-size:28px">⚽</div><div>Спорт</div></div>
-      <div class="cat-card" onclick="selectCategory('Хүүхдийн бараа','🧸')"><div style="font-size:28px">🧸</div><div>Хүүхэд</div></div>
-      <div class="cat-card" onclick="selectCategory('Эрүүл мэнд','💊')"><div style="font-size:28px">💊</div><div>Эрүүл мэнд</div></div>
-      <div class="cat-card" onclick="selectCategory('Хоол хүнс','🍎')"><div style="font-size:28px">🍎</div><div>Хоол хүнс</div></div>
-      <div class="cat-card" onclick="selectCategory('Амьтад','🐾')"><div style="font-size:28px">🐾</div><div>Амьтад</div></div>
-      <div class="cat-card" onclick="selectCategory('Ном','📚')"><div style="font-size:28px">📚</div><div>Ном</div></div>
-      <div class="cat-card" onclick="selectCategory('Ажлын байр','💼')"><div style="font-size:28px">💼</div><div>Ажлын байр</div></div>
-      <div class="cat-card" onclick="selectCategory('Үйлчилгээ','🔧')"><div style="font-size:28px">🔧</div><div>Үйлчилгээ</div></div>
-      <div class="cat-card" onclick="selectCategory('Бусад','📦')"><div style="font-size:28px">📦</div><div>Бусад</div></div>
+    <!-- STEP INDICATOR -->
+    <div style="display:flex;gap:4px;margin-bottom:20px" id="stepIndicator">
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--a)" id="step1bar"></div>
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--b)" id="step2bar"></div>
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--b)" id="step3bar"></div>
     </div>
-  </div>
 
-  <!-- STEP 2: DETAILS -->
-  <div id="postStep2" style="display:none;padding:20px 16px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-      <button onclick="goStep(1)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
-      <div>
-        <div style="font-size:18px;font-weight:800" id="step2Title">Мэдээлэл</div>
-        <div style="font-size:12px;color:var(--m)">Барааны мэдээллийг оруулна уу</div>
+    <!-- STEP 1: CATEGORY -->
+    <div id="postStep1">
+      <div class="modal-title">Ангилал сонгох</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" id="catGrid">
+        <div class="cat-card" onclick="selectCategory('Техник','📱')">📱<div>Техник</div></div>
+        <div class="cat-card" onclick="selectCategory('Хувцас','👗')">👗<div>Хувцас</div></div>
+        <div class="cat-card" onclick="selectCategory('Гутал','👟')">👟<div>Гутал</div></div>
+        <div class="cat-card" onclick="selectCategory('Гоо сайхан','💄')">💄<div>Гоо сайхан</div></div>
+        <div class="cat-card" onclick="selectCategory('Тавилга','🪑')">🪑<div>Тавилга</div></div>
+        <div class="cat-card" onclick="selectCategory('Гэр ахуй','🏡')">🏡<div>Гэр ахуй</div></div>
+        <div class="cat-card" onclick="selectCategory('Авто','🚗')">🚗<div>Авто</div></div>
+        <div class="cat-card" onclick="selectCategory('Үл хөдлөх','🏠')">🏠<div>Үл хөдлөх</div></div>
+        <div class="cat-card" onclick="selectCategory('Тоглоом','🎮')">🎮<div>Тоглоом</div></div>
+        <div class="cat-card" onclick="selectCategory('Спорт','⚽')">⚽<div>Спорт</div></div>
+        <div class="cat-card" onclick="selectCategory('Хүүхдийн бараа','🧸')">🧸<div>Хүүхэд</div></div>
+        <div class="cat-card" onclick="selectCategory('Эрүүл мэнд','💊')">💊<div>Эрүүл мэнд</div></div>
+        <div class="cat-card" onclick="selectCategory('Хоол хүнс','🍎')">🍎<div>Хоол хүнс</div></div>
+        <div class="cat-card" onclick="selectCategory('Амьтад','🐾')">🐾<div>Амьтад</div></div>
+        <div class="cat-card" onclick="selectCategory('Ном','📚')">📚<div>Ном</div></div>
+        <div class="cat-card" onclick="selectCategory('Ажлын байр','💼')">💼<div>Ажлын байр</div></div>
+        <div class="cat-card" onclick="selectCategory('Үйлчилгээ','🔧')">🔧<div>Үйлчилгээ</div></div>
+        <div class="cat-card" onclick="selectCategory('Бусад','📦')">📦<div>Бусад</div></div>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Гарчиг *</label>
-      <input class="form-input" id="postTitle" placeholder="Барааны нэрийг бичнэ үү" style="font-size:16px">
+    <!-- STEP 2: DETAILS -->
+    <div id="postStep2" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <button onclick="goStep(1)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
+        <div class="modal-title" style="margin:0" id="step2Title">Мэдээлэл оруулах</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Гарчиг *</label>
+        <input class="form-input" id="postTitle" placeholder="Барааны нэрийг бичнэ үү">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Тайлбар</label>
+        <textarea class="form-input" id="postDesc" placeholder="Барааны нөхцөл байдал, онцлог, нэмэлт мэдээлэл..." style="min-height:100px"></textarea>
+      </div>
+
+      <!-- Dynamic fields by category -->
+      <div id="dynamicFields"></div>
+
+      <div class="form-group">
+        <label class="form-label">Үнэ (₮) *</label>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input class="form-input" type="number" id="postPrice" placeholder="0" style="flex:1">
+          <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="postNegotiable" onchange="document.getElementById('postPrice').disabled=this.checked;if(this.checked)document.getElementById('postPrice').value=''">
+            Тохиролцооны
+          </label>
+        </div>
+      </div>
+
+      <!-- LOCATION -->
+      <div class="form-group">
+        <label class="form-label">Байршил *</label>
+        <div style="display:flex;gap:8px">
+          <select class="form-input" id="postDistrict" onchange="updateKhoroo()" style="flex:1">
+            <option value="">Дүүрэг сонгох</option>
+            <option>Баянгол</option>
+            <option>Баянзүрх</option>
+            <option>Сүхбаатар</option>
+            <option>Хан-Уул</option>
+            <option>Чингэлтэй</option>
+            <option>Сонгинохайрхан</option>
+            <option>Налайх</option>
+            <option>Багануур</option>
+            <option>Багахангай</option>
+          </select>
+          <select class="form-input" id="postKhoroo" style="flex:1">
+            <option value="">Хороо сонгох</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="goStep(3)">Үргэлжлүүлэх →</button>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Тайлбар</label>
-      <textarea class="form-input" id="postDesc" placeholder="Барааны нөхцөл, онцлог, нэмэлт мэдээлэл..." style="min-height:120px;font-size:14px;resize:none"></textarea>
-    </div>
+    <!-- STEP 3: MEDIA -->
+    <div id="postStep3" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <button onclick="goStep(2)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
+        <div class="modal-title" style="margin:0">Зураг & Бичлэг</div>
+      </div>
 
-    <div id="dynamicFields"></div>
-
-    <div class="form-group">
-      <label class="form-label">Үнэ *</label>
-      <div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px">
-        <input class="form-input" type="number" id="postPrice" placeholder="₮ Үнэ оруулах" style="font-size:18px;font-weight:700;border:none;padding:0;background:transparent;margin-bottom:10px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-          <input type="checkbox" id="postNegotiable" style="width:18px;height:18px">
-          <span style="font-size:14px">💬 Тохиролцооны үнэ</span>
+      <div class="form-group">
+        <label class="form-label">Зурагнууд (макс 10)</label>
+        <div id="imgPreview" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"></div>
+        <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px;text-align:center">
+          📷 Зураг сонгох
+          <input type="file" id="postImages" accept="image/*" multiple style="display:none" onchange="previewImages(this)">
         </label>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label class="form-label">Байршил *</label>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <select class="form-input" id="postDistrict" onchange="updateKhoroo()" style="flex:1">
-          <option value="">Дүүрэг</option>
-          <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
-          <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
-          <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
-        </select>
-        <select class="form-input" id="postKhoroo" style="flex:1">
-          <option value="">Хороо</option>
-        </select>
+      <div class="form-group">
+        <label class="form-label">Бичлэг (макс 100MB)</label>
+        <div id="videoPreview" style="margin-bottom:8px"></div>
+        <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px">
+          🎥 Бичлэг сонгох
+          <input type="file" id="postVideo" style="display:none" onchange="previewVideo(this)">
+        </label>
       </div>
-      <input class="form-input" id="postAddress" placeholder="Дэлгэрэнгүй хаяг..." style="margin-bottom:8px">
-      <button type="button" class="btn btn-ghost btn-full" onclick="openMapPicker()" style="font-size:13px">📍 Одоогийн байршил ашиглах</button>
-      <div id="mapPickerBox" style="display:none;margin-top:8px;border-radius:12px;overflow:hidden;height:200px">
-        <iframe id="mapPickerFrame" width="100%" height="200" frameborder="0" style="border:none" src="https://maps.google.com/maps?q=Улаанбаатар&output=embed&z=12"></iframe>
-      </div>
-      <div id="selectedLocation" style="display:none;margin-top:6px;font-size:12px;color:#00C96B;font-weight:600"></div>
-    </div>
 
-    <button class="btn btn-primary btn-full" onclick="goStep(3)" style="height:52px;font-size:16px">Үргэлжлүүлэх →</button>
-  </div>
-
-  <!-- STEP 3: MEDIA -->
-  <div id="postStep3" style="display:none;padding:20px 16px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-      <button onclick="goStep(2)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
-      <div>
-        <div style="font-size:18px;font-weight:800">Зураг & Бичлэг</div>
-        <div style="font-size:12px;color:var(--m)">Барааны зурагнуудыг оруулна уу</div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Зурагнууд (макс 10)</label>
-      <div id="imgPreview" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px"></div>
-      <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:24px;cursor:pointer;color:var(--m);font-size:14px;text-align:center">
-        <span style="font-size:32px">📷</span>
-        <span>Зураг сонгох</span>
-        <span style="font-size:11px">JPG, PNG, HEIC • Макс 10 зураг</span>
-        <input type="file" id="postImages" accept="image/*" multiple style="display:none" onchange="previewImages(this)">
-      </label>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Бичлэг (заавал биш)</label>
-      <div id="videoPreview" style="margin-bottom:8px"></div>
-      <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px">
-        <span style="font-size:28px">🎥</span>
-        <span>Бичлэг сонгох</span>
-        <input type="file" id="postVideo" style="display:none" onchange="previewVideo(this)">
-      </label>
-    </div>
-
-    <div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:16px">
-      <div class="toggle-row">
-        <div>
-          <div style="font-weight:600;font-size:14px">🚚 Хүргэлт боломжтой</div>
-          <div style="font-size:12px;color:var(--m)">Хүргэгч барааг хүргэж өгнө</div>
+      <div class="form-group">
+        <div class="toggle-row">
+          <span class="toggle-label">🚚 Хүргэлт боломжтой</span>
+          <label class="toggle"><input type="checkbox" id="postDelivery"><span class="toggle-slider"></span></label>
         </div>
-        <label class="toggle"><input type="checkbox" id="postDelivery"><span class="toggle-slider"></span></label>
       </div>
+
+      <button class="btn btn-primary btn-full" onclick="postListing()">✅ Зар байршуулах</button>
     </div>
 
-    <button class="btn btn-primary btn-full" onclick="postListing()" style="height:56px;font-size:16px;font-weight:700">✅ Зар байршуулах</button>
+    <input type="hidden" id="postCategory" value="">
   </div>
-
-  <input type="hidden" id="postCategory" value="">
-  <input type="hidden" id="postModal" data-edit-id="">
 </div>
 
 <!-- CHAT MODAL -->
@@ -768,6 +810,7 @@ async function init() {
   }
   loadListings();
   loadStats();
+  startBannerSlider();
   // Request notification permission
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
@@ -794,58 +837,19 @@ function clearChatBadge() {
 
 function startGlobalNotifications() {
   if (!CU) return;
-  if (window._globalChannel) sb.removeChannel(window._globalChannel);
-  
-  window._globalChannel = sb.channel('global_'+CU.id)
-    // Шинэ мессеж
+  sb.channel('global_notifications_'+CU.id)
     .on('postgres_changes', {
-      event: 'INSERT', schema: 'public', table: 'messages',
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
       filter: 'receiver_id=eq.'+CU.id
     }, function(payload) {
-      sendNotification('💬 Шинэ мессеж', payload.new.content || 'Шинэ мессеж ирлээ');
+      var msg = payload.new;
+      sendNotification('💬 Шинэ мессеж', msg.content || 'Шинэ мессеж ирлээ');
       showToast('💬 Шинэ мессеж ирлээ!');
-      loadNotifications();
-      var badge = document.getElementById('chatBadge');
-      if (badge) { var c=(parseInt(badge.textContent)||0)+1; badge.textContent=c; badge.style.display='flex'; }
-    })
-    // Шинэ мэдэгдэл
-    .on('postgres_changes', {
-      event: 'INSERT', schema: 'public', table: 'notifications',
-      filter: 'user_id=eq.'+CU.id
-    }, function(payload) {
-      var n = payload.new;
-      sendNotification(n.title, n.body);
-      showToast(n.title);
-      loadNotifications();
     })
     .subscribe();
-
-  // Admin бол шинэ зар ирэхэд мэдэгдэл
-  sb.from('users').select('is_admin').eq('id', CU.id).single().then(function(u) {
-    if (u.data && u.data.is_admin) {
-      sb.channel('admin_listings_'+CU.id)
-        .on('postgres_changes', {
-          event: 'INSERT', schema: 'public', table: 'listings'
-        }, function(payload) {
-          sendNotification('📋 Шинэ зар', '"'+payload.new.title+'" зар зөвшөөрөл хүлээж байна');
-          showToast('📋 Шинэ зар ирлээ!');
-          sendNotifToUser(CU.id, '📋 Шинэ зар', '"'+payload.new.title+'" зар зөвшөөрөл хүлээж байна');
-          loadNotifications();
-        })
-        .on('postgres_changes', {
-          event: 'INSERT', schema: 'public', table: 'reports'
-        }, function(payload) {
-          sendNotification('🚩 Шинэ мэдээлэл', 'Зар мэдээлэгдлээ: '+payload.new.reason);
-          showToast('🚩 Зар мэдээлэгдлээ!');
-          sendNotifToUser(CU.id, '🚩 Шинэ мэдээлэл', 'Зар мэдээлэгдлээ: '+payload.new.reason);
-          loadNotifications();
-        })
-        .subscribe();
-    }
-  });
 }
-
-
 
 
 
@@ -898,8 +902,7 @@ async function showDetail(id) {
   if (!l) return;
   var imgs = l.images&&l.images.length ? l.images : null;
   var imgHtml = imgs ?
-    '<div style="position:relative;width:100%;max-width:480px;margin:0 auto;padding-bottom:min(100%,480px);overflow:hidden;background:var(--s2)" id="imgSliderWrap">'+
-    '<div style="position:absolute;inset:0" id="imgSlider">'+
+    '<div style="position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--surface2)" id="imgSlider">'+
     '<div style="display:flex;transition:transform 0.3s;height:100%" id="imgSliderInner">'+
     imgs.map(function(url){ return '<img src="'+url+'" style="min-width:100%;height:100%;object-fit:cover">'; }).join('')+
     '</div>'+
@@ -909,42 +912,29 @@ async function showDetail(id) {
     '</div>'+
     '<button onclick="slideImg(-1,true)" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer">‹</button>'+
     '<button onclick="slideImg(1,true)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer">›</button>':'')+
-    '</div></div>' :
+    '</div>' :
     '<div class="detail-img">'+(EMOJIS[l.category]||'📦')+'</div>';
   document.getElementById('detailContent').innerHTML =
-    '<div style="display:grid;grid-template-columns:1fr;gap:0">'+
     imgHtml+
-    (imgs&&imgs.length>1?'<div style="display:flex;gap:6px;padding:8px;overflow-x:auto;background:var(--s2)">'+
-    imgs.map(function(url,i){ return '<img src="'+url+'" onclick="slideImg('+i+')" style="width:70px;height:70px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid '+(i===0?'var(--a)':'transparent')+'" id="thumb'+i+'">'; }).join('')+
-    '</div>':'')+
-    '</div>'+
-    '<div style="display:grid;grid-template-columns:1fr auto;gap:12px;padding:0 16px;margin-top:12px">'+
-    '<div style="min-width:0">'+
+    '<div class="detail-body">'+
     '<div class="detail-title">'+l.title+'</div>'+
-    (l.is_negotiable&&l.price?'<div class="detail-price">₮'+Number(l.price).toLocaleString()+' <span style="font-size:13px;color:#00C96B;font-weight:600">• Тохиролцооны</span></div>':
-    l.is_negotiable?'<div class="detail-price" style="color:#00C96B">Тохиролцооны</div>':
-    '<div class="detail-price">₮'+Number(l.price||0).toLocaleString()+'</div>')+
-    '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--g);border-color:var(--g)">🚚 Хүргэлт</span>':'')+'</div>'+
-    '</div>'+
-    // Баруун талын реклам
-    '<div id="sideAdBox" style="width:80px;flex-shrink:0"></div>'+
-    '</div>'+
-    '<div class="detail-body" style="padding-top:0">'+
+    '<div class="detail-price">₮'+Number(l.price).toLocaleString()+'</div>'+
+    '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'</div>'+
     '<div class="detail-desc">'+(l.description||'Тайлбар байхгүй')+'</div>'+
     (l.video_url?'<div style="margin-bottom:16px"><video src="'+l.video_url+'" controls style="width:100%;border-radius:10px;max-height:220px;background:#333"></video></div>':'')+
     '<div class="seller-card"><div class="seller-avatar">'+((l.users&&l.users.name?l.users.name:'?')[0].toUpperCase())+'</div>'+
     '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.name?l.users.name:'Хэрэглэгч')+(l.users&&l.users.is_verified?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+'</div>'+
     '<div class="seller-rating">⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+' • Найдвартай</div></div></div>'+
     '<div class="action-btns">'+
-    '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none" onclick="return confirmCall(\''+(l.users&&l.users.phone?l.users.phone:'')+'\')"><button class="btn btn-ghost btn-full" style="width:100%">📞 '+(l.users&&l.users.phone?l.users.phone:'Холбоо барих')+'</button></a>'+
+    '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none"><button class="btn btn-ghost btn-full" style="width:100%">📞 Холбоо барих</button></a>'+
     '<button class="btn btn-ghost btn-full" onclick="openChat(\''+l.id+'\',\''+l.user_id+'\')">💬 Чат</button>'+
     '</div>'+
     (CU&&l.user_id!==CU.id?'<button style="background:none;border:none;color:var(--m);font-size:12px;cursor:pointer;margin-top:8px;display:block;width:100%;text-align:right" onclick="reportListing(\''+l.id+'\')">🚩 Мэдээлэх</button>':'')+
-    (CU&&l.user_id===CU.id?'<div style="margin-top:10px">'+
+    (CU&&l.user_id===CU.id?
+    '<div style="margin-top:10px">'+
     (l.has_delivery?'<button class="btn btn-primary btn-full" onclick="openDelivery(\''+l.id+'\')">🚚 Хүргэлт захиалах</button>':'<button class="btn btn-ghost btn-full" onclick="enableDelivery(\''+l.id+'\')">🚚 Хүргэлт нэмэх</button>')+
     '</div>':'')+
-    (l.location?'<div id="mapBox" style="margin-top:16px;border-radius:12px;overflow:hidden;height:200px"><iframe width="100%" height="200" frameborder="0" src="https://maps.google.com/maps?q='+encodeURIComponent((l.location||'Улаанбаатар')+', Улаанбаатар, Монгол')+'&output=embed&z=14" style="border:none"></iframe></div>':'')+
-    '<div style="margin-top:16px" id="reviewSection"></div>'+
+    (l.location?'<div id="mapBox" style="margin-top:16px;border-radius:12px;overflow:hidden;height:200px"><iframe width="100%" height="200" frameborder="0" src="https://maps.google.com/maps?q='+encodeURIComponent((l.location||'Улаанбаатар')+', Улаанбаатар, Монгол')+'&output=embed&z=14" style="border:none"></iframe></div>':'')+'<div style="margin-top:16px" id="reviewSection"></div>'+
     (CU&&l.user_id===CU.id?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><button class="btn btn-ghost btn-full" style="color:#e53e3e;border-color:#e53e3e" onclick="deleteListing(\''+l.id+'\')">🗑️ Устгах</button><button class="btn btn-ghost btn-full" onclick="editListing(\''+l.id+'\')">✏️ Засах</button></div>':'')+
     '</div>';
   window._slideIdx = 0;
@@ -952,7 +942,6 @@ async function showDetail(id) {
   window._currentListingId = l.id;
   window._currentSellerId = l.user_id;
   loadReviews(l.id);
-  loadSideAd();
 }
 
 function slideImg(n, isRelative) {
@@ -965,32 +954,8 @@ function slideImg(n, isRelative) {
   for (var i=0; i<total; i++) {
     var dot = document.getElementById('dot'+i);
     if (dot) dot.style.background = i===window._slideIdx ? 'white' : 'rgba(255,255,255,0.5)';
-    var thumb = document.getElementById('thumb'+i);
-    if (thumb) thumb.style.border = i===window._slideIdx ? '2px solid var(--a)' : '2px solid transparent';
   }
 }
-
-async function loadSideAd() {
-  var box = document.getElementById('sideAdBox');
-  if (!box) return;
-  var ads = await loadAds();
-  if (!ads.length) { box.innerHTML = ''; return; }
-  var ad = ads[Math.floor(Math.random()*ads.length)];
-  var adLink = ad.link_url ? (ad.link_url.startsWith('http') ? ad.link_url : 'https://'+ad.link_url) : '';
-  var content = '';
-  if (ad.image_url) {
-    content = '<img src="'+ad.image_url+'" style="width:80px;height:160px;object-fit:cover;border-radius:8px">';
-  } else if (ad.video_url) {
-    content = '<video src="'+ad.video_url+'" autoplay muted loop playsinline style="width:80px;height:160px;object-fit:cover;border-radius:8px"></video>';
-  } else {
-    content = '<div style="width:80px;height:160px;background:var(--s2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--m);text-align:center;padding:6px">📺 Реклам</div>';
-  }
-  box.innerHTML = '<div style="cursor:pointer;position:relative" onclick="'+(adLink?'window.open(\''+adLink+'\',\'_blank\')':'')+'">' +
-    content +
-    '<div style="font-size:9px;color:var(--m);text-align:center;margin-top:2px">Реклам</div>' +
-    '</div>';
-}
-
 
 async function loadReviews(listingId) {
   var sec = document.getElementById('reviewSection');
@@ -1035,46 +1000,13 @@ function goStep(n) {
   ['step1bar','step2bar','step3bar'].forEach(function(id, i) {
     document.getElementById(id).style.background = (i < n) ? 'var(--a)' : 'var(--b)';
   });
-  window.scrollTo(0,0);
+  document.querySelector('#postModal .modal').scrollTop = 0;
 }
 
 var KHOROO = {
   'Баянгол': 12, 'Баянзүрх': 24, 'Сүхбаатар': 12, 'Хан-Уул': 12,
   'Чингэлтэй': 12, 'Сонгинохайрхан': 32, 'Налайх': 5, 'Багануур': 5, 'Багахангай': 3
 };
-
-function openMapPicker() {
-  var box = document.getElementById('mapPickerBox');
-  box.style.display = box.style.display === 'none' ? 'block' : 'none';
-}
-
-function useCurrentLocation() {
-  if (!navigator.geolocation) { showToast('Байршил авах боломжгүй', true); return; }
-  showToast('Байршил тодорхойлж байна...', false, 10000);
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    var lat = pos.coords.latitude;
-    var lng = pos.coords.longitude;
-    // Reverse geocode
-    fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lng+'&format=json&accept-language=mn')
-      .then(function(r){ return r.json(); })
-      .then(function(data) {
-        var addr = data.display_name || (lat.toFixed(4)+', '+lng.toFixed(4));
-        var short = addr.split(',').slice(0,3).join(',');
-        document.getElementById('postAddress').value = short;
-        document.getElementById('selectedLocation').style.display = 'block';
-        document.getElementById('selectedLocation').textContent = '📍 '+short;
-        // Update map
-        var frame = document.getElementById('mapPickerFrame');
-        frame.src = 'https://maps.google.com/maps?q='+lat+','+lng+'&output=embed&z=16';
-        showToast('Байршил олдлоо! ✅');
-      }).catch(function() {
-        document.getElementById('postAddress').value = lat.toFixed(4)+', '+lng.toFixed(4);
-        showToast('Байршил олдлоо! ✅');
-      });
-  }, function() {
-    showToast('Байршил авах зөвшөөрөл байхгүй', true);
-  });
-}
 
 function updateKhoroo() {
   var d = document.getElementById('postDistrict').value;
@@ -1121,6 +1053,36 @@ function loadDynamicFields(cat) {
   }).join('');
 }
 
+
+var _bannerIdx = 0;
+var _bannerTimer = null;
+
+function slideBanner(n) {
+  _bannerIdx = n;
+  var inner = document.getElementById('bannerInner');
+  if (inner) inner.style.transform = 'translateX(-'+n*100+'%)';
+  for (var i=0; i<3; i++) {
+    var d = document.getElementById('bd'+i);
+    if (d) { d.style.width = i===n?'20px':'6px'; d.style.opacity = i===n?'1':'0.4'; }
+  }
+}
+
+function startBannerSlider() {
+  if (_bannerTimer) clearInterval(_bannerTimer);
+  _bannerTimer = setInterval(function() {
+    _bannerIdx = (_bannerIdx+1) % 3;
+    slideBanner(_bannerIdx);
+  }, 4000);
+}
+
+function filterCat(cat) {
+  CC = cat;
+  document.querySelectorAll('.cat').forEach(function(c) {
+    c.classList.toggle('active', c.getAttribute('data-cat') === cat);
+  });
+  doSearch();
+  window.scrollTo(0, 0);
+}
 
 function setRating(n) {
   _rating = n;
@@ -1264,7 +1226,7 @@ async function loadAdmin() {
       '</div>'+
       '<div style="display:flex;gap:6px">'+
       '<button onclick="toggleFeatured(\''+l.id+'\','+l.is_featured+')" style="background:'+(l.is_featured?'#FFD700':'var(--s2)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer" title="Онцлох">'+
-      (l.is_featured?('⭐ '+(l.featured_until?new Date(l.featured_until).toLocaleDateString('mn-MN',{timeZone:'Asia/Ulaanbaatar',month:'2-digit',day:'2-digit'})+'хүртэл':'Онцлох')):'☆ Онцлох')+'</button>'+
+      (l.is_featured?('⭐ '+(l.featured_until?new Date(l.featured_until).toLocaleDateString('mn-MN',{month:'2-digit',day:'2-digit'})+'хүртэл':'Онцлох')):'☆ Онцлох')+'</button>'+
       '<button onclick="adminDeleteListing(\''+l.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
       '</div></div>';
   }).join('');
@@ -1300,19 +1262,8 @@ async function toggleFeatured(id, current) {
   days = parseInt(days) || 7;
   var until = new Date();
   until.setDate(until.getDate() + days);
-  var untilStr = until.toLocaleDateString('mn-MN', {timeZone:'Asia/Ulaanbaatar', month:'2-digit', day:'2-digit'});
   await sb.from('listings').update({is_featured:true, featured_until:until.toISOString()}).eq('id',id);
-  // Хэрэглэгчид мэдэгдэл илгээх
-  var listing = await sb.from('listings').select('user_id, title').eq('id', id).single();
-  if (listing.data) {
-    await sb.from('notifications').insert({
-      user_id: listing.data.user_id,
-      title: '⭐ Таны зар онцлох боллоо!',
-      body: '"'+listing.data.title+'" зар '+untilStr+' хүртэл онцлох зарт орлоо!',
-      listing_id: id
-    });
-  }
-  showToast('Онцлох болгогдлоо! '+days+' хоног ⭐');
+  showToast('Онцлох болгогдлоо! '+days+' хоног');
   loadAdmin(); loadListings();
 }
 
@@ -1323,12 +1274,6 @@ async function adminDeleteUser(id) {
   showToast('Хэрэглэгч устгагдлаа!');
   loadAdmin();
 }
-
-function confirmCall(phone) {
-  if (!phone) { showToast('Утасны дугаар байхгүй байна', true); return false; }
-  return true;
-}
-
 
 function toggleAdSound(i) {
   var video = document.getElementById('adVideo_'+i);
@@ -1443,16 +1388,7 @@ async function toggleAdmin(id, current) {
 }
 
 async function approveListing(id) {
-  var listing = await sb.from('listings').select('user_id, title').eq('id', id).single();
   await sb.from('listings').update({status:'active'}).eq('id', id);
-  if (listing.data) {
-    await sb.from('notifications').insert({
-      user_id: listing.data.user_id,
-      title: '✅ Таны зар нийтлэгдлээ!',
-      body: '"'+listing.data.title+'" зар амжилттай нийтлэгдлээ. Одоо хүн бүр харах боломжтой!',
-      listing_id: id
-    });
-  }
   showToast('Зар зөвшөөрөгдлөө! ✅');
   loadAdmin(); loadListings();
 }
@@ -1531,23 +1467,16 @@ async function editListing(id) {
   var r = await sb.from('listings').select('*').eq('id', id).single();
   var l = r.data;
   if (!l) return;
-  goStep(2);
   document.getElementById('postTitle').value = l.title||'';
   document.getElementById('postDesc').value = l.description||'';
   document.getElementById('postPrice').value = l.price||'';
-  document.getElementById('postNegotiable').checked = l.is_negotiable||false;
-  document.getElementById('postCategory').value = l.category||'';
+  document.getElementById('postLocation').value = l.location||'';
+  document.getElementById('postCategory').value = l.category||'Бусад';
   document.getElementById('postDelivery').checked = l.has_delivery||false;
-  // Location
-  if (l.location) {
-    var parts = l.location.split(', ');
-    if (parts[0]) document.getElementById('postDistrict').value = parts[0];
-    if (parts[1]) { updateKhoroo(); document.getElementById('postKhoroo').value = parts[1]; }
-    if (parts[2]) document.getElementById('postAddress').value = parts.slice(2).join(', ');
-  }
-  document.getElementById('step2Title').textContent = (l.category||'Зар засах');
   document.getElementById('postModal').setAttribute('data-edit-id', id);
-  showPage('post');
+  document.querySelector('#postModal .modal-title').textContent = 'Зар засах';
+  document.querySelector('#postModal .btn-primary.btn-full').textContent = 'Хадгалах';
+  openModal('postModal');
 }
 
 async function updateAdSpace(isCourier) {
@@ -1637,10 +1566,8 @@ async function login() {
   CU = r.data.user;
   closeModal('authModal');
   await updateNav();
-  showPage('profile');
-  await loadProfile();
+  loadProfile();
   showToast('Амжилттай нэвтэрлээ! 👋');
-  loadNotifications();
 }
 
 async function register() {
@@ -1737,7 +1664,7 @@ async function showPostModal() {
   var u = await sb.from('users').select('is_courier').eq('id', CU.id).single();
   if (u.data && u.data.is_courier) { showToast('Хүргэгч зар байршуулах боломжгүй',true); return; }
   goStep(1);
-  showPage('post');
+  openModal('postModal');
 }
 
 function previewImages(input) {
@@ -1800,17 +1727,17 @@ async function uploadVideo(file) {
 async function postListing() {
   var title = document.getElementById('postTitle').value;
   var desc = document.getElementById('postDesc').value;
-  var price = document.getElementById('postPrice').value;
+  var price = document.getElementById('postNegotiable').checked ? 0 : document.getElementById('postPrice').value;
   var negotiable = document.getElementById('postNegotiable').checked;
   var district = document.getElementById('postDistrict').value;
   var khoroo = document.getElementById('postKhoroo').value;
-  var address = document.getElementById('postAddress').value;
-  var loc = [district, khoroo, address].filter(Boolean).join(', ');
+  var loc = [district, khoroo].filter(Boolean).join(', ');
   var cat = document.getElementById('postCategory').value;
   var hasD = document.getElementById('postDelivery').checked;
   var imgFiles = document.getElementById('postImages').files;
   var vidFile = document.getElementById('postVideo').files[0];
   var editId = document.getElementById('postModal').getAttribute('data-edit-id');
+  if (!title) { showToast('Гарчиг оруулна уу', true); return; }
   if (!negotiable && !price) { showToast('Үнэ оруулна уу', true); return; }
   if (!cat) { showToast('Ангилал сонгоно уу', true); return; }
   // Хориотой үг шалгах
@@ -1823,14 +1750,12 @@ async function postListing() {
     var el = document.getElementById('df_'+f.id);
     if (el && el.value) extra[f.id] = el.value;
   });
-  showToast('🖼️ Зураг байршуулж байна...', false, 60000);
+  showToast('Байршуулж байна...');
   var imgUrls = imgFiles.length ? await uploadImages(imgFiles) : [];
-  if (vidFile) showToast('🎥 Бичлэг байршуулж байна...', false, 60000);
   var vidUrl = vidFile ? await uploadVideo(vidFile) : null;
-  showToast('📋 Зар илгээж байна...', false, 60000);
   var data = {
     title: title, description: desc,
-    price: price ? Number(price) : null,
+    price: negotiable ? null : Number(price),
     location: loc, category: cat, has_delivery: hasD,
     extra_data: Object.keys(extra).length ? extra : null,
     is_negotiable: negotiable
@@ -1839,27 +1764,13 @@ async function postListing() {
   if (vidUrl) data.video_url = vidUrl;
   var r;
   if (editId) {
-    data.status = 'pending';
     r = await sb.from('listings').update(data).eq('id', editId);
   } else {
     data.user_id = CU.id; data.is_active = true; data.status = 'pending';
     r = await sb.from('listings').insert(data);
   }
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
-  // Admin-д мэдэгдэл илгээх
-  var newId = editId || (r.data && r.data[0] && r.data[0].id);
-  var admins = await sb.from('users').select('id').eq('is_admin', true);
-  if (admins.data) {
-    for (var ai=0; ai<admins.data.length; ai++) {
-      await sb.from('notifications').insert({
-        user_id: admins.data[ai].id,
-        title: editId ? '✏️ Зар засагдлаа' : '📋 Шинэ зар ирлээ',
-        body: '"'+title+'" зар '+(editId?'засагдаж':'шинээр')+' зөвшөөрөл хүлээж байна',
-        listing_id: newId || null
-      });
-    }
-  }
-  showPage('home');
+  closeModal('postModal');
   document.getElementById('postModal').removeAttribute('data-edit-id');
   document.getElementById('postTitle').value='';
   document.getElementById('postDesc').value='';
@@ -1870,11 +1781,8 @@ async function postListing() {
   document.getElementById('videoPreview').innerHTML='';
   document.getElementById('postNegotiable').checked=false;
   document.getElementById('postDistrict').value='';
-  document.getElementById('postAddress').value='';
   document.getElementById('postKhoroo').innerHTML='<option value="">Хороо сонгох</option>';
-  document.getElementById('selectedLocation').style.display='none';
-  document.getElementById('mapPickerBox').style.display='none';
-  showToast(editId?'⏳ Зар засагдлаа! Admin шалгаад нийтэлнэ':'⏳ Зар илгээгдлээ! Admin шалгаад удахгүй нийтэлнэ', false, 6000);
+  showToast(editId?'Зар засагдлаа! ✅':'Зар илгээгдлээ! Admin шалгаад зөвшөөрнө 🎉');
   loadListings(); loadStats();
 }
 
@@ -1908,16 +1816,11 @@ async function orderDelivery() {
 }
 
 async function loadProfile() {
-  if (!CU) { 
-    document.getElementById('profileContent').innerHTML = '<div class="empty" style="padding-top:80px"><div class="empty-icon">👤</div><p>Нэвтэрч профайлаа харна уу</p><br><button class="btn btn-primary" onclick="openAuth(\'login\')">Нэвтрэх</button></div>';
-    return; 
-  }
-  document.getElementById('profileContent').innerHTML = '<div style="text-align:center;padding:40px;color:var(--m)">⏳ Уншиж байна...</div>';
+  if (!CU) return;
   var u = await sb.from('users').select('*').eq('id',CU.id).single();
-  if (!u.data) { showToast('Профайл олдсонгүй: '+CU.id.substring(0,8), true); return; }
   var ls = await sb.from('listings').select('*').eq('user_id',CU.id);
   var ds = await sb.from('deliveries').select('*, listings(title)').eq('buyer_id',CU.id);
-  var user = u.data;
+  var user = u.data; if (!user) return;
   document.getElementById('profileContent').innerHTML =
     '<div class="profile-header"><div class="profile-avatar">'+(user.name||'?')[0].toUpperCase()+'</div>'+
     '<div class="profile-name">'+(user.name||'Хэрэглэгч')+'</div><div class="profile-email">'+user.email+'</div></div>'+
@@ -2003,27 +1906,12 @@ async function loadNotifications() {
   if (!box) return;
   if (!notifs.length) { box.innerHTML = '<div class="empty"><div class="empty-icon">🔔</div><p>Мэдэгдэл байхгүй</p></div>'; return; }
   box.innerHTML = notifs.map(function(n) {
-    var onclick = '';
-    if (n.listing_id) onclick = 'showDetail(\''+n.listing_id+'\')';
-    else if (n.title.includes('Шинэ зар') || n.title.includes('зар')) onclick = 'showPage(\'admin\')';
-    else if (n.title.includes('мэдээлэл') || n.title.includes('🚩')) onclick = 'showPage(\'admin\')';
-    else if (n.title.includes('мессеж') || n.title.includes('💬')) onclick = 'showPage(\'chats\')';
-    else if (n.title.includes('захиалга') || n.title.includes('🚚') || n.title.includes('📦')) onclick = 'showPage(\'deliveries\')';
-    else if (n.title.includes('устгагдлаа') || n.title.includes('⚠️')) onclick = 'showPage(\'home\')';
-    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:8px;'+(n.is_read?'':'border-left:3px solid var(--a)')+';display:flex;align-items:flex-start;gap:8px">'+
-      '<div style="flex:1;cursor:'+(onclick?'pointer':'default')+'" onclick="markRead(\''+n.id+'\');'+(onclick?onclick+';':'')+'">'+
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:8px;'+(n.is_read?'':'border-left:3px solid var(--a)')+'" onclick="markRead(\''+n.id+'\')">'+
       '<div style="font-weight:600;font-size:13px;margin-bottom:4px">'+(n.is_read?'':'🔴 ')+n.title+'</div>'+
       '<div style="font-size:12px;color:var(--m)">'+n.body+'</div>'+
-      '<div style="font-size:10px;color:var(--m);margin-top:4px">'+new Date(n.created_at).toLocaleString('mn-MN', {timeZone:'Asia/Ulaanbaatar'})+'</div>'+
-      '</div>'+
-      '<button onclick="deleteNotif(\''+n.id+'\')" style="background:none;border:none;color:var(--m);font-size:16px;cursor:pointer;padding:0;flex-shrink:0">×</button>'+
+      '<div style="font-size:10px;color:var(--m);margin-top:4px">'+new Date(n.created_at).toLocaleString('mn-MN')+'</div>'+
       '</div>';
   }).join('');
-}
-
-async function deleteNotif(id) {
-  await sb.from('notifications').delete().eq('id', id);
-  loadNotifications();
 }
 
 async function markRead(id) {
@@ -2270,7 +2158,6 @@ function showPage(name) {
   if (name === 'deliveries') loadDeliveriesPage();
   if (name === 'profile') { loadProfile(); }
   if (name === 'notifications') loadNotifications();
-  if (name === 'post') { document.getElementById('postModal').removeAttribute('data-edit-id'); }
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -2286,12 +2173,11 @@ document.querySelectorAll('.modal-overlay').forEach(function(m){
   m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
 });
 
-function showToast(msg, isError, duration) {
+function showToast(msg, isError) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast'+(isError?' error':'')+' show';
-  if (window._toastTimer) clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(function(){ t.classList.remove('show'); }, duration||3000);
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 
 init();
