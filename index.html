@@ -54,17 +54,17 @@ nav{position:sticky;top:0;z-index:100;background:#E62B05;padding:0 16px;height:5
 .cat-card{background:var(--s2);border:2px solid var(--b);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:28px}
 .cat-card div{font-size:12px;font-weight:600;margin-top:6px;color:var(--t)}
 .card-featured{border:2px solid #FFD700!important;box-shadow:0 4px 20px rgba(255,215,0,0.3)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#f0f0f0;border-top:1px solid #f0f0f0;padding:0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;background:#f0f0f0;border-top:1px solid #f0f0f0;padding:14px}
 @media(min-width:768px){#searchWrap{padding:20px 200px 24px!important}}
 @media(min-width:1024px){#searchWrap{padding:20px 360px 24px!important}}
 @media(min-width:1440px){#searchWrap{padding:20px 480px 24px!important}}
 @media(min-width:768px){#searchInner{padding:36px 18px!important;border-radius:20px!important;background:linear-gradient(white,white) padding-box,linear-gradient(90deg,#E62B05,#FF8C00) border-box!important;border:2px solid transparent!important;box-shadow:0 4px 20px rgba(230,43,5,0.15)!important}}
+@media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr);padding:0 80px}}
-@media(min-width:1024px){.grid{grid-template-columns:repeat(5,1fr);padding:0 150px}}
-@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
-@media(min-width:1200px){.grid{grid-template-columns:repeat(5,1fr)}}
-.card{background:white;border:1px solid #f0f0f0;border-radius:4px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;position:relative}
+@media(min-width:1024px){.grid{grid-template-columns:repeat(6,1fr);padding:0 150px}}
+.card{background:white;border:2px solid #ddd;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;position:relative}
+.card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.12);border-color:#ccc}
+.card-inner{margin:10px;border:1px solid #eee;border-radius:6px;overflow:hidden}
 .card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.1)}
 .card-img{width:100%;aspect-ratio:1;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;overflow:hidden}
 .card-img img{width:100%;height:100%;object-fit:cover}
@@ -158,6 +158,8 @@ select.form-input{cursor:pointer}
 </nav>
 
 <div class="page active" id="page-home">
+  <!-- BANNER + SEARCH STICKY WRAPPER -->
+  <div style="position:sticky;top:50px;z-index:90;background:white">
   <!-- BANNER SLIDER -->
   <div style="position:relative;overflow:hidden;background:#f5f5f5" id="bannerSlider">
     <div style="display:flex;transition:transform 0.5s;height:160px" id="bannerInner">
@@ -193,6 +195,7 @@ select.form-input{cursor:pointer}
       <div onclick="slideBanner(2)" id="bd2" style="width:6px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:0.4"></div>
     </div>
   </div>
+  </div><!-- END STICKY WRAPPER -->
 
   <!-- CATEGORY TABS -->
   <div style="background:white;border-bottom:1px solid #f0f0f0">
@@ -835,6 +838,7 @@ function renderListings(arr) {
     var featuredBadge = l.is_featured ?
       '<div style="background:linear-gradient(90deg,#FF8C00,#FFD700);color:white;font-size:10px;font-weight:800;padding:4px 8px;text-align:center;letter-spacing:0.5px">⭐ ОНЦЛОХ ЗАР</div>' : '';
     return '<div class="card'+(l.is_featured?' card-featured':'')+'" style="'+(l.is_featured?'grid-column:span 2':'')+'" onclick="showDetail(\''+l.id+'\')">'+
+      '<div class="card-inner">'+
       featuredBadge+
       '<div class="card-img" style="'+(l.is_featured?'aspect-ratio:16/7':'')+'">'+
       (l.images&&l.images[0]?'<img src="'+l.images[0]+'" onerror="this.parentElement.innerHTML=\''+( EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
