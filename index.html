@@ -47,9 +47,9 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .stat-label{font-size:10px;color:var(--m);margin-top:3px}
 .section{padding:0 16px 24px}
 .section-title{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px}
-.cats{display:flex;flex-direction:row;flex-wrap:nowrap;gap:0;overflow-x:auto;padding:0;scrollbar-width:none;background:white;border-bottom:1px solid var(--b)}
+.cats{display:flex;flex-direction:row;flex-wrap:nowrap;gap:0;overflow-x:scroll;padding:0;scrollbar-width:none;background:white;border-bottom:1px solid var(--b);-webkit-overflow-scrolling:touch}
 .cats::-webkit-scrollbar{display:none}
-.cat{flex-shrink:0;white-space:nowrap;background:white;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m);display:inline-block}
+.cat{flex:0 0 auto;white-space:nowrap;background:white;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m);display:inline-block;line-height:1.5}
 .cat:hover,.cat.active{color:#E62B05;border-bottom-color:#E62B05;font-weight:600}
 .cat-card{background:var(--s2);border:2px solid var(--b);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:28px}
 .cat-card div{font-size:12px;font-weight:600;margin-top:6px;color:var(--t)}
@@ -152,7 +152,7 @@ select.form-input{cursor:pointer}
 <div class="toast" id="toast"></div>
 <nav>
   <div onclick="showPage('home')" style="cursor:pointer">
-    <svg width="160" height="40" viewBox="0 0 360 90" role="img">
+    <svg width="160" height="40" viewBox="0 0 360 68" role="img">
       <defs>
         <linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#E62B05"/>
@@ -212,15 +212,14 @@ select.form-input{cursor:pointer}
   </div>
 
   <!-- CATEGORY TABS -->
-  <div style="background:white;border-bottom:1px solid #f0f0f0">
-    <div class="cats" id="catList">
+  <div style="background:white;border-bottom:1px solid #f0f0f0;overflow:hidden">
+    <div id="catList" style="display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;border:none;padding:0">
       <div class="cat active" data-cat=''>🔥 Бүгд</div>
       <div class="cat" data-cat='Авто'>🚗 Авто</div>
       <div class="cat" data-cat='Үл хөдлөх'>🏠 Үл хөдлөх</div>
       <div class="cat" data-cat='Ажлын байр'>💼 Ажлын байр</div>
       <div class="cat" data-cat='Гар утас'>📱 Гар утас</div>
       <div class="cat" data-cat='Компьютер'>💻 Компьютер</div>
-      <div class="cat" </div>
       <div class="cat" data-cat='ТВ & Дагалдах'>📺 ТВ & Дагалдах</div>
       <div class="cat" data-cat='Хувцас'>👗 Хувцас</div>
       <div class="cat" data-cat='Гутал'>👟 Гутал</div>
@@ -459,6 +458,7 @@ select.form-input{cursor:pointer}
         <input type="hidden" id="regRole" value="user">
       </div>
       <div class="form-group"><label class="form-label">Нэр</label><input class="form-input" type="text" id="regName" placeholder="Таны нэр"></div>
+      <div class="form-group"><label class="form-label">Регистрийн дугаар</label><input class="form-input" type="text" id="regNumber" placeholder="АА00000000" maxlength="10" oninput="this.value=this.value.toUpperCase()"></div>
       <div class="form-group"><label class="form-label">Имэйл</label><input class="form-input" type="email" id="regEmail" placeholder="email@example.com"></div>
       <div class="form-group"><label class="form-label">Утас</label><input class="form-input" type="tel" id="regPhone" placeholder="99xxxxxx"></div>
       <div class="form-group"><label class="form-label">Нууц үг</label><input class="form-input" type="password" id="regPassword" placeholder="••••••••"></div>
@@ -1405,15 +1405,31 @@ async function loadAdmin() {
   // Users
   var us = await sb.from('users').select('*').order('created_at', {ascending:false}).limit(30);
   document.getElementById('adminUsers').innerHTML = (us.data||[]).map(function(u) {
-    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">'+
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px">'+
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
       '<div style="flex:1">'+
       '<div style="font-weight:600;font-size:13px">'+u.name+
       (u.is_courier?' <span style="background:#FF5C00;color:white;border-radius:4px;padding:1px 6px;font-size:10px">🚚 Хүргэгч</span>':' <span style="background:#5C8BFF;color:white;border-radius:4px;padding:1px 6px;font-size:10px">🛍️ Хэрэглэгч</span>')+
       (u.is_admin?' <span style="background:#333;color:white;border-radius:4px;padding:1px 6px;font-size:10px">🛡️ Admin</span>':'')+
       '</div>'+
       '<div style="font-size:11px;color:var(--m)">'+u.email+(u.phone?' • '+u.phone:'')+'</div>'+
+      // Регистрийн дугаар
+      '<div style="font-size:12px;margin-top:4px;display:flex;align-items:center;gap:6px">'+
+      '<span style="color:var(--m)">🪪 Регистр:</span> '+
+      (u.register_number ?
+        '<span style="font-weight:700;color:'+(u.is_verified_id?'#00C96B':'#E62B05')+';font-family:monospace">'+u.register_number+'</span>'+
+        (u.is_verified_id?' <span style="color:#00C96B;font-size:10px">✓ Баталгаажсан</span>':' <span style="color:#e53e3e;font-size:10px">⚠️ Шалгаагүй</span>') :
+        '<span style="color:#999;font-size:11px">Оруулаагүй</span>')+
       '</div>'+
-      '<div style="display:flex;gap:6px">'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+      (u.register_number && !u.is_verified_id ?
+        '<button onclick="verifyRegNumber(\''+u.id+'\')" style="background:#00C96B;color:white;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer">🪪 Регистр баталгаажуулах</button>' : '')+
+      (u.register_number && u.is_verified_id ?
+        '<button onclick="unverifyRegNumber(\''+u.id+'\')" style="background:none;border:1px solid #999;color:#999;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer">Буцаах</button>' : '')+
+      '</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
       '<button onclick="toggleVerified(\''+u.id+'\','+u.is_verified+')" style="background:'+(u.is_verified?'#00C96B':'var(--s2)')+';color:'+(u.is_verified?'white':'var(--t)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">'+(u.is_verified?'✓ Баталгаажсан':'Баталгаажуулах')+'</button>'+
       '<button onclick="toggleAdmin(\''+u.id+'\','+u.is_admin+')" style="background:'+(u.is_admin?'var(--a)':'var(--s2)')+';color:'+(u.is_admin?'white':'var(--t)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">'+(u.is_admin?'🛡️ Admin':'Admin болгох')+'</button>'+
       '<button onclick="adminDeleteUser(\''+u.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
@@ -1546,6 +1562,19 @@ async function deleteAd(id) {
   await sb.from('ads').delete().eq('id', id);
   loadAdminAds();
   updateAdSpace(false);
+}
+
+async function verifyRegNumber(id) {
+  await sb.from('users').update({is_verified_id: true}).eq('id', id);
+  await sendNotifToUser(id, '🪪 Регистр баталгаажлаа!', 'Таны регистрийн дугаар Admin-аар баталгаажлаа. Одоо та бүрэн эрхтэй хэрэглэгч болсон!');
+  showToast('Регистр баталгаажлаа! ✅');
+  loadAdmin();
+}
+
+async function unverifyRegNumber(id) {
+  await sb.from('users').update({is_verified_id: false}).eq('id', id);
+  showToast('Баталгаажуулалт цуцлагдлаа');
+  loadAdmin();
 }
 
 async function toggleVerified(id, current) {
@@ -1743,20 +1772,23 @@ async function login() {
 
 async function register() {
   var name = document.getElementById('regName').value;
+  var regNum = document.getElementById('regNumber').value.toUpperCase();
   var email = document.getElementById('regEmail').value;
   var phone = document.getElementById('regPhone').value;
   var pass = document.getElementById('regPassword').value;
   var role = document.getElementById('regRole').value;
   if (!name||!email||!pass) { showToast('Бүх талбарыг бөглөнө үү',true); return; }
+  if (!regNum) { showToast('Регистрийн дугаар оруулна уу',true); return; }
+  if (!/^[А-ЯЁӨҮ]{2}\d{8}$/.test(regNum)) { showToast('Регистрийн дугаар буруу байна (АА00000000)',true); return; }
+  // Давхар регистр шалгах
+  var existing = await sb.from('users').select('id').eq('register_number', regNum).single();
+  if (existing.data) { showToast('Энэ регистрийн дугаар аль хэдийн бүртгэлтэй байна',true); return; }
   var r = await sb.auth.signUp({email:email,password:pass});
   if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
   if (r.data.user) {
-    await sb.from('users').insert({id:r.data.user.id,email:email,name:name,phone:phone,is_courier:role==='courier'});
-    CU = r.data.user;
+    await sb.from('users').insert({id:r.data.user.id,email:email,name:name,phone:phone,register_number:regNum,is_courier:role==='courier'});
     closeModal('authModal');
-    await updateNav();
-    loadProfile();
-    showToast(role==='courier'?'Хүргэгчээр бүртгэгдлээ! 🚚':'Бүртгэл амжилттай! 🎉');
+    showToast('📧 Имэйл рүү баталгаажуулах линк явуулсан! Шалгана уу', false, 8000);
   }
 }
 
