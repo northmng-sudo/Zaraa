@@ -1783,12 +1783,24 @@ async function register() {
   // Давхар регистр шалгах
   var existing = await sb.from('users').select('id').eq('register_number', regNum).single();
   if (existing.data) { showToast('Энэ регистрийн дугаар аль хэдийн бүртгэлтэй байна',true); return; }
-  var r = await sb.auth.signUp({email:email,password:pass});
+  var r = await sb.auth.signUp({email:email,password:pass,options:{data:{name:name}}});
   if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
   if (r.data.user) {
     await sb.from('users').update({name:name,phone:phone,register_number:regNum,is_courier:role==='courier'}).eq('id', r.data.user.id);
-    closeModal('authModal');
-    showToast('📧 '+email+' рүү баталгаажуулах имэйл явуулсан!', false, 8000);
+    // Шууд нэвтрэх
+    var login = await sb.auth.signInWithPassword({email:email,password:pass});
+    if (!login.error) {
+      CU = login.data.user;
+      closeModal('authModal');
+      await updateNav();
+      showPage('profile');
+      await loadProfile();
+      loadNotifications();
+      showToast(role==='courier'?'Хүргэгчээр бүртгэгдлээ! 🚚':'Бүртгэл амжилттай! 🎉');
+    } else {
+      closeModal('authModal');
+      showToast('Бүртгэл амжилттай! Нэвтэрнэ үү 👋', false, 5000);
+    }
   }
 }
 
