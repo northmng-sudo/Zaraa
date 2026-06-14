@@ -9,8 +9,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 :root{--bg:#F5F5F7;--s:#FFFFFF;--s2:#F0F0F3;--b:#E0E0E8;--a:#FF5C00;--a2:#FF8A3D;--t:#1A1A2E;--m:#6A6A7A;--g:#00C96B;--r:14px}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
-nav{position:sticky;top:0;z-index:100;background:var(--a);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between}
+body{font-family:'Inter',sans-serif;background:#f0f0f0;color:var(--t);min-height:100vh;overflow-x:hidden}
+.app-wrap{max-width:480px;margin:0 auto;background:var(--bg);min-height:100vh;position:relative;box-shadow:0 0 40px rgba(0,0,0,0.15)}
+nav{position:sticky;top:0;z-index:100;background:var(--a);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;max-width:480px;width:100%}
 .logo{font-size:20px;font-weight:900;letter-spacing:-1px;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none;color:white}
 .logo-icon{width:32px;height:32px;background:white;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--a);font-size:18px;font-weight:900;line-height:1}
 .logo span{color:white;opacity:0.9}
@@ -69,7 +70,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--a);padding:0 16px;height:
 .delivery-cta h2{font-size:20px;font-weight:900;margin-bottom:6px}
 .delivery-cta p{font-size:12px;opacity:0.85;margin-bottom:16px;max-width:200px;line-height:1.5}
 .btn-white{background:white;color:var(--a);font-weight:700;padding:9px 20px;border-radius:50px;border:none;font-size:13px;cursor:pointer}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--b);display:flex;justify-content:space-around;padding:6px 0 16px;z-index:100}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:white;border-top:1px solid var(--b);display:flex;justify-content:space-around;padding:6px 0 16px;z-index:100}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:500;color:var(--m);cursor:pointer;padding:4px 8px;border-radius:8px;transition:color 0.2s;position:relative}
 .nav-item svg{width:22px;height:22px}
 .nav-item.active{color:var(--a)}
@@ -139,6 +140,7 @@ select.form-input{cursor:pointer}
 </style>
 </head>
 <body>
+<div class="app-wrap">
 <div class="toast" id="toast"></div>
 <nav>
   <div class="logo" onclick="showPage('home')">
@@ -896,7 +898,7 @@ async function showDetail(id) {
   if (!l) return;
   var imgs = l.images&&l.images.length ? l.images : null;
   var imgHtml = imgs ?
-    '<div style="position:relative;width:100%;padding-bottom:100%;overflow:hidden;background:var(--s2)" id="imgSliderWrap">'+
+    '<div style="position:relative;width:100%;max-width:480px;margin:0 auto;padding-bottom:min(100%,480px);overflow:hidden;background:var(--s2)" id="imgSliderWrap">'+
     '<div style="position:absolute;inset:0" id="imgSlider">'+
     '<div style="display:flex;transition:transform 0.3s;height:100%" id="imgSliderInner">'+
     imgs.map(function(url){ return '<img src="'+url+'" style="min-width:100%;height:100%;object-fit:cover">'; }).join('')+
