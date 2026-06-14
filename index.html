@@ -1783,7 +1783,7 @@ async function register() {
   // Давхар регистр шалгах
   var existing = await sb.from('users').select('id').eq('register_number', regNum).single();
   if (existing.data) { showToast('Энэ регистрийн дугаар аль хэдийн бүртгэлтэй байна',true); return; }
-  var r = await sb.functions.invoke('create-user', {
+  var r = await sb.functions.invoke('bright-api', {
     body: {email, password:pass, name, phone, register_number:regNum, is_courier:role==='courier'}
   });
   if (r.error || (r.data && r.data.error)) { 
