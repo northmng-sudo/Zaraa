@@ -1673,8 +1673,10 @@ async function enableDelivery(id) {
 
 async function deleteListing(id) {
   if (!confirm('Зарыг устгах уу?')) return;
+  var listing = await sb.from('listings').select('title').eq('id', id).single();
   var r = await sb.from('listings').delete().eq('id', id);
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  await notifyAdmins('🗑️ Зар устгагдлаа', '"'+(listing.data&&listing.data.title||'?')+'" зар хэрэглэгчээр устгагдлаа');
   showToast('Зар устгагдлаа!');
   showPage('home');
   loadListings();
@@ -2028,7 +2030,13 @@ async function postListing() {
   document.getElementById('postNegotiable').checked=false;
   document.getElementById('postDistrict').value='';
   document.getElementById('postKhoroo').innerHTML='<option value="">Хороо сонгох</option>';
-  showToast(editId?'Зар засагдлаа! ✅':'Зар илгээгдлээ! Admin шалгаад зөвшөөрнө 🎉');
+  showToast(editId?'⏳ Зар засагдлаа! Admin шалгаад нийтэлнэ':'⏳ Зар илгээгдлээ! Admin шалгаад зөвшөөрнө');
+  // Admin-д мэдэгдэл
+  await notifyAdmins(
+    editId ? '✏️ Зар засагдлаа' : '📋 Шинэ зар ирлээ',
+    '"'+title+'" зар '+(editId?'засагдаж':'шинээр')+' зөвшөөрөл хүлээж байна',
+    editId || null
+  );
   loadListings(); loadStats();
 }
 
@@ -2152,10 +2160,19 @@ async function loadNotifications() {
   if (!box) return;
   if (!notifs.length) { box.innerHTML = '<div class="empty"><div class="empty-icon">🔔</div><p>Мэдэгдэл байхгүй</p></div>'; return; }
   box.innerHTML = notifs.map(function(n) {
-    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:8px;'+(n.is_read?'':'border-left:3px solid var(--a)')+'" onclick="markRead(\''+n.id+'\')">'+
+    var nav = '';
+    if (n.listing_id) nav = 'showDetail(\''+n.listing_id+'\')';
+    else if (n.title.includes('📋') || n.title.includes('✏️') || n.title.includes('🗑️') || n.title.includes('🚩') || n.title.includes('👤') || n.title.includes('🪪')) nav = 'showPage(\'admin\')';
+    else if (n.title.includes('💬') || n.title.includes('мессеж')) nav = 'showPage(\'chats\')';
+    else if (n.title.includes('🚚') || n.title.includes('📦') || n.title.includes('захиалга')) nav = 'showPage(\'deliveries\')';
+    else if (n.title.includes('✅') || n.title.includes('⭐')) nav = n.listing_id ? 'showDetail(\''+n.listing_id+'\')' : 'showPage(\'home\')';
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:8px;'+(n.is_read?'':'border-left:3px solid var(--a)')+';display:flex;align-items:flex-start;gap:8px">'+
+      '<div style="flex:1;cursor:'+(nav?'pointer':'default')+'" onclick="markRead(\''+n.id+'\');'+(nav?nav+';':'')+'">'+
       '<div style="font-weight:600;font-size:13px;margin-bottom:4px">'+(n.is_read?'':'🔴 ')+n.title+'</div>'+
       '<div style="font-size:12px;color:var(--m)">'+n.body+'</div>'+
-      '<div style="font-size:10px;color:var(--m);margin-top:4px">'+new Date(n.created_at).toLocaleString('mn-MN')+'</div>'+
+      '<div style="font-size:10px;color:var(--m);margin-top:4px">'+new Date(n.created_at).toLocaleString('mn-MN',{timeZone:'Asia/Ulaanbaatar'})+'</div>'+
+      '</div>'+
+      '<button onclick="deleteNotif(\''+n.id+'\')" style="background:none;border:none;color:var(--m);font-size:18px;cursor:pointer;padding:0;flex-shrink:0">×</button>'+
       '</div>';
   }).join('');
 }
@@ -2169,6 +2186,20 @@ async function markAllRead() {
   if (!CU) return;
   await sb.from('notifications').update({is_read:true}).eq('user_id', CU.id);
   loadNotifications();
+}
+
+async function notifyAdmins(title, body, listingId) {
+  var admins = await sb.from('users').select('id').eq('is_admin', true);
+  if (admins.data) {
+    for (var i=0; i<admins.data.length; i++) {
+      await sb.from('notifications').insert({
+        user_id: admins.data[i].id,
+        title: title,
+        body: body,
+        listing_id: listingId || null
+      });
+    }
+  }
 }
 
 async function sendNotifToUser(userId, title, body) {
