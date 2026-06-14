@@ -1783,30 +1783,32 @@ async function register() {
   // Давхар регистр шалгах
   var existing = await sb.from('users').select('id').eq('register_number', regNum).single();
   if (existing.data) { showToast('Энэ регистрийн дугаар аль хэдийн бүртгэлтэй байна',true); return; }
-  var r = await sb.auth.signUp({
-    email:email,
-    password:pass,
-    options:{
-      data:{name:name},
-      emailRedirectTo: null
-    }
+  var r = await sb.functions.invoke('create-user', {
+    body: {email, password:pass, name, phone, register_number:regNum, is_courier:role==='courier'}
   });
-  if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
-  if (r.data.user) {
-    await sb.from('users').update({name:name,phone:phone,register_number:regNum,is_courier:role==='courier'}).eq('id', r.data.user.id);
-    // Шууд нэвтрэх
-    var login = await sb.auth.signInWithPassword({email:email,password:pass});
-    if (!login.error) {
-      CU = login.data.user;
-      closeModal('authModal');
-      await updateNav();
-      showPage('profile');
-      await loadProfile();
-      loadNotifications();
-      showToast(role==='courier'?'Хүргэгчээр бүртгэгдлээ! 🚚':'Бүртгэл амжилттай! 🎉');
-    } else {
-      closeModal('authModal');
-      showToast('Бүртгэл амжилттай! Нэвтэрнэ үү 👋', false, 5000);
+  if (r.error || (r.data && r.data.error)) { 
+    showToast('Алдаа: '+(r.data&&r.data.error||r.error.message), true); 
+    return; 
+  }
+  // Шууд нэвтрэх
+  var login = await sb.auth.signInWithPassword({email:email, password:pass});
+  if (login.error) { showToast('Алдаа: '+login.error.message, true); return; }
+  CU = login.data.user;
+  closeModal('authModal');
+  await updateNav();
+  showPage('profile');
+  await loadProfile();
+  loadNotifications();
+  showToast(role==='courier'?'Хүргэгчээр бүртгэгдлээ! 🚚':'Бүртгэл амжилттай! 🎉');
+  // Admin-д мэдэгдэл
+  var admins = await sb.from('users').select('id').eq('is_admin', true);
+  if (admins.data) {
+    for (var i=0; i<admins.data.length; i++) {
+      await sb.from('notifications').insert({
+        user_id: admins.data[i].id,
+        title: '👤 Шинэ хэрэглэгч бүртгүүлсэн',
+        body: name+' ('+regNum+') бүртгүүлсэн. Регистрийн дугаарыг баталгаажуулна уу!'
+      });
     }
   }
 }
@@ -1883,10 +1885,11 @@ async function quickToggleAvailability() {
 
 async function showPostModal() {
   if (!CU) { openAuth('login'); showToast('Эхлээд нэвтэрнэ үү',true); return; }
-  var u = await sb.from('users').select('is_courier').eq('id', CU.id).single();
+  var u = await sb.from('users').select('is_courier, is_verified_id').eq('id', CU.id).single();
   if (u.data && u.data.is_courier) { showToast('Хүргэгч зар байршуулах боломжгүй',true); return; }
+  if (u.data && !u.data.is_verified_id) { showToast('⚠️ Регистрийн дугаар баталгаажаагүй байна. Admin баталгаажуулсны дараа зар тавих боломжтой!',true); return; }
   goStep(1);
-  openModal('postModal');
+  showPage('post');
 }
 
 function previewImages(input) {
