@@ -10,7 +10,7 @@
 :root{--bg:#F5F5F7;--s:#FFFFFF;--s2:#F0F0F3;--b:#E0E0E8;--a:#FF5C00;--a2:#FF8A3D;--t:#1A1A2E;--m:#6A6A7A;--g:#00C96B;--r:14px}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
-nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#E62B05,#FF8C00);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between}
+nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#E62B05,#FF8C00);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between}
 .logo{font-size:20px;font-weight:900;letter-spacing:-1px;cursor:pointer;display:flex;align-items:center;gap:6px;color:white}
 .logo span{color:rgba(255,255,255,0.85)}
 .nav-right .btn-ghost{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)}
@@ -151,9 +151,26 @@ select.form-input{cursor:pointer}
 <body>
 <div class="toast" id="toast"></div>
 <nav>
-  <div class="logo" onclick="showPage('home')">
-    <div class="logo-icon">З</div>
-    араа<span>.</span>
+  <div onclick="showPage('home')" style="cursor:pointer">
+    <svg width="160" height="40" viewBox="0 0 360 90" role="img">
+      <defs>
+        <linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#E62B05"/>
+          <stop offset="100%" stop-color="#FF8C00"/>
+        </linearGradient>
+        <linearGradient id="ul" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#E62B05"/>
+          <stop offset="100%" stop-color="#FF8C00"/>
+        </linearGradient>
+      </defs>
+      <!-- Hexagon -->
+      <polygon points="38,5 62,19 62,47 38,61 14,47 14,19" fill="url(#hg)"/>
+      <text x="38" y="42" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="30" font-weight="900" fill="white">З</text>
+      <!-- ЗАРАА -->
+      <text x="75" y="48" font-family="Arial Black,sans-serif" font-size="38" font-weight="900" fill="white">ЗАРАА</text>
+      <!-- Underline -->
+      <rect x="75" y="55" width="230" height="4" rx="2" fill="url(#ul)"/>
+    </svg>
   </div>
   <div class="nav-right" id="navRight">
     <button class="btn btn-ghost" onclick="openAuth('login')">Нэвтрэх</button>
