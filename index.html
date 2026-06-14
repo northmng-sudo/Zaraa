@@ -830,14 +830,23 @@ function startGlobalNotifications() {
   if (!CU) return;
   sb.channel('global_notifications_'+CU.id)
     .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'messages',
+      event: 'INSERT', schema: 'public', table: 'messages',
       filter: 'receiver_id=eq.'+CU.id
     }, function(payload) {
       var msg = payload.new;
       sendNotification('💬 Шинэ мессеж', msg.content || 'Шинэ мессеж ирлээ');
       showToast('💬 Шинэ мессеж ирлээ!');
+      var badge = document.getElementById('chatBadge');
+      if (badge) { var c=(parseInt(badge.textContent)||0)+1; badge.textContent=c; badge.style.display='flex'; }
+    })
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'notifications',
+      filter: 'user_id=eq.'+CU.id
+    }, function(payload) {
+      var n = payload.new;
+      sendNotification(n.title, n.body);
+      showToast(n.title);
+      loadNotifications();
     })
     .subscribe();
 }
