@@ -1787,8 +1787,12 @@ async function register() {
   if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
   if (r.data.user) {
     await sb.from('users').insert({id:r.data.user.id,email:email,name:name,phone:phone,register_number:regNum,is_courier:role==='courier'});
+    // Баталгаажуулах имэйл илгээх
+    await sb.functions.invoke('send-email', {
+      body: { to: email, name: name }
+    });
     closeModal('authModal');
-    showToast('📧 Имэйл рүү баталгаажуулах линк явуулсан! Шалгана уу', false, 8000);
+    showToast('📧 '+email+' рүү баталгаажуулах имэйл явуулсан!', false, 8000);
   }
 }
 
