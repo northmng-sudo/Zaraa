@@ -1903,9 +1903,9 @@ async function quickToggleAvailability() {
 
 async function showPostModal() {
   if (!CU) { openAuth('login'); showToast('Эхлээд нэвтэрнэ үү',true); return; }
-  var u = await sb.from('users').select('is_courier, is_verified_id').eq('id', CU.id).single();
+  var u = await sb.from('users').select('is_courier, is_verified_id, is_admin').eq('id', CU.id).single();
   if (u.data && u.data.is_courier) { showToast('Хүргэгч зар байршуулах боломжгүй',true); return; }
-  if (u.data && !u.data.is_verified_id) { showToast('⚠️ Регистрийн дугаар баталгаажаагүй байна. Admin баталгаажуулсны дараа зар тавих боломжтой!',true); return; }
+  if (u.data && !u.data.is_verified_id && !u.data.is_admin) { showToast('⚠️ Регистрийн дугаар баталгаажаагүй байна. Admin баталгаажуулсны дараа зар тавих боломжтой!',true); return; }
   goStep(1);
   showPage('post');
 }
