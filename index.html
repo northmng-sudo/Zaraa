@@ -1783,7 +1783,14 @@ async function register() {
   // Давхар регистр шалгах
   var existing = await sb.from('users').select('id').eq('register_number', regNum).single();
   if (existing.data) { showToast('Энэ регистрийн дугаар аль хэдийн бүртгэлтэй байна',true); return; }
-  var r = await sb.auth.signUp({email:email,password:pass,options:{data:{name:name}}});
+  var r = await sb.auth.signUp({
+    email:email,
+    password:pass,
+    options:{
+      data:{name:name},
+      emailRedirectTo: null
+    }
+  });
   if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
   if (r.data.user) {
     await sb.from('users').update({name:name,phone:phone,register_number:regNum,is_courier:role==='courier'}).eq('id', r.data.user.id);
