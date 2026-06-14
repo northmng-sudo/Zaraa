@@ -1907,7 +1907,7 @@ async function showPostModal() {
   if (u.data && u.data.is_courier) { showToast('Хүргэгч зар байршуулах боломжгүй',true); return; }
   if (u.data && !u.data.is_verified_id && !u.data.is_admin) { showToast('⚠️ Регистрийн дугаар баталгаажаагүй байна. Admin баталгаажуулсны дараа зар тавих боломжтой!',true); return; }
   goStep(1);
-  showPage('post');
+  openModal('postModal');
 }
 
 function previewImages(input) {
