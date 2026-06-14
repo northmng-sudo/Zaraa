@@ -1786,7 +1786,7 @@ async function register() {
   var r = await sb.auth.signUp({email:email,password:pass});
   if (r.error) { showToast('Алдаа: '+r.error.message,true); return; }
   if (r.data.user) {
-    await sb.from('users').insert({id:r.data.user.id,email:email,name:name,phone:phone,register_number:regNum,is_courier:role==='courier'});
+    await sb.from('users').update({name:name,phone:phone,register_number:regNum,is_courier:role==='courier'}).eq('id', r.data.user.id);
     closeModal('authModal');
     showToast('📧 '+email+' рүү баталгаажуулах имэйл явуулсан!', false, 8000);
   }
