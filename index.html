@@ -1626,6 +1626,15 @@ async function adminDeleteListing(id) {
   loadAdmin(); loadListings();
 }
 
+async function editDelivery(id, currentAddress) {
+  var newAddress = prompt('Хүргэх хаяг:', currentAddress);
+  if (!newAddress || newAddress === currentAddress) return;
+  var r = await sb.from('deliveries').update({address: newAddress}).eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Хаяг шинэчлэгдлээ! ✅');
+  loadMyDeliveries();
+}
+
 async function cancelDelivery(id) {
   if (!confirm('Захиалгыг цуцлах уу?')) return;
   var r = await sb.from('deliveries').update({status:'cancelled'}).eq('id', id);
@@ -1961,16 +1970,17 @@ async function uploadVideo(file) {
 async function postListing() {
   var title = document.getElementById('postTitle').value;
   var desc = document.getElementById('postDesc').value;
-  var price = document.getElementById('postNegotiable').checked ? 0 : document.getElementById('postPrice').value;
+  var price = document.getElementById('postPrice').value;
   var negotiable = document.getElementById('postNegotiable').checked;
   var district = document.getElementById('postDistrict').value;
   var khoroo = document.getElementById('postKhoroo').value;
-  var loc = [district, khoroo].filter(Boolean).join(', ');
+  var address = document.getElementById('postAddress') ? document.getElementById('postAddress').value : '';
+  var loc = [district, khoroo, address].filter(Boolean).join(', ');
   var cat = document.getElementById('postCategory').value;
   var hasD = document.getElementById('postDelivery').checked;
   var imgFiles = document.getElementById('postImages').files;
   var vidFile = document.getElementById('postVideo').files[0];
-  var editId = document.getElementById('postModal').getAttribute('data-edit-id');
+  var editId = document.getElementById('postModal') ? document.getElementById('postModal').getAttribute('data-edit-id') : '';
   if (!title) { showToast('Гарчиг оруулна уу', true); return; }
   if (!negotiable && !price) { showToast('Үнэ оруулна уу', true); return; }
   if (!cat) { showToast('Ангилал сонгоно уу', true); return; }
@@ -2210,11 +2220,16 @@ async function loadMyDeliveries() {
       }).join('')+
     '</div>';
     return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:12px">'+
-      '<div style="font-weight:700;font-size:15px;margin-bottom:4px">'+(d.listings&&d.listings.title||'Зар')+'</div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
+      '<div style="font-weight:700;font-size:15px">'+(d.listings&&d.listings.title||'Зар')+'</div>'+
+      (d.status==='pending'?'<div style="display:flex;gap:6px">'+
+        '<button onclick="editDelivery(\''+d.id+'\',\''+d.address+'\')" style="background:none;border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">✏️ Засах</button>'+
+        '<button onclick="cancelDelivery(\''+d.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️ Устгах</button>'+
+      '</div>':'')+
+      '</div>'+
       '<div style="font-size:12px;color:var(--m);margin-bottom:4px">📍 '+d.address+'</div>'+
       progressBar+
       (d.status==='accepted'&&d.users?'<div style="background:var(--s2);border-radius:10px;padding:10px;font-size:13px">🚗 Хүргэгч: <b>'+(d.users.name||'?')+'</b> • 📞 '+(d.users.phone||'?')+'</div>':'')+
-      (d.status==='pending'?'<button class="btn btn-ghost btn-full" style="margin-top:10px;color:#e53e3e;border-color:#e53e3e" onclick="cancelDelivery(\''+d.id+'\')">❌ Цуцлах</button>':'')+
       (d.status==='delivered'?'<button class="btn btn-primary btn-full" style="margin-top:10px" onclick="confirmDelivery(\''+d.id+'\')">✅ Хүлээн авсан баталгаажуулах</button>':'')+
       '</div>';
   }).join('');
