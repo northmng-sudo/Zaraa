@@ -532,7 +532,7 @@ select.form-input{cursor:pointer}
         <div style="display:flex;gap:10px;align-items:center">
           <input class="form-input" type="number" id="postPrice" placeholder="0" style="flex:1">
           <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="postNegotiable" onchange="document.getElementById('postPrice').disabled=this.checked;if(this.checked)document.getElementById('postPrice').value=''">
+            <input type="checkbox" id="postNegotiable">
             Тохирно
           </label>
         </div>
@@ -1994,9 +1994,11 @@ async function postListing() {
     var el = document.getElementById('df_'+f.id);
     if (el && el.value) extra[f.id] = el.value;
   });
-  showToast('Байршуулж байна...');
+  showToast('🖼️ Зураг байршуулж байна...', false, 60000);
   var imgUrls = imgFiles.length ? await uploadImages(imgFiles) : [];
+  if (vidFile) showToast('🎥 Бичлэг байршуулж байна...', false, 60000);
   var vidUrl = vidFile ? await uploadVideo(vidFile) : null;
+  showToast('📋 Зар илгээж байна...', false, 60000);
   var data = {
     title: title, description: desc,
     price: negotiable ? null : Number(price),
