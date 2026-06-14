@@ -10,7 +10,7 @@
 :root{--bg:#F5F5F7;--s:#FFFFFF;--s2:#F0F0F3;--b:#E0E0E8;--a:#FF5C00;--a2:#FF8A3D;--t:#1A1A2E;--m:#6A6A7A;--g:#00C96B;--r:14px}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
-nav{position:sticky;top:0;z-index:100;background:#E62B05;padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between}
+nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#E62B05,#FF8C00);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between}
 .logo{font-size:20px;font-weight:900;letter-spacing:-1px;cursor:pointer;display:flex;align-items:center;gap:6px;color:white}
 .logo span{color:rgba(255,255,255,0.85)}
 .nav-right .btn-ghost{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)}
@@ -47,9 +47,9 @@ nav{position:sticky;top:0;z-index:100;background:#E62B05;padding:0 16px;height:5
 .stat-label{font-size:10px;color:var(--m);margin-top:3px}
 .section{padding:0 16px 24px}
 .section-title{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px}
-.cats{display:flex;gap:0;overflow-x:auto;padding:0;scrollbar-width:none;background:white;border-bottom:1px solid var(--b)}
+.cats{display:flex;flex-direction:row;flex-wrap:nowrap;gap:0;overflow-x:auto;padding:0;scrollbar-width:none;background:white;border-bottom:1px solid var(--b)}
 .cats::-webkit-scrollbar{display:none}
-.cat{flex-shrink:0;background:white;border:none;border-bottom:2px solid transparent;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m)}
+.cat{flex-shrink:0;white-space:nowrap;background:white;border:none;border-bottom:2px solid transparent;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m)}
 .cat:hover,.cat.active{color:#E62B05;border-bottom-color:#E62B05;font-weight:600}
 .cat-card{background:var(--s2);border:2px solid var(--b);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:28px}
 .cat-card div{font-size:12px;font-weight:600;margin-top:6px;color:var(--t)}
@@ -198,14 +198,18 @@ select.form-input{cursor:pointer}
   <div style="background:white;border-bottom:1px solid #f0f0f0">
     <div class="cats" id="catList">
       <div class="cat active" data-cat=''>🔥 Бүгд</div>
-      <div class="cat" data-cat='Техник'>📱 Техник</div>
+      <div class="cat" data-cat='Авто'>🚗 Авто</div>
+      <div class="cat" data-cat='Үл хөдлөх'>🏠 Үл хөдлөх</div>
+      <div class="cat" data-cat='Ажлын байр'>💼 Ажлын байр</div>
+      <div class="cat" data-cat='Гар утас'>📱 Гар утас</div>
+      <div class="cat" data-cat='Компьютер'>💻 Компьютер</div>
+      <div class="cat" </div>
+      <div class="cat" data-cat='ТВ & Дагалдах'>📺 ТВ & Дагалдах</div>
       <div class="cat" data-cat='Хувцас'>👗 Хувцас</div>
       <div class="cat" data-cat='Гутал'>👟 Гутал</div>
       <div class="cat" data-cat='Гоо сайхан'>💄 Гоо сайхан</div>
       <div class="cat" data-cat='Тавилга'>🪑 Тавилга</div>
       <div class="cat" data-cat='Гэр ахуй'>🏡 Гэр ахуй</div>
-      <div class="cat" data-cat='Авто'>🚗 Авто</div>
-      <div class="cat" data-cat='Үл хөдлөх'>🏠 Үл хөдлөх</div>
       <div class="cat" data-cat='Тоглоом'>🎮 Тоглоом</div>
       <div class="cat" data-cat='Спорт'>⚽ Спорт</div>
       <div class="cat" data-cat='Хүүхдийн бараа'>🧸 Хүүхэд</div>
@@ -213,7 +217,6 @@ select.form-input{cursor:pointer}
       <div class="cat" data-cat='Хоол хүнс'>🍎 Хоол хүнс</div>
       <div class="cat" data-cat='Амьтад'>🐾 Амьтад</div>
       <div class="cat" data-cat='Ном'>📚 Ном</div>
-      <div class="cat" data-cat='Ажлын байр'>💼 Ажлын байр</div>
       <div class="cat" data-cat='Үйлчилгээ'>🔧 Үйлчилгээ</div>
       <div class="cat" data-cat='Бусад'>📦 Бусад</div>
     </div>
@@ -463,14 +466,18 @@ select.form-input{cursor:pointer}
     <div id="postStep1">
       <div class="modal-title">Ангилал сонгох</div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" id="catGrid">
-        <div class="cat-card" onclick="selectCategory('Техник','📱')">📱<div>Техник</div></div>
+        <div class="cat-card" onclick="selectCategory('Авто','🚗')">🚗<div>Авто</div></div>
+        <div class="cat-card" onclick="selectCategory('Үл хөдлөх','🏠')">🏠<div>Үл хөдлөх</div></div>
+        <div class="cat-card" onclick="selectCategory('Ажлын байр','💼')">💼<div>Ажлын байр</div></div>
+        <div class="cat-card" onclick="selectCategory('Гар утас','📱')">📱<div>Гар утас</div></div>
+        <div class="cat-card" onclick="selectCategory('Компьютер','💻')">💻<div>Компьютер</div></div>
+        <div class="cat-card" onclick="
+        <div class="cat-card" onclick="selectCategory('ТВ & Дагалдах','📺')">📺<div>ТВ & Дагалдах</div></div>
         <div class="cat-card" onclick="selectCategory('Хувцас','👗')">👗<div>Хувцас</div></div>
         <div class="cat-card" onclick="selectCategory('Гутал','👟')">👟<div>Гутал</div></div>
         <div class="cat-card" onclick="selectCategory('Гоо сайхан','💄')">💄<div>Гоо сайхан</div></div>
         <div class="cat-card" onclick="selectCategory('Тавилга','🪑')">🪑<div>Тавилга</div></div>
         <div class="cat-card" onclick="selectCategory('Гэр ахуй','🏡')">🏡<div>Гэр ахуй</div></div>
-        <div class="cat-card" onclick="selectCategory('Авто','🚗')">🚗<div>Авто</div></div>
-        <div class="cat-card" onclick="selectCategory('Үл хөдлөх','🏠')">🏠<div>Үл хөдлөх</div></div>
         <div class="cat-card" onclick="selectCategory('Тоглоом','🎮')">🎮<div>Тоглоом</div></div>
         <div class="cat-card" onclick="selectCategory('Спорт','⚽')">⚽<div>Спорт</div></div>
         <div class="cat-card" onclick="selectCategory('Хүүхдийн бараа','🧸')">🧸<div>Хүүхэд</div></div>
@@ -478,7 +485,6 @@ select.form-input{cursor:pointer}
         <div class="cat-card" onclick="selectCategory('Хоол хүнс','🍎')">🍎<div>Хоол хүнс</div></div>
         <div class="cat-card" onclick="selectCategory('Амьтад','🐾')">🐾<div>Амьтад</div></div>
         <div class="cat-card" onclick="selectCategory('Ном','📚')">📚<div>Ном</div></div>
-        <div class="cat-card" onclick="selectCategory('Ажлын байр','💼')">💼<div>Ажлын байр</div></div>
         <div class="cat-card" onclick="selectCategory('Үйлчилгээ','🔧')">🔧<div>Үйлчилгээ</div></div>
         <div class="cat-card" onclick="selectCategory('Бусад','📦')">📦<div>Бусад</div></div>
       </div>
@@ -627,7 +633,7 @@ const sb = supabase.createClient(SURL, SKEY);
 var CU = null;
 var AL = [];
 var CC = '';
-var EMOJIS = {'Техник':'📱','Хувцас':'👗','Гутал':'👟','Гоо сайхан':'💄','Тавилга':'🪑','Гэр ахуй':'🏡','Авто':'🚗','Үл хөдлөх':'🏠','Тоглоом':'🎮','Спорт':'⚽','Хүүхдийн бараа':'🧸','Эрүүл мэнд':'💊','Хоол хүнс':'🍎','Амьтад':'🐾','Ном':'📚','Ажлын байр':'💼','Үйлчилгээ':'🔧','Бусад':'📦'};
+var EMOJIS = {'Авто':'🚗','Үл хөдлөх':'🏠','Ажлын байр':'💼','Гар утас':'📱','Компьютер':'💻','ТВ & Дагалдах':'📺','Хувцас':'👗','Гутал':'👟','Гоо сайхан':'💄','Тавилга':'🪑','Гэр ахуй':'🏡','Тоглоом':'🎮','Спорт':'⚽','Хүүхдийн бараа':'🧸','Эрүүл мэнд':'💊','Хоол хүнс':'🍎','Амьтад':'🐾','Ном':'📚','Үйлчилгээ':'🔧','Техник':'📱','Бусад':'📦'};
 
 // Category click
 document.getElementById('catList').addEventListener('click', function(e) {
