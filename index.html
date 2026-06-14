@@ -155,42 +155,6 @@ select.form-input{cursor:pointer}
 </nav>
 
 <div class="page active" id="page-home">
-  <!-- SEARCH - ТУСДАА ХЭСЭГ -->
-  <div style="background:white;border-bottom:1px solid #f0f0f0;padding:10px 0">
-    <div style="max-width:800px;margin:0 auto;padding:0 16px">
-      <div style="background:#f5f5f5;border:2px solid #E62B05;border-radius:6px;display:flex;align-items:center;overflow:hidden">
-        <svg style="margin-left:12px;flex-shrink:0" width="18" height="18" fill="none" stroke="#999" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="searchInput" placeholder="Юу хайж байна вэ?" oninput="doSearch()" autocomplete="off" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:15px;font-family:'Inter',sans-serif;padding:10px 12px">
-        <button onclick="toggleFilter()" style="background:none;border:none;border-left:1px solid #eee;cursor:pointer;padding:10px 12px;color:#999;font-size:14px">⚙️</button>
-        <button onclick="doSearch()" style="background:#E62B05;color:white;border:none;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">Хайх</button>
-      </div>
-      <!-- FILTER PANEL -->
-      <div id="filterPanel" style="display:none;background:white;border:1px solid #eee;border-radius:8px;padding:16px;margin-top:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
-        <div style="font-weight:700;margin-bottom:12px;font-size:14px">🔍 Шүүлтүүр</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-          <div><label class="form-label">Доод үнэ (₮)</label><input class="form-input" type="number" id="filterMinPrice" placeholder="0" oninput="doSearch()"></div>
-          <div><label class="form-label">Дээд үнэ (₮)</label><input class="form-input" type="number" id="filterMaxPrice" placeholder="∞" oninput="doSearch()"></div>
-        </div>
-        <div style="margin-bottom:12px">
-          <label class="form-label">Дүүрэг</label>
-          <select class="form-input" id="filterDistrict" onchange="doSearch()">
-            <option value="">Бүгд</option>
-            <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
-            <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
-            <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
-          </select>
-        </div>
-        <div id="catFilters"></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterDelivery" onchange="doSearch()"> 🚚 Хүргэлттэй</label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохиролцооны</label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterVerified" onchange="doSearch()"> ✅ Баталгаажсан</label>
-        </div>
-        <button class="btn btn-ghost" style="width:100%" onclick="clearFilter()">Цэвэрлэх</button>
-      </div>
-    </div>
-  </div>
-
   <!-- BANNER SLIDER -->
   <div style="max-width:1200px;margin:0 auto">
   <div style="position:relative;overflow:hidden;background:#f5f5f5" id="bannerSlider">
@@ -225,6 +189,41 @@ select.form-input{cursor:pointer}
       <div onclick="slideBanner(0)" id="bd0" style="width:20px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:1"></div>
       <div onclick="slideBanner(1)" id="bd1" style="width:6px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:0.4"></div>
       <div onclick="slideBanner(2)" id="bd2" style="width:6px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:0.4"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH — БАННЕРЫН ДООР -->
+  <div style="background:white;padding:10px 0;border-bottom:1px solid #f0f0f0">
+    <div style="max-width:1100px;margin:0 auto;padding:0 16px">
+      <div style="background:white;border:2px solid #FF8C00;border-radius:6px;display:flex;align-items:center;overflow:hidden">
+        <svg style="margin-left:12px;flex-shrink:0" width="18" height="18" fill="none" stroke="#ccc" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Юу хайж байна вэ?" oninput="doSearch()" autocomplete="off" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:14px;font-family:'Inter',sans-serif;padding:9px 10px">
+        <button onclick="toggleFilter()" style="background:none;border:none;border-left:1px solid #f0f0f0;cursor:pointer;padding:9px 12px;color:#999;font-size:13px">⚙️</button>
+        <button onclick="doSearch()" style="background:#FF8C00;color:white;border:none;padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">Хайх</button>
+      </div>
+      <div id="filterPanel" style="display:none;background:white;border:1px solid #eee;border-radius:8px;padding:16px;margin-top:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
+        <div style="font-weight:700;margin-bottom:12px;font-size:14px">🔍 Шүүлтүүр</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div><label class="form-label">Доод үнэ (₮)</label><input class="form-input" type="number" id="filterMinPrice" placeholder="0" oninput="doSearch()"></div>
+          <div><label class="form-label">Дээд үнэ (₮)</label><input class="form-input" type="number" id="filterMaxPrice" placeholder="∞" oninput="doSearch()"></div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label class="form-label">Дүүрэг</label>
+          <select class="form-input" id="filterDistrict" onchange="doSearch()">
+            <option value="">Бүгд</option>
+            <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
+            <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
+            <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
+          </select>
+        </div>
+        <div id="catFilters"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterDelivery" onchange="doSearch()"> 🚚 Хүргэлттэй</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохиролцооны</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterVerified" onchange="doSearch()"> ✅ Баталгаажсан</label>
+        </div>
+        <button class="btn btn-ghost" style="width:100%" onclick="clearFilter()">Цэвэрлэх</button>
+      </div>
     </div>
   </div>
 
