@@ -245,7 +245,7 @@ select.form-input{cursor:pointer}
       <div id="catFilters"></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterDelivery" onchange="doSearch()"> 🚚 Хүргэлттэй</label>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохиролцооны</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохирно</label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterVerified" onchange="doSearch()"> ✅ Баталгаажсан</label>
       </div>
       <button class="btn btn-ghost" style="width:100%" onclick="clearFilter()">Цэвэрлэх</button>
@@ -494,7 +494,7 @@ select.form-input{cursor:pointer}
           <input class="form-input" type="number" id="postPrice" placeholder="0" style="flex:1">
           <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;font-size:13px">
             <input type="checkbox" id="postNegotiable" onchange="document.getElementById('postPrice').disabled=this.checked;if(this.checked)document.getElementById('postPrice').value=''">
-            Тохиролцооны
+            Тохирно
           </label>
         </div>
       </div>
@@ -840,8 +840,11 @@ function renderListings(arr) {
       (l.images&&l.images[0]?'<img src="'+l.images[0]+'" onerror="this.parentElement.innerHTML=\''+( EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
-      '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.65));padding:18px 6px 5px">'+
-      '<div style="color:white;font-size:13px;font-weight:700">'+(l.is_negotiable&&!l.price?'Тохиролцооны':'₮'+Number(l.price||0).toLocaleString())+'</div>'+
+      '</div>'+
+      '<div style="padding:6px 8px 4px;background:white">'+
+      '<div style="color:#111;font-size:15px;font-weight:800">'+
+      (l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price&&l.is_negotiable?' · ':'')+( l.is_negotiable?'Тохирно':'')+
+      '</div>'+
       '</div>'+
       '</div>'+
       '<div class="card-body">'+
@@ -936,7 +939,7 @@ async function loadRelatedListings(category, currentId) {
         '<div style="aspect-ratio:1;position:relative;overflow:hidden;background:#f5f5f5">'+
         (l.images&&l.images[0]?'<img src="'+l.images[0]+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:28px">'+(EMOJIS[l.category]||'📦')+'</div>')+
         '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.6));padding:12px 6px 4px">'+
-        '<div style="color:white;font-size:11px;font-weight:700">'+(l.is_negotiable&&!l.price?'Тохиролцооны':'₮'+Number(l.price||0).toLocaleString())+'</div>'+
+        '<div style="color:white;font-size:11px;font-weight:700">'+(l.is_negotiable&&!l.price?'Тохирно':'₮'+Number(l.price||0).toLocaleString())+'</div>'+
         '</div>'+
         (l.is_featured?'<div style="position:absolute;top:4px;left:4px;background:#FFD700;color:#333;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px">⭐ Онцлох</div>':'')+
         '</div>'+
