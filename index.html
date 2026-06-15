@@ -946,7 +946,10 @@ function renderListings(arr) {
       '<div style="padding:6px 8px 8px;background:white">'+
       '<div style="color:#111;font-size:15px;font-weight:800">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
       '<div class="card-title" style="margin-top:4px">'+l.title+'</div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:3px">'+
       '<div style="font-size:10px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
+      '<div style="font-size:10px;color:#bbb">'+new Date(l.created_at).toLocaleDateString('mn-MN',{timeZone:'Asia/Ulaanbaatar',month:'short',day:'numeric'})+'</div>'+
+      '</div>'+
       '</div></div></div>';
   });
 
@@ -977,7 +980,7 @@ async function showDetail(id) {
     '<div class="detail-body">'+
     '<div class="detail-title">'+l.title+'</div>'+
     '<div class="detail-price">₮'+Number(l.price).toLocaleString()+'</div>'+
-    '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'</div>'+
+    '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'<span style="font-size:11px;color:#999;margin-left:4px">🕐 '+new Date(l.created_at).toLocaleDateString('mn-MN',{timeZone:'Asia/Ulaanbaatar',year:'numeric',month:'short',day:'numeric'})+'</span></div>'+
     '<div class="detail-desc">'+(l.description||'Тайлбар байхгүй')+'</div>'+
     (l.extra_data && Object.keys(l.extra_data).length ?
       '<div style="background:var(--s2);border-radius:10px;padding:14px;margin-bottom:16px">'+
@@ -1352,7 +1355,7 @@ async function loadChat(listingId, sellerId) {
   var msgs = r.data || [];
   box.innerHTML = msgs.length ? msgs.map(function(m){
     var isMine = m.sender_id === CU.id;
-    var time = new Date(m.created_at).toLocaleTimeString('mn-MN', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Ulaanbaatar'});
+    var time = mTime(m.created_at);
     return '<div style="display:flex;justify-content:'+(isMine?'flex-end':'flex-start')+'">'+
       '<div style="max-width:75%;background:'+(isMine?'linear-gradient(135deg,#E62B05,#FF8C00)':'white')+';color:'+(isMine?'white':'#111')+';padding:10px 14px;border-radius:'+(isMine?'18px 18px 4px 18px':'18px 18px 18px 4px')+';font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,0.1)">'+
       '<div>'+m.content+'</div>'+
@@ -1375,6 +1378,13 @@ async function sendMessage() {
   if (!r.error) {
     input.value = '';
     loadChat(window._chatListingId, window._chatSellerId);
+    // Нөгөө хэрэглэгчид мэдэгдэл
+    var me = await sb.from('users').select('name').eq('id', CU.id).single();
+    await sb.from('notifications').insert({
+      user_id: window._chatSellerId,
+      title: '💬 Шинэ мессеж',
+      body: (me.data&&me.data.name||'Хэрэглэгч')+': '+content
+    });
   }
 }
 
@@ -2443,7 +2453,7 @@ async function loadMyChats() {
   box.innerHTML = chats.map(function(m) {
     var otherId = m.sender_id === CU.id ? m.receiver_id : m.sender_id;
     var isMe = m.sender_id === CU.id;
-    var time = new Date(m.created_at).toLocaleTimeString('mn-MN', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Ulaanbaatar'});
+    var time = mTime(m.created_at);
     return '<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f5f5f5;cursor:pointer;background:white;transition:background 0.15s" onmouseover="this.style.background=\'#f9f9f9\'" onmouseout="this.style.background=\'white\'">'+
       '<div onclick="openChatFromList(\''+m.listing_id+'\',\''+otherId+'\')" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#E62B05,#FF8C00);display:flex;align-items:center;justify-content:center;color:white;font-size:18px;font-weight:700;flex-shrink:0">💬</div>'+
       '<div style="flex:1;min-width:0" onclick="openChatFromList(\''+m.listing_id+'\',\''+otherId+'\')">'+
@@ -2510,19 +2520,11 @@ function showPage(name) {
   if (name === 'notifications') loadNotifications();
 }
 
-// Android keyboard handler
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', function() {
-    var modal = document.getElementById('chatModalInner');
-    if (modal && document.getElementById('chatModal').classList.contains('open')) {
-      var keyboardHeight = window.innerHeight - window.visualViewport.height;
-      modal.style.marginBottom = keyboardHeight > 50 ? keyboardHeight + 'px' : '0';
-      setTimeout(function() {
-        var msgs = document.getElementById('chatMessages');
-        if (msgs) msgs.scrollTop = msgs.scrollHeight;
-      }, 100);
-    }
-  });
+function mTime(dateStr) {
+  return new Date(dateStr).toLocaleTimeString('mn-MN', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Ulaanbaatar'});
+}
+function mDateTime(dateStr) {
+  return new Date(dateStr).toLocaleString('mn-MN', {timeZone:'Asia/Ulaanbaatar'});
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
