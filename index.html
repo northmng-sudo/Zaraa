@@ -821,11 +821,15 @@ async function init() {
   loadListings();
   loadStats();
   startBannerSlider();
-  // Хайх хэсгийн autofill цэвэрлэх
-  setTimeout(function() {
+  // Autofill цэвэрлэх
+  var clearSearch = function() {
     var s = document.getElementById('searchInput');
-    if (s) s.value = '';
-  }, 500);
+    if (s && s.value && s.value.includes('@')) s.value = '';
+  };
+  clearSearch();
+  setTimeout(clearSearch, 300);
+  setTimeout(clearSearch, 800);
+  setTimeout(clearSearch, 1500);
   // Request notification permission
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
