@@ -931,7 +931,8 @@ function selectTier2(sub, el) {
     return;
   }
   document.getElementById('catTier3Grid').innerHTML = items.map(function(item) {
-    return '<div class="cat-pill" onclick="selectTier3(\''+item+'\',this)" style="font-size:12px">'+item+'</div>';
+    var icon = SUB_ICONS[item] || '📌';
+    return '<div class="cat-pill" onclick="selectTier3(\''+item+'\',this)" style="font-size:12px">'+icon+' '+item+'</div>';
   }).join('');
   tier3.style.display = 'block';
   formFields.style.display = 'block';
