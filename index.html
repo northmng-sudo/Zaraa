@@ -56,7 +56,12 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .cats::-webkit-scrollbar{display:none}
 .cat{flex:0 0 auto;white-space:nowrap;background:white;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m);display:inline-block;line-height:1.5}
 .cat:hover,.cat.active{color:#E62B05;border-bottom-color:#E62B05;font-weight:600}
-.cat-card{background:var(--s2);border:2px solid var(--b);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:28px}
+.cat-pill{flex-shrink:0;background:#f5f5f5;border:2px solid transparent;border-radius:50px;padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;color:#333;white-space:nowrap}
+.cat-pill:hover{border-color:#E62B05;color:#E62B05}
+.cat-pill.active{background:#E62B05;color:white;border-color:#E62B05}
+.sub-cat{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px;transition:all 0.15s;text-align:center}
+.sub-cat:hover{border-color:#E62B05;color:#E62B05;background:#fff5f5}
+.sub-cat.active{background:#E62B05;color:white;border-color:#E62B05}
 .cat-card div{font-size:12px;font-weight:600;margin-top:6px;color:var(--t)}
 .card-featured{border:2px solid #FFD700!important;box-shadow:0 4px 20px rgba(255,215,0,0.4);animation:featuredPulse 2s infinite}
 @keyframes featuredPulse{0%,100%{box-shadow:0 4px 20px rgba(255,215,0,0.4)}50%{box-shadow:0 8px 32px rgba(255,165,0,0.7)}}
@@ -413,6 +418,8 @@ select.form-input{cursor:pointer}
   <div id="detailContent" style="max-width:600px;margin:0 auto"></div>
 </div>
 
+<div id="cardPopup" style="display:none;position:fixed;z-index:999;background:white;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:16px;width:280px;pointer-events:none;border:1px solid #f0f0f0"></div>
+
 <div class="bottom-nav">
   <div class="nav-item active" id="nav-home" onclick="showPage('home')">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Нүүр
@@ -490,29 +497,37 @@ select.form-input{cursor:pointer}
     <!-- STEP 1: CATEGORY -->
     <div id="postStep1">
       <div class="modal-title">Ангилал сонгох</div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" id="catGrid">
-        <div class="cat-card" onclick="selectCategory('Авто','🚗')">🚗<div>Авто</div></div>
-        <div class="cat-card" onclick="selectCategory('Үл хөдлөх','🏠')">🏠<div>Үл хөдлөх</div></div>
-        <div class="cat-card" onclick="selectCategory('Ажлын байр','💼')">💼<div>Ажлын байр</div></div>
-        <div class="cat-card" onclick="selectCategory('Гар утас','📱')">📱<div>Гар утас</div></div>
-        <div class="cat-card" onclick="selectCategory('Компьютер','💻')">💻<div>Компьютер</div></div>
-        <div class="cat-card" onclick="
-        <div class="cat-card" onclick="selectCategory('ТВ & Дагалдах','📺')">📺<div>ТВ & Дагалдах</div></div>
-        <div class="cat-card" onclick="selectCategory('Хувцас','👗')">👗<div>Хувцас</div></div>
-        <div class="cat-card" onclick="selectCategory('Гутал','👟')">👟<div>Гутал</div></div>
-        <div class="cat-card" onclick="selectCategory('Гоо сайхан','💄')">💄<div>Гоо сайхан</div></div>
-        <div class="cat-card" onclick="selectCategory('Тавилга','🪑')">🪑<div>Тавилга</div></div>
-        <div class="cat-card" onclick="selectCategory('Гэр ахуй','🏡')">🏡<div>Гэр ахуй</div></div>
-        <div class="cat-card" onclick="selectCategory('Тоглоом','🎮')">🎮<div>Тоглоом</div></div>
-        <div class="cat-card" onclick="selectCategory('Спорт','⚽')">⚽<div>Спорт</div></div>
-        <div class="cat-card" onclick="selectCategory('Хүүхдийн бараа','🧸')">🧸<div>Хүүхэд</div></div>
-        <div class="cat-card" onclick="selectCategory('Эрүүл мэнд','💊')">💊<div>Эрүүл мэнд</div></div>
-        <div class="cat-card" onclick="selectCategory('Хоол хүнс','🍎')">🍎<div>Хоол хүнс</div></div>
-        <div class="cat-card" onclick="selectCategory('Амьтад','🐾')">🐾<div>Амьтад</div></div>
-        <div class="cat-card" onclick="selectCategory('Ном','📚')">📚<div>Ном</div></div>
-        <div class="cat-card" onclick="selectCategory('Үйлчилгээ','🔧')">🔧<div>Үйлчилгээ</div></div>
-        <div class="cat-card" onclick="selectCategory('Бусад','📦')">📦<div>Бусад</div></div>
+
+      <!-- Tier 1: Үндсэн ангилал -->
+      <div id="catTier1" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;border-bottom:2px solid #f0f0f0;margin-bottom:12px">
+        <div class="cat-pill active" onclick="selectTier1('Үл хөдлөх','🏠',this)">🏠 Үл хөдлөх</div>
+        <div class="cat-pill" onclick="selectTier1('Авто','🚗',this)">🚗 Авто</div>
+        <div class="cat-pill" onclick="selectTier1('Ажлын байр','💼',this)">💼 Ажлын байр</div>
+        <div class="cat-pill" onclick="selectTier1('Гар утас','📱',this)">📱 Гар утас</div>
+        <div class="cat-pill" onclick="selectTier1('Компьютер','💻',this)">💻 Компьютер</div>
+        <div class="cat-pill" onclick="selectTier1('ТВ & Дагалдах','📺',this)">📺 ТВ</div>
+        <div class="cat-pill" onclick="selectTier1('Хувцас','👗',this)">👗 Хувцас</div>
+        <div class="cat-pill" onclick="selectTier1('Гутал','👟',this)">👟 Гутал</div>
+        <div class="cat-pill" onclick="selectTier1('Гоо сайхан','💄',this)">💄 Гоо сайхан</div>
+        <div class="cat-pill" onclick="selectTier1('Тавилга','🪑',this)">🪑 Тавилга</div>
+        <div class="cat-pill" onclick="selectTier1('Гэр ахуй','🏡',this)">🏡 Гэр ахуй</div>
+        <div class="cat-pill" onclick="selectTier1('Спорт','⚽',this)">⚽ Спорт</div>
+        <div class="cat-pill" onclick="selectTier1('Тоглоом','🎮',this)">🎮 Тоглоом</div>
+        <div class="cat-pill" onclick="selectTier1('Хүүхдийн бараа','🧸',this)">🧸 Хүүхэд</div>
+        <div class="cat-pill" onclick="selectTier1('Амьтад','🐾',this)">🐾 Амьтад</div>
+        <div class="cat-pill" onclick="selectTier1('Ном','📚',this)">📚 Ном</div>
+        <div class="cat-pill" onclick="selectTier1('Үйлчилгээ','🔧',this)">🔧 Үйлчилгээ</div>
+        <div class="cat-pill" onclick="selectTier1('Бусад','📦',this)">📦 Бусад</div>
       </div>
+
+      <!-- Tier 2: Дэд ангилал -->
+      <div id="catTier2" style="margin-bottom:12px">
+        <!-- JS-ээр дүүргэнэ -->
+      </div>
+
+      <!-- Tier 3: Нарийн ангилал -->
+      <div id="catTier3" style="margin-bottom:12px"></div>
+
     </div>
 
     <!-- STEP 2: DETAILS -->
@@ -750,6 +765,171 @@ function loadCatFilters(cat) {
 }
 
 
+var CAT_SUBS = {
+  'Үл хөдлөх': {
+    'Зарна': ['Орон сууц','Монгол гэр','Хашаа байшин','Газар','Оффис','Граф контейнер/зуслан','АОС хаус','Худалдаа үйлчилгээний талбай','Үйлдвэр/агуулах','00 өрөө В1 подвал','Бусад'],
+    'Түрээслүүлнэ': ['Орон сууц','Монгол гэр','Хашаа байшин','Газар','Оффис','Граф контейнер','Худалдаа үйлчилгээний талбай','Үйлдвэр/агуулах','Бусад']
+  },
+  'Авто': {
+    'Зорчигч машин': ['Седан','Кросс/SUV','Минивэн','Купе','Кабриолет'],
+    'Ачааны машин': ['Жижиг ачааны','Том ачааны','Тагт машин'],
+    'Автобус/микробус': ['Автобус','Микробус'],
+    'Мотоцикл': ['Мотоцикл','Скутер','ATV'],
+    'Спецтехник': ['Трактор','Экскаватор','Бульдозер','Бусад'],
+    'Эд анги': ['Дугуй','Хөдөлгүүр','Кузов','Бусад']
+  },
+  'Ажлын байр': {
+    'Бүтэн цагийн': null,
+    'Хагас цагийн': null,
+    'Зайнаас': null,
+    'Дадлага': null,
+    'Хувиараа': null
+  },
+  'Гар утас': {
+    'Зарна': ['iPhone','Samsung','Xiaomi','Huawei','Бусад'],
+    'Худалдан авна': null,
+    'Дагалдах хэрэгсэл': ['Чихэвч','Цэнэглэгч','Бүрхүүл','Бусад']
+  },
+  'Компьютер': {
+    'Зөөврийн': ['MacBook','Dell','HP','Lenovo','Бусад'],
+    'Суурин': null,
+    'Монитор': null,
+    'Эд анги': ['Процессор','Видео карт','RAM','SSD','Бусад']
+  },
+  'ТВ & Дагалдах': {
+    'Телевизор': ['Samsung','LG','Sony','Бусад'],
+    'Проектор': null,
+    'Дагалдах хэрэгсэл': ['Дагалдах хэрэгсэл','Remote','Антен','Бусад']
+  },
+  'Хувцас': {
+    'Эрэгтэй': null,
+    'Эмэгтэй': null,
+    'Хүүхэд': null,
+    'Спорт': null
+  },
+  'Гутал': {
+    'Эрэгтэй': null,
+    'Эмэгтэй': null,
+    'Хүүхэд': null,
+    'Спорт': null
+  },
+  'Гоо сайхан': {
+    'Арьс халамж': null,
+    'Үс засал': null,
+    'Нүүр будалт': null,
+    'Хумс': null,
+    'Үнэр': null
+  },
+  'Тавилга': {
+    'Унтлагын өрөө': null,
+    'Зочны өрөө': null,
+    'Гал тогоо': null,
+    'Оффис': null,
+    'Бусад': null
+  },
+  'Гэр ахуй': {
+    'Гал тогооны хэрэгсэл': null,
+    'Угаалгын машин': null,
+    'Хөргөгч': null,
+    'Тоос сорогч': null,
+    'Бусад': null
+  },
+  'Спорт': {
+    'Фитнесс': null,
+    'Хөл бөмбөг': null,
+    'Дугуй': null,
+    'Усан спорт': null,
+    'Бусад': null
+  },
+  'Тоглоом': {
+    'PlayStation': null,
+    'Xbox': null,
+    'Nintendo': null,
+    'PC тоглоом': null,
+    'Хүүхэлдэй': null
+  },
+  'Хүүхдийн бараа': {
+    'Тоглоом': null,
+    'Хувцас': null,
+    'Тэрэг': null,
+    'Сургуулийн хэрэгсэл': null
+  },
+  'Амьтад': {
+    'Нохой': null,
+    'Муур': null,
+    'Шувуу': null,
+    'Загас': null,
+    'Бусад': null
+  },
+  'Ном': {
+    'Сурах бичиг': null,
+    'Уран зохиол': null,
+    'Гадаад хэл': null,
+    'Бизнес': null,
+    'Бусад': null
+  },
+  'Үйлчилгээ': {
+    'Засвар үйлчилгээ': null,
+    'Тээвэр': null,
+    'Цэвэрлэгээ': null,
+    'Барилга': null,
+    'Бусад': null
+  },
+  'Бусад': null
+};
+
+function selectTier1(cat, emoji, el) {
+  document.querySelectorAll('.cat-pill').forEach(function(p){ p.classList.remove('active'); });
+  el.classList.add('active');
+  document.getElementById('postCategory').value = cat;
+  window._catEmoji = emoji;
+  window._catSub = '';
+  window._catSub2 = '';
+  // Tier 2 харуулах
+  var subs = CAT_SUBS[cat];
+  var tier2 = document.getElementById('catTier2');
+  var tier3 = document.getElementById('catTier3');
+  tier3.innerHTML = '';
+  if (!subs) {
+    tier2.innerHTML = '<button class="btn btn-primary btn-full" onclick="goStep(2)" style="margin-top:8px">Үргэлжлүүлэх →</button>';
+    return;
+  }
+  var keys = Object.keys(subs);
+  tier2.innerHTML = '<div style="font-size:12px;color:var(--m);margin-bottom:8px">Дэд ангилал сонгох</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">'+
+    keys.map(function(k) {
+      return '<div class="sub-cat" onclick="selectTier2(\''+k+'\',this)">'+k+'</div>';
+    }).join('')+
+    '</div>';
+}
+
+function selectTier2(sub, el) {
+  document.querySelectorAll('.sub-cat').forEach(function(s){ s.classList.remove('active'); });
+  el.classList.add('active');
+  window._catSub = sub;
+  var cat = document.getElementById('postCategory').value;
+  var subs = CAT_SUBS[cat];
+  var items = subs && subs[sub];
+  var tier3 = document.getElementById('catTier3');
+  if (!items) {
+    tier3.innerHTML = '<button class="btn btn-primary btn-full" onclick="goStep(2)" style="margin-top:8px">Үргэлжлүүлэх →</button>';
+    return;
+  }
+  tier3.innerHTML = '<div style="font-size:12px;color:var(--m);margin-bottom:8px">Нарийвчлах</div>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">'+
+    items.map(function(item) {
+      return '<div class="cat-pill" onclick="selectTier3(\''+item+'\',this)" style="font-size:12px">'+item+'</div>';
+    }).join('')+
+    '</div>'+
+    '<button class="btn btn-primary btn-full" onclick="goStep(2)">Үргэлжлүүлэх →</button>';
+}
+
+function selectTier3(item, el) {
+  document.querySelectorAll('#catTier3 .cat-pill').forEach(function(p){ p.classList.remove('active'); });
+  el.classList.add('active');
+  window._catSub2 = item;
+}
+
 function toggleFilter() {
   var panel = document.getElementById('filterPanel');
   panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -973,7 +1153,10 @@ function renderListings(arr) {
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
       '</div>';
-    html += '<div class="card" onclick="if(!event.target.closest(\'[data-imgs]\'))showDetail(\''+l.id+'\')">'+
+    html += '<div class="card" style="position:relative" '+
+      'onmouseenter="showCardPopup(event,this,\''+l.id+'\')" '+
+      'onmouseleave="hideCardPopup()" '+
+      'onclick="if(!event.target.closest(\'[data-imgs]\'))showDetail(\''+l.id+'\')">'+
       '<div class="card-inner">'+imgHtml+
       '<div style="padding:6px 8px 8px;background:white">'+
       '<div style="color:#111;font-size:15px;font-weight:800">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
@@ -1140,6 +1323,12 @@ function selectCategory(cat, emoji) {
 
 function goStep(n) {
   _postStep = n;
+  if (n === 1) {
+    setTimeout(function() {
+      var first = document.querySelector('.cat-pill');
+      if (first) first.click();
+    }, 50);
+  }
   document.getElementById('postStep1').style.display = n===1?'block':'none';
   document.getElementById('postStep2').style.display = n===2?'block':'none';
   document.getElementById('postStep3').style.display = n===3?'block':'none';
