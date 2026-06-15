@@ -498,130 +498,116 @@ select.form-input{cursor:pointer}
     </div>
     <div style="padding:16px">
 
-    <!-- STEP 1: CATEGORY -->
-    <div id="postStep1">
-      <div class="modal-title">Ангилал сонгох</div>
+    <!-- НЭГДСЭН ФОРМ -->
+    <div id="postForm">
 
-      <!-- Tier 1: Үндсэн ангилал -->
-      <div id="catTier1" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;border-bottom:2px solid #f0f0f0;margin-bottom:12px">
-        <div class="cat-pill active" onclick="selectTier1('Үл хөдлөх','🏠',this)">🏠 Үл хөдлөх</div>
-        <div class="cat-pill" onclick="selectTier1('Авто','🚗',this)">🚗 Авто</div>
-        <div class="cat-pill" onclick="selectTier1('Ажлын байр','💼',this)">💼 Ажлын байр</div>
-        <div class="cat-pill" onclick="selectTier1('Гар утас','📱',this)">📱 Гар утас</div>
-        <div class="cat-pill" onclick="selectTier1('Компьютер','💻',this)">💻 Компьютер</div>
-        <div class="cat-pill" onclick="selectTier1('ТВ & Дагалдах','📺',this)">📺 ТВ</div>
-        <div class="cat-pill" onclick="selectTier1('Хувцас','👗',this)">👗 Хувцас</div>
-        <div class="cat-pill" onclick="selectTier1('Гутал','👟',this)">👟 Гутал</div>
-        <div class="cat-pill" onclick="selectTier1('Гоо сайхан','💄',this)">💄 Гоо сайхан</div>
-        <div class="cat-pill" onclick="selectTier1('Тавилга','🪑',this)">🪑 Тавилга</div>
-        <div class="cat-pill" onclick="selectTier1('Гэр ахуй','🏡',this)">🏡 Гэр ахуй</div>
-        <div class="cat-pill" onclick="selectTier1('Спорт','⚽',this)">⚽ Спорт</div>
-        <div class="cat-pill" onclick="selectTier1('Тоглоом','🎮',this)">🎮 Тоглоом</div>
-        <div class="cat-pill" onclick="selectTier1('Хүүхдийн бараа','🧸',this)">🧸 Хүүхэд</div>
-        <div class="cat-pill" onclick="selectTier1('Амьтад','🐾',this)">🐾 Амьтад</div>
-        <div class="cat-pill" onclick="selectTier1('Ном','📚',this)">📚 Ном</div>
-        <div class="cat-pill" onclick="selectTier1('Үйлчилгээ','🔧',this)">🔧 Үйлчилгээ</div>
-        <div class="cat-pill" onclick="selectTier1('Бусад','📦',this)">📦 Бусад</div>
+      <!-- 1. АНГИЛАЛ -->
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:6px">АНГИЛАЛ</div>
+        <div id="catTier1" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none">
+          <div class="cat-pill active" onclick="selectTier1('Үл хөдлөх','🏠',this)">🏠 Үл хөдлөх</div>
+          <div class="cat-pill" onclick="selectTier1('Авто','🚗',this)">🚗 Авто</div>
+          <div class="cat-pill" onclick="selectTier1('Ажлын байр','💼',this)">💼 Ажлын байр</div>
+          <div class="cat-pill" onclick="selectTier1('Гар утас','📱',this)">📱 Гар утас</div>
+          <div class="cat-pill" onclick="selectTier1('Компьютер','💻',this)">💻 Компьютер</div>
+          <div class="cat-pill" onclick="selectTier1('ТВ & Дагалдах','📺',this)">📺 ТВ</div>
+          <div class="cat-pill" onclick="selectTier1('Хувцас','👗',this)">👗 Хувцас</div>
+          <div class="cat-pill" onclick="selectTier1('Гутал','👟',this)">👟 Гутал</div>
+          <div class="cat-pill" onclick="selectTier1('Гоо сайхан','💄',this)">💄 Гоо сайхан</div>
+          <div class="cat-pill" onclick="selectTier1('Тавилга','🪑',this)">🪑 Тавилга</div>
+          <div class="cat-pill" onclick="selectTier1('Гэр ахуй','🏡',this)">🏡 Гэр ахуй</div>
+          <div class="cat-pill" onclick="selectTier1('Спорт','⚽',this)">⚽ Спорт</div>
+          <div class="cat-pill" onclick="selectTier1('Тоглоом','🎮',this)">🎮 Тоглоом</div>
+          <div class="cat-pill" onclick="selectTier1('Хүүхдийн бараа','🧸',this)">🧸 Хүүхэд</div>
+          <div class="cat-pill" onclick="selectTier1('Амьтад','🐾',this)">🐾 Амьтад</div>
+          <div class="cat-pill" onclick="selectTier1('Ном','📚',this)">📚 Ном</div>
+          <div class="cat-pill" onclick="selectTier1('Үйлчилгээ','🔧',this)">🔧 Үйлчилгээ</div>
+          <div class="cat-pill" onclick="selectTier1('Бусад','📦',this)">📦 Бусад</div>
+        </div>
       </div>
 
-      <!-- Tier 2: Дэд ангилал -->
-      <div id="catTier2" style="margin-bottom:12px">
-        <!-- JS-ээр дүүргэнэ -->
+      <!-- 2. ДЭД АНГИЛАЛ -->
+      <div id="catTier2" style="margin-bottom:12px;display:none">
+        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:6px">ДЭД АНГИЛАЛ</div>
+        <div id="catTier2Grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
       </div>
 
-      <!-- Tier 3: Нарийн ангилал -->
-      <div id="catTier3" style="margin-bottom:12px"></div>
-
-    </div>
-
-    <!-- STEP 2: DETAILS -->
-    <div id="postStep2" style="display:none">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <button onclick="goStep(1)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
-        <div class="modal-title" style="margin:0" id="step2Title">Мэдээлэл оруулах</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Гарчиг *</label>
-        <input class="form-input" id="postTitle" placeholder="Барааны нэрийг бичнэ үү">
+      <!-- 3. НАРИЙН АНГИЛАЛ -->
+      <div id="catTier3" style="margin-bottom:12px;display:none">
+        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:6px">ТӨРӨЛ</div>
+        <div id="catTier3Grid" style="display:flex;gap:6px;flex-wrap:wrap"></div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Тайлбар</label>
-        <textarea class="form-input" id="postDesc" placeholder="Барааны нөхцөл байдал, онцлог, нэмэлт мэдээлэл..." style="min-height:100px"></textarea>
-      </div>
+      <!-- ФОРМ ТАЛБАРУУД -->
+      <div id="formFields" style="display:none">
+        <div style="height:1px;background:#f0f0f0;margin:8px 0 16px"></div>
 
-      <!-- Dynamic fields by category -->
-      <div id="dynamicFields"></div>
+        <div class="form-group">
+          <label class="form-label">Гарчиг *</label>
+          <input class="form-input" id="postTitle" placeholder="Барааны нэрийг бичнэ үү">
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">Үнэ (₮) *</label>
-        <div style="display:flex;gap:10px;align-items:center">
-          <input class="form-input" type="number" id="postPrice" placeholder="0" style="flex:1">
-          <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="postNegotiable">
-            Тохирно
+        <div class="form-group">
+          <label class="form-label">Тайлбар</label>
+          <textarea class="form-input" id="postDesc" placeholder="Барааны нөхцөл байдал, онцлог..." style="min-height:80px"></textarea>
+        </div>
+
+        <div id="dynamicFields"></div>
+
+        <div class="form-group">
+          <label class="form-label">Байршил *</label>
+          <div style="display:flex;gap:8px">
+            <select class="form-input" id="postDistrict" onchange="updateKhoroo()" style="flex:1">
+              <option value="">Дүүрэг</option>
+              <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
+              <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
+              <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
+            </select>
+            <select class="form-input" id="postKhoroo" style="flex:1">
+              <option value="">Хороо</option>
+            </select>
+          </div>
+          <input class="form-input" id="postAddress" placeholder="Дэлгэрэнгүй хаяг" style="margin-top:8px">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Үнэ (₮)</label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input class="form-input" type="number" id="postPrice" placeholder="0" style="flex:1">
+            <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;font-size:13px">
+              <input type="checkbox" id="postNegotiable"> Тохирно
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Зурагнууд (макс 10)</label>
+          <div id="imgPreview" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"></div>
+          <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px">
+            📷 Зураг сонгох
+            <input type="file" id="postImages" accept="image/*" multiple style="display:none" onchange="previewImages(this)">
           </label>
         </div>
-      </div>
 
-      <!-- LOCATION -->
-      <div class="form-group">
-        <label class="form-label">Байршил *</label>
-        <div style="display:flex;gap:8px">
-          <select class="form-input" id="postDistrict" onchange="updateKhoroo()" style="flex:1">
-            <option value="">Дүүрэг сонгох</option>
-            <option>Баянгол</option>
-            <option>Баянзүрх</option>
-            <option>Сүхбаатар</option>
-            <option>Хан-Уул</option>
-            <option>Чингэлтэй</option>
-            <option>Сонгинохайрхан</option>
-            <option>Налайх</option>
-            <option>Багануур</option>
-            <option>Багахангай</option>
-          </select>
-          <select class="form-input" id="postKhoroo" style="flex:1">
-            <option value="">Хороо сонгох</option>
-          </select>
+        <div class="form-group">
+          <label class="form-label">Бичлэг (макс 100MB)</label>
+          <div id="videoPreview" style="margin-bottom:8px"></div>
+          <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:16px;cursor:pointer;color:var(--m);font-size:14px">
+            🎥 Бичлэг сонгох
+            <input type="file" id="postVideo" style="display:none" onchange="previewVideo(this)">
+          </label>
         </div>
-      </div>
 
-      <button class="btn btn-primary btn-full" onclick="goStep(3)">Үргэлжлүүлэх →</button>
-    </div>
-
-    <!-- STEP 3: MEDIA -->
-    <div id="postStep3" style="display:none">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <button onclick="goStep(2)" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:20px">←</button>
-        <div class="modal-title" style="margin:0">Зураг & Бичлэг</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Зурагнууд (макс 10)</label>
-        <div id="imgPreview" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"></div>
-        <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px;text-align:center">
-          📷 Зураг сонгох
-          <input type="file" id="postImages" accept="image/*" multiple style="display:none" onchange="previewImages(this)">
-        </label>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Бичлэг (макс 100MB)</label>
-        <div id="videoPreview" style="margin-bottom:8px"></div>
-        <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px">
-          🎥 Бичлэг сонгох
-          <input type="file" id="postVideo" style="display:none" onchange="previewVideo(this)">
-        </label>
-      </div>
-
-      <div class="form-group">
-        <div class="toggle-row">
-          <span class="toggle-label">🚚 Хүргэлт боломжтой</span>
-          <label class="toggle"><input type="checkbox" id="postDelivery"><span class="toggle-slider"></span></label>
+        <div class="form-group">
+          <div class="toggle-row">
+            <span class="toggle-label">🚚 Хүргэлт боломжтой</span>
+            <label class="toggle"><input type="checkbox" id="postDelivery"><span class="toggle-slider"></span></label>
+          </div>
         </div>
+
+        <button class="btn btn-primary btn-full" onclick="postListing()" style="margin-top:8px">✅ Зар байршуулах</button>
       </div>
 
-      <button class="btn btn-primary btn-full" onclick="postListing()">✅ Зар байршуулах</button>
     </div>
 
     <input type="hidden" id="postCategory" value="">
@@ -883,53 +869,57 @@ var CAT_SUBS = {
 };
 
 function selectTier1(cat, emoji, el) {
-  document.querySelectorAll('.cat-pill').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('#catTier1 .cat-pill').forEach(function(p){ p.classList.remove('active'); });
   el.classList.add('active');
   document.getElementById('postCategory').value = cat;
   window._catEmoji = emoji;
   window._catSub = '';
   window._catSub2 = '';
-  // Tier 2 харуулах
   var subs = CAT_SUBS[cat];
   var tier2 = document.getElementById('catTier2');
   var tier3 = document.getElementById('catTier3');
-  tier3.innerHTML = '';
+  var formFields = document.getElementById('formFields');
+  tier3.style.display = 'none';
+  document.getElementById('catTier3Grid').innerHTML = '';
   if (!subs) {
-    tier2.innerHTML = '<button class="btn btn-primary btn-full" onclick="goStep(2)" style="margin-top:8px">Үргэлжлүүлэх →</button>';
+    tier2.style.display = 'none';
+    formFields.style.display = 'block';
+    loadDynamicFields(cat);
     return;
   }
   var keys = Object.keys(subs);
-  tier2.innerHTML = '<div style="font-size:12px;color:var(--m);margin-bottom:8px">Дэд ангилал сонгох</div>'+
-    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">'+
-    keys.map(function(k) {
-      return '<div class="sub-cat" onclick="selectTier2(\''+k+'\',this)">'+k+'</div>';
-    }).join('')+
-    '</div>';
+  document.getElementById('catTier2Grid').innerHTML = keys.map(function(k) {
+    return '<div class="sub-cat" onclick="selectTier2(\''+k+'\',this)">'+k+'</div>';
+  }).join('');
+  tier2.style.display = 'block';
+  formFields.style.display = 'none';
 }
 
 function selectTier2(sub, el) {
-  document.querySelectorAll('.sub-cat').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('#catTier2Grid .sub-cat').forEach(function(s){ s.classList.remove('active'); });
   el.classList.add('active');
   window._catSub = sub;
   var cat = document.getElementById('postCategory').value;
   var subs = CAT_SUBS[cat];
   var items = subs && subs[sub];
   var tier3 = document.getElementById('catTier3');
+  var formFields = document.getElementById('formFields');
   if (!items) {
-    tier3.innerHTML = '<button class="btn btn-primary btn-full" onclick="goStep(2)" style="margin-top:8px">Үргэлжлүүлэх →</button>';
+    tier3.style.display = 'none';
+    formFields.style.display = 'block';
+    loadDynamicFields(cat);
     return;
   }
-  tier3.innerHTML = '<div style="font-size:12px;color:var(--m);margin-bottom:8px">Нарийвчлах</div>'+
-    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">'+
-    items.map(function(item) {
-      return '<div class="cat-pill" onclick="selectTier3(\''+item+'\',this)" style="font-size:12px">'+item+'</div>';
-    }).join('')+
-    '</div>'+
-    '<button class="btn btn-primary btn-full" onclick="goStep(2)">Үргэлжлүүлэх →</button>';
+  document.getElementById('catTier3Grid').innerHTML = items.map(function(item) {
+    return '<div class="cat-pill" onclick="selectTier3(\''+item+'\',this)" style="font-size:12px">'+item+'</div>';
+  }).join('');
+  tier3.style.display = 'block';
+  formFields.style.display = 'block';
+  loadDynamicFields(cat);
 }
 
 function selectTier3(item, el) {
-  document.querySelectorAll('#catTier3 .cat-pill').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('#catTier3Grid .cat-pill').forEach(function(p){ p.classList.remove('active'); });
   el.classList.add('active');
   window._catSub2 = item;
 }
@@ -1327,17 +1317,12 @@ function selectCategory(cat, emoji) {
 
 function goStep(n) {
   _postStep = n;
-  if (n === 1) {
-    setTimeout(function() {
-      var first = document.querySelector('.cat-pill');
-      if (first) first.click();
-    }, 50);
+  if (n === 2 || n === 3) {
+    var f = document.getElementById('formFields');
+    if (f) f.style.display = 'block';
   }
-  document.getElementById('postStep1').style.display = n===1?'block':'none';
-  document.getElementById('postStep2').style.display = n===2?'block':'none';
-  document.getElementById('postStep3').style.display = n===3?'block':'none';
   ['step1bar','step2bar','step3bar'].forEach(function(id, i) {
-    document.getElementById(id).style.background = (i < n) ? 'var(--a)' : 'var(--b)';
+    document.getElementById(id).style.background = (i < n) ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)';
   });
   document.querySelector('#postModal .modal').scrollTop = 0;
 }
