@@ -247,7 +247,7 @@ select.form-input{cursor:pointer}
   <div id="searchWrap" style="position:sticky;top:50px;z-index:90;background:#f5f5f5;padding:20px 16px 24px">
     <div id="searchInner" style="background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.12);border:2px solid #FF8C00;display:flex;align-items:center;overflow:hidden;padding:18px 8px 18px 14px;gap:6px">
       <svg style="flex-shrink:0;color:#999" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:14px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
+      <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:14px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
       <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px 8px;color:#999;font-size:13px;border-radius:8px;flex-shrink:0">⚙️</button>
       <button onclick="doSearch()" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
     </div>
@@ -950,19 +950,20 @@ function renderListings(arr) {
   normal.forEach(function(l) {
     var imgs = l.images && l.images.length ? l.images : null;
     var imgHtml = imgs && imgs.length > 1 ?
-      '<div style="position:relative;aspect-ratio:1;overflow:hidden;background:#f5f5f5" '+
+      '<div style="position:relative;aspect-ratio:1;overflow:hidden;background:#f5f5f5;cursor:pointer" '+
       'data-imgs="'+encodeURIComponent(JSON.stringify(imgs))+'" data-idx="0" '+
       'ontouchstart="cardSwipeStart(event,this)" ontouchend="cardSwipeEnd(event,this)" '+
+      'onclick="showDetail(\''+l.id+'\')" '+
       'onmouseenter="this.querySelector(\'.card-arrows\').style.display=\'flex\'" '+
       'onmouseleave="this.querySelector(\'.card-arrows\').style.display=\'none\'">'+
-      '<img id="cimg_'+l.id+'" src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover">'+
-      (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
-      (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
-      '<div class="card-arrows" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;align-items:center;justify-content:space-between;padding:0 4px;pointer-events:none">'+
-      '<button onclick="cardPrev(event,this.parentElement.parentElement)" style="pointer-events:all;background:rgba(0,0,0,0.45);color:white;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">‹</button>'+
-      '<button onclick="cardNext(event,this.parentElement.parentElement)" style="pointer-events:all;background:rgba(0,0,0,0.45);color:white;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">›</button>'+
+      '<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover;pointer-events:none">'+
+      (l.has_delivery?'<div class="delivery-badge" style="pointer-events:none">Хүргэнэ</div>':'')+
+      (l.video_url?'<div class="video-badge" style="pointer-events:none">▶ Бичлэг</div>':'')+
+      '<div class="card-arrows" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;align-items:center;justify-content:space-between;padding:0 4px">'+
+      '<button onclick="cardPrev(event,this.closest(\'[data-imgs]\')" style="background:rgba(0,0,0,0.45);color:white;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">‹</button>'+
+      '<button onclick="cardNext(event,this.closest(\'[data-imgs]\')" style="background:rgba(0,0,0,0.45);color:white;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">›</button>'+
       '</div>'+
-      '<div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px">'+
+      '<div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;pointer-events:none">'+
       imgs.map(function(_,i){ return '<div style="width:5px;height:5px;border-radius:50%;background:'+(i===0?'white':'rgba(255,255,255,0.5)')+'"></div>'; }).join('')+
       '</div></div>' :
       '<div class="card-img">'+
@@ -970,7 +971,7 @@ function renderListings(arr) {
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
       '</div>';
-    html += '<div class="card" onclick="showDetail(\''+l.id+'\')">'+
+    html += '<div class="card" onclick="if(!event.target.closest(\'[data-imgs]\'))showDetail(\''+l.id+'\')">'+
       '<div class="card-inner">'+imgHtml+
       '<div style="padding:6px 8px 8px;background:white">'+
       '<div style="color:#111;font-size:15px;font-weight:800">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
