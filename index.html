@@ -1699,12 +1699,19 @@ async function editListing(id) {
   document.getElementById('postTitle').value = l.title||'';
   document.getElementById('postDesc').value = l.description||'';
   document.getElementById('postPrice').value = l.price||'';
-  document.getElementById('postLocation').value = l.location||'';
-  document.getElementById('postCategory').value = l.category||'Бусад';
+  document.getElementById('postNegotiable').checked = l.is_negotiable||false;
   document.getElementById('postDelivery').checked = l.has_delivery||false;
+  // Location
+  if (l.location) {
+    var parts = l.location.split(', ');
+    if (document.getElementById('postDistrict')) document.getElementById('postDistrict').value = parts[0]||'';
+    if (parts[1] && document.getElementById('postKhoroo')) {
+      updateKhoroo();
+      setTimeout(function(){ document.getElementById('postKhoroo').value = parts[1]; }, 100);
+    }
+    if (document.getElementById('postAddress')) document.getElementById('postAddress').value = parts.slice(2).join(', ')||'';
+  }
   document.getElementById('postModal').setAttribute('data-edit-id', id);
-  document.querySelector('#postModal .modal-title').textContent = 'Зар засах';
-  document.querySelector('#postModal .btn-primary.btn-full').textContent = 'Хадгалах';
   openModal('postModal');
 }
 
