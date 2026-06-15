@@ -948,10 +948,16 @@ function renderListings(arr) {
     var imgHtml = imgs && imgs.length > 1 ?
       '<div style="position:relative;aspect-ratio:1;overflow:hidden;background:#f5f5f5" '+
       'data-imgs="'+encodeURIComponent(JSON.stringify(imgs))+'" data-idx="0" '+
-      'ontouchstart="cardSwipeStart(event,this)" ontouchend="cardSwipeEnd(event,this)">'+
+      'ontouchstart="cardSwipeStart(event,this)" ontouchend="cardSwipeEnd(event,this)" '+
+      'onmouseenter="this.querySelector(\'.card-arrows\').style.display=\'flex\'" '+
+      'onmouseleave="this.querySelector(\'.card-arrows\').style.display=\'none\'">'+
       '<img id="cimg_'+l.id+'" src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover">'+
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
+      '<div class="card-arrows" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;align-items:center;justify-content:space-between;padding:0 4px;pointer-events:none">'+
+      '<button onclick="cardPrev(event,this.parentElement.parentElement)" style="pointer-events:all;background:rgba(0,0,0,0.45);color:white;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">‹</button>'+
+      '<button onclick="cardNext(event,this.parentElement.parentElement)" style="pointer-events:all;background:rgba(0,0,0,0.45);color:white;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">›</button>'+
+      '</div>'+
       '<div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px">'+
       imgs.map(function(_,i){ return '<div style="width:5px;height:5px;border-radius:50%;background:'+(i===0?'white':'rgba(255,255,255,0.5)')+'"></div>'; }).join('')+
       '</div></div>' :
@@ -2555,6 +2561,27 @@ function timeAgo(dateStr) {
   return Math.floor(diff/31536000) + ' жилийн өмнө';
 }
 
+function cardPrev(e, el) {
+  e.stopPropagation();
+  cardChangeImg(el, -1);
+}
+function cardNext(e, el) {
+  e.stopPropagation();
+  cardChangeImg(el, 1);
+}
+function cardChangeImg(el, dir) {
+  var imgs = JSON.parse(decodeURIComponent(el.getAttribute('data-imgs')));
+  var idx = parseInt(el.getAttribute('data-idx')) || 0;
+  idx = (idx + dir + imgs.length) % imgs.length;
+  el.setAttribute('data-idx', idx);
+  var img = el.querySelector('img');
+  if (img) img.src = imgs[idx];
+  var dots = el.querySelectorAll('div:last-child div');
+  dots.forEach(function(d, i) {
+    d.style.background = i===idx ? 'white' : 'rgba(255,255,255,0.5)';
+  });
+}
+
 var _swipeStartX = 0;
 function cardSwipeStart(e, el) {
   _swipeStartX = e.touches[0].clientX;
@@ -2563,16 +2590,7 @@ function cardSwipeEnd(e, el) {
   var dx = e.changedTouches[0].clientX - _swipeStartX;
   if (Math.abs(dx) < 40) return;
   e.stopPropagation();
-  var imgs = JSON.parse(decodeURIComponent(el.getAttribute('data-imgs')));
-  var idx = parseInt(el.getAttribute('data-idx')) || 0;
-  idx = dx < 0 ? Math.min(idx+1, imgs.length-1) : Math.max(idx-1, 0);
-  el.setAttribute('data-idx', idx);
-  var img = el.querySelector('img');
-  if (img) img.src = imgs[idx];
-  var dots = el.querySelectorAll('div:last-child div');
-  dots.forEach(function(d, i) {
-    d.style.background = i===idx ? 'white' : 'rgba(255,255,255,0.5)';
-  });
+  cardChangeImg(el, dx < 0 ? 1 : -1);
 }
 
 function scrollChatToBottom() {
