@@ -830,9 +830,9 @@ function startGlobalNotifications() {
   if (!CU) return;
   sb.channel('global_notifications_'+CU.id)
     .on('postgres_changes', {
-      event: 'INSERT', schema: 'public', table: 'messages',
-      filter: 'receiver_id=eq.'+CU.id
+      event: 'INSERT', schema: 'public', table: 'messages'
     }, function(payload) {
+      if (payload.new.receiver_id !== CU.id) return;
       var msg = payload.new;
       sendNotification('💬 Шинэ мессеж', msg.content || 'Шинэ мессеж ирлээ');
       showToast('💬 Шинэ мессеж ирлээ!');
@@ -1301,10 +1301,11 @@ function openChat(listingId, sellerId) {
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
-      table: 'messages',
-      filter: 'listing_id=eq.'+listingId
+      table: 'messages'
     }, function(payload) {
-      loadChat(listingId, sellerId);
+      if (payload.new.listing_id === listingId) {
+        loadChat(listingId, sellerId);
+      }
     })
     .subscribe();
 }
@@ -2437,9 +2438,12 @@ async function deleteChat(listingId) {
 function openChatFromList(listingId, otherId) {
   window._chatListingId = listingId;
   window._chatSellerId = otherId;
+  loadChat(listingId, otherId);
+  openModal('chatModal');
+  if (window._chatChannel) sb.removeChannel(window._chatChannel);
   window._chatChannel = sb.channel('chat_'+listingId)
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'messages', filter:'listing_id=eq.'+listingId}, function() {
-      loadChat(listingId, otherId);
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'messages'}, function(payload) {
+      if (payload.new.listing_id === listingId) loadChat(listingId, otherId);
     }).subscribe();
 }
 
