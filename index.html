@@ -56,14 +56,15 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .cats::-webkit-scrollbar{display:none}
 .cat{flex:0 0 auto;white-space:nowrap;background:white;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m);display:inline-block;line-height:1.5}
 .cat:hover,.cat.active{color:#E62B05;border-bottom-color:#E62B05;font-weight:600}
-.cat-pill{flex-shrink:0;background:#f5f5f5;border:2px solid transparent;border-radius:50px;padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);color:#333;white-space:nowrap;transform:scale(1)}
-.cat-pill:hover{border-color:#E62B05;color:#E62B05;transform:scale(1.05)}
-.cat-pill.active{background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border-color:transparent;transform:scale(1.05);box-shadow:0 4px 12px rgba(230,43,5,0.3)}
-.sub-cat{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);text-align:center;transform:scale(1)}
-.sub-cat:hover{border-color:#E62B05;color:#E62B05;background:#fff5f5;transform:scale(1.03)}
-.sub-cat.active{background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border-color:transparent;transform:scale(1.03);box-shadow:0 4px 12px rgba(230,43,5,0.3)}
-@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.cat-pill,.sub-cat{animation:slideIn 0.2s ease forwards}
+.flow-item{position:relative;overflow:hidden;padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.flow-item:last-child{border-bottom:none}
+.flow-item::before{content:'';position:absolute;top:50%;left:-110%;width:120%;height:100%;background:linear-gradient(90deg,#E62B05,#FF8C00);transform:translateY(-50%) skewX(-12deg);transition:left 0.32s cubic-bezier(0.4,0,0.2,1);z-index:0}
+.flow-item:hover::before,.flow-item.active::before{left:-5%}
+.fi{font-size:18px;position:relative;z-index:1}
+.ft{font-size:14px;font-weight:600;color:rgba(255,255,255,0.75);position:relative;z-index:1;transition:color 0.2s;flex:1}
+.fa{font-size:13px;color:rgba(255,255,255,0.3);position:relative;z-index:1;transition:transform 0.25s,color 0.2s}
+.flow-item:hover .ft,.flow-item.active .ft{color:white}
+.flow-item:hover .fa,.flow-item.active .fa{transform:translateX(4px);color:white}
 .cat-card div{font-size:12px;font-weight:600;margin-top:6px;color:var(--t)}
 .card-featured{border:2px solid #FFD700!important;box-shadow:0 4px 20px rgba(255,215,0,0.4);animation:featuredPulse 2s infinite}
 @keyframes featuredPulse{0%,100%{box-shadow:0 4px 20px rgba(255,215,0,0.4)}50%{box-shadow:0 8px 32px rgba(255,165,0,0.7)}}
@@ -505,33 +506,33 @@ select.form-input{cursor:pointer}
 
       <!-- 1. АНГИЛАЛ -->
       <div style="margin-bottom:12px">
-        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:6px">АНГИЛАЛ</div>
-        <div id="catTier1" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none">
-          <div class="cat-pill active" onclick="selectTier1('Үл хөдлөх','🏠',this)">🏠 Үл хөдлөх</div>
-          <div class="cat-pill" onclick="selectTier1('Авто','🚗',this)">🚗 Авто</div>
-          <div class="cat-pill" onclick="selectTier1('Ажлын байр','💼',this)">💼 Ажлын байр</div>
-          <div class="cat-pill" onclick="selectTier1('Гар утас','📱',this)">📱 Гар утас</div>
-          <div class="cat-pill" onclick="selectTier1('Компьютер','💻',this)">💻 Компьютер</div>
-          <div class="cat-pill" onclick="selectTier1('ТВ & Дагалдах','📺',this)">📺 ТВ</div>
-          <div class="cat-pill" onclick="selectTier1('Хувцас','👗',this)">👗 Хувцас</div>
-          <div class="cat-pill" onclick="selectTier1('Гутал','👟',this)">👟 Гутал</div>
-          <div class="cat-pill" onclick="selectTier1('Гоо сайхан','💄',this)">💄 Гоо сайхан</div>
-          <div class="cat-pill" onclick="selectTier1('Тавилга','🪑',this)">🪑 Тавилга</div>
-          <div class="cat-pill" onclick="selectTier1('Гэр ахуй','🏡',this)">🏡 Гэр ахуй</div>
-          <div class="cat-pill" onclick="selectTier1('Спорт','⚽',this)">⚽ Спорт</div>
-          <div class="cat-pill" onclick="selectTier1('Тоглоом','🎮',this)">🎮 Тоглоом</div>
-          <div class="cat-pill" onclick="selectTier1('Хүүхдийн бараа','🧸',this)">🧸 Хүүхэд</div>
-          <div class="cat-pill" onclick="selectTier1('Амьтад','🐾',this)">🐾 Амьтад</div>
-          <div class="cat-pill" onclick="selectTier1('Ном','📚',this)">📚 Ном</div>
-          <div class="cat-pill" onclick="selectTier1('Үйлчилгээ','🔧',this)">🔧 Үйлчилгээ</div>
-          <div class="cat-pill" onclick="selectTier1('Бусад','📦',this)">📦 Бусад</div>
+        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:8px">АНГИЛАЛ</div>
+        <div id="catTier1" style="background:#1a1a2e;border-radius:12px;overflow:hidden">
+          <div class="flow-item active" onclick="selectTier1('Үл хөдлөх','🏠',this)"><span class="fi">🏠</span><span class="ft">Үл хөдлөх</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Авто','🚗',this)"><span class="fi">🚗</span><span class="ft">Авто</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Ажлын байр','💼',this)"><span class="fi">💼</span><span class="ft">Ажлын байр</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Гар утас','📱',this)"><span class="fi">📱</span><span class="ft">Гар утас</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Компьютер','💻',this)"><span class="fi">💻</span><span class="ft">Компьютер</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('ТВ & Дагалдах','📺',this)"><span class="fi">📺</span><span class="ft">ТВ & Дагалдах</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Хувцас','👗',this)"><span class="fi">👗</span><span class="ft">Хувцас</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Гутал','👟',this)"><span class="fi">👟</span><span class="ft">Гутал</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Гоо сайхан','💄',this)"><span class="fi">💄</span><span class="ft">Гоо сайхан</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Тавилга','🪑',this)"><span class="fi">🪑</span><span class="ft">Тавилга</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Гэр ахуй','🏡',this)"><span class="fi">🏡</span><span class="ft">Гэр ахуй</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Спорт','⚽',this)"><span class="fi">⚽</span><span class="ft">Спорт</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Тоглоом','🎮',this)"><span class="fi">🎮</span><span class="ft">Тоглоом</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Хүүхдийн бараа','🧸',this)"><span class="fi">🧸</span><span class="ft">Хүүхдийн бараа</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Амьтад','🐾',this)"><span class="fi">🐾</span><span class="ft">Амьтад</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Ном','📚',this)"><span class="fi">📚</span><span class="ft">Ном</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Үйлчилгээ','🔧',this)"><span class="fi">🔧</span><span class="ft">Үйлчилгээ</span><span class="fa">→</span></div>
+          <div class="flow-item" onclick="selectTier1('Бусад','📦',this)"><span class="fi">📦</span><span class="ft">Бусад</span><span class="fa">→</span></div>
         </div>
       </div>
 
       <!-- 2. ДЭД АНГИЛАЛ -->
       <div id="catTier2" style="margin-bottom:12px;display:none">
-        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:6px">📂 ДЭД АНГИЛАЛ</div>
-        <div id="catTier2Grid" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none"></div>
+        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:8px">📂 ДЭД АНГИЛАЛ</div>
+        <div id="catTier2Grid" style="background:#1a1a2e;border-radius:12px;overflow:hidden"></div>
       </div>
 
       <!-- 3. НАРИЙН АНГИЛАЛ -->
@@ -942,7 +943,7 @@ var SUB_ICONS = {
 };
 
 function selectTier1(cat, emoji, el) {
-  document.querySelectorAll('#catTier1 .cat-pill').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('#catTier1 .flow-item').forEach(function(p){ p.classList.remove('active'); });
   el.classList.add('active');
   document.getElementById('postCategory').value = cat;
   window._catEmoji = emoji;
@@ -963,7 +964,7 @@ function selectTier1(cat, emoji, el) {
   var keys = Object.keys(subs);
   document.getElementById('catTier2Grid').innerHTML = keys.map(function(k) {
     var icon = SUB_ICONS[k] || '📌';
-    return '<div class="cat-pill" onclick="selectTier2(\''+k+'\',this)" style="flex-shrink:0">'+icon+' '+k+'</div>';
+    return '<div class="flow-item" onclick="selectTier2(\''+k+'\',this)"><span class="fi">'+icon+'</span><span class="ft">'+k+'</span><span class="fa">→</span></div>';
   }).join('');
   tier2.style.display = 'block';
   tier2.style.animation = 'slideIn 0.25s ease';
@@ -971,7 +972,7 @@ function selectTier1(cat, emoji, el) {
 }
 
 function selectTier2(sub, el) {
-  document.querySelectorAll('#catTier2Grid .sub-cat').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('#catTier2Grid .flow-item').forEach(function(s){ s.classList.remove('active'); });
   el.classList.add('active');
   window._catSub = sub;
   var cat = document.getElementById('postCategory').value;
