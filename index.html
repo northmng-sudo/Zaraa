@@ -56,12 +56,14 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .cats::-webkit-scrollbar{display:none}
 .cat{flex:0 0 auto;white-space:nowrap;background:white;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--m);display:inline-block;line-height:1.5}
 .cat:hover,.cat.active{color:#E62B05;border-bottom-color:#E62B05;font-weight:600}
-.cat-pill{flex-shrink:0;background:#f5f5f5;border:2px solid transparent;border-radius:50px;padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;color:#333;white-space:nowrap}
-.cat-pill:hover{border-color:#E62B05;color:#E62B05}
-.cat-pill.active{background:#E62B05;color:white;border-color:#E62B05}
-.sub-cat{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px;transition:all 0.15s;text-align:center}
-.sub-cat:hover{border-color:#E62B05;color:#E62B05;background:#fff5f5}
-.sub-cat.active{background:#E62B05;color:white;border-color:#E62B05}
+.cat-pill{flex-shrink:0;background:#f5f5f5;border:2px solid transparent;border-radius:50px;padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);color:#333;white-space:nowrap;transform:scale(1)}
+.cat-pill:hover{border-color:#E62B05;color:#E62B05;transform:scale(1.05)}
+.cat-pill.active{background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border-color:transparent;transform:scale(1.05);box-shadow:0 4px 12px rgba(230,43,5,0.3)}
+.sub-cat{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);text-align:center;transform:scale(1)}
+.sub-cat:hover{border-color:#E62B05;color:#E62B05;background:#fff5f5;transform:scale(1.03)}
+.sub-cat.active{background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border-color:transparent;transform:scale(1.03);box-shadow:0 4px 12px rgba(230,43,5,0.3)}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.cat-pill,.sub-cat{animation:slideIn 0.2s ease forwards}
 .cat-card div{font-size:12px;font-weight:600;margin-top:6px;color:var(--t)}
 .card-featured{border:2px solid #FFD700!important;box-shadow:0 4px 20px rgba(255,215,0,0.4);animation:featuredPulse 2s infinite}
 @keyframes featuredPulse{0%,100%{box-shadow:0 4px 20px rgba(255,215,0,0.4)}50%{box-shadow:0 8px 32px rgba(255,165,0,0.7)}}
@@ -890,24 +892,34 @@ var BRAND_DOMAINS = {
 };
 
 var BRAND_ICONS = {
-  'Toyota':'🇯🇵','Honda':'🇯🇵','Nissan':'🇯🇵','Mazda':'🇯🇵','Subaru':'🇯🇵','Suzuki':'🇯🇵',
-  'Mitsubishi':'🇯🇵','Isuzu':'🇯🇵','Daihatsu':'🇯🇵','Lexus':'🇯🇵','Infiniti':'🇯🇵',
-  'Hyundai':'🇰🇷','Kia':'🇰🇷','SsangYong':'🇰🇷','Daewoo':'🇰🇷','Samsung':'🇰🇷',
-  'BMW':'🇩🇪','Mercedes-Benz':'🇩🇪','Volkswagen':'🇩🇪','Audi':'🇩🇪','Porsche':'🇩🇪',
-  'Opel':'🇩🇪','Škoda':'🇩🇪','MINI':'🇬🇧',
-  'Ford':'🇺🇸','Chevrolet':'🇺🇸','Cadillac':'🇺🇸','GMC':'🇺🇸','Dodge':'🇺🇸',
-  'Chrysler':'🇺🇸','Hummer':'🇺🇸','Lincoln':'🇺🇸','Tesla':'🇺🇸','Jeep':'🇺🇸',
-  'Land Rover':'🇬🇧','Jaguar':'🇬🇧','Bentley':'🇬🇧','Rolls Royce':'🇬🇧','Vauxhall':'🇬🇧',
-  'Peugeot':'🇫🇷','Citroën':'🇫🇷','Renault':'🇫🇷',
-  'Fiat':'🇮🇹','Lamborghini':'🇮🇹','Ferrari':'🇮🇹',
-  'BYD':'🇨🇳','Geely':'🇨🇳','Haval':'🇨🇳','Chery':'🇨🇳','Changan':'🇨🇳',
-  'GAC':'🇨🇳','Dongfeng':'🇨🇳','Foton':'🇨🇳','GWM Tank':'🇨🇳','Baojun':'🇨🇳',
-  'Baic':'🇨🇳','BAW':'🇨🇳','Bestune':'🇨🇳','Dayun':'🇨🇳','Huawei':'🇨🇳',
-  'Jetour':'🇨🇳','Kaiyi':'🇨🇳','Kenbo':'🇨🇳','Leapmotor':'🇨🇳','Li Auto':'🇨🇳',
-  'Lynk & Co':'🇨🇳','MG':'🇨🇳','Neta':'🇨🇳','Wuling':'🇨🇳','Zotye':'🇨🇳',
-  'Volvo':'🇸🇪','Saab':'🇸🇪',
-  'Lada':'🇷🇺','UAZ':'🇷🇺',
-  'Acura':'🇯🇵','Buick':'🇺🇸','Бусад':'📦'
+  // Японы брэнд
+  'Toyota':'🔵','Honda':'🔴','Nissan':'🔷','Mazda':'🔴','Subaru':'⭐','Suzuki':'🟡',
+  'Mitsubishi':'💎','Isuzu':'🔵','Lexus':'⬜','Infiniti':'🔘','Acura':'🔺','Daihatsu':'🟢',
+  // Солонгосын брэнд
+  'Hyundai':'🔵','Kia':'🔴','SsangYong':'🟤','Daewoo':'🔵','Samsung':'🔵',
+  // Германы брэнд
+  'BMW':'🔵','Mercedes-Benz':'⭐','Volkswagen':'🔵','Audi':'⭕','Porsche':'🟡',
+  'Opel':'⚡','Škoda':'🟢','MINI':'🔴',
+  // Америкийн брэнд
+  'Ford':'🔵','Chevrolet':'🏅','Cadillac':'🟡','GMC':'🔴','Dodge':'🔴',
+  'Chrysler':'🔵','Hummer':'🟡','Lincoln':'🔵','Tesla':'🔴','Jeep':'🟢',
+  // Британий брэнд
+  'Land Rover':'🟢','Jaguar':'🐆','Bentley':'🟡','Rolls Royce':'👑',
+  // Францын брэнд
+  'Peugeot':'🦁','Citroën':'🔷','Renault':'🔷',
+  // Италийн брэнд
+  'Fiat':'🔴','Lamborghini':'🟡',
+  // Хятадын брэнд
+  'BYD':'🟢','Geely':'🔵','Haval':'🔴','Chery':'🔴','Changan':'🔵',
+  'GAC':'🔵','Dongfeng':'🔵','Foton':'🔵','GWM Tank':'🟢','Baojun':'🔵',
+  'Baic':'🔵','BAW':'🔵','Bestune':'🔵','Dayun':'🔵','Huawei':'🔴',
+  'Jetour':'🔵','Kaiyi':'🔵','Kenbo':'🔵','Leapmotor':'🔵','Li Auto':'🟢',
+  'Lynk & Co':'🔵','MG':'🔴','Neta':'🟢','Wuling':'🔵','Zotye':'🔵',
+  // Швед
+  'Volvo':'🔵','Saab':'🟡',
+  // Орос
+  'Lada':'🔴','UAZ':'🟢',
+  'Бусад':'📦'
 };
 
 var SUB_ICONS = {
@@ -954,6 +966,7 @@ function selectTier1(cat, emoji, el) {
     return '<div class="cat-pill" onclick="selectTier2(\''+k+'\',this)" style="flex-shrink:0">'+icon+' '+k+'</div>';
   }).join('');
   tier2.style.display = 'block';
+  tier2.style.animation = 'slideIn 0.25s ease';
   formFields.style.display = 'none';
 }
 
@@ -977,7 +990,9 @@ function selectTier2(sub, el) {
     return '<div class="cat-pill" onclick="selectTier3(\''+item+'\',this)" style="font-size:12px">'+icon+' '+item+'</div>';
   }).join('');
   tier3.style.display = 'block';
+  tier3.style.animation = 'slideIn 0.25s ease';
   formFields.style.display = 'block';
+  formFields.style.animation = 'slideIn 0.3s ease';
   loadDynamicFields(cat);
 }
 
