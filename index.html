@@ -868,6 +868,27 @@ var CAT_SUBS = {
   'Бусад': null
 };
 
+var BRAND_DOMAINS = {
+  'Toyota':'toyota.com','Honda':'honda.com','Nissan':'nissan.com','Mazda':'mazda.com',
+  'Subaru':'subaru.com','Suzuki':'suzuki.com','Mitsubishi':'mitsubishi.com',
+  'Isuzu':'isuzu.com','Lexus':'lexus.com','Infiniti':'infiniti.com',
+  'Hyundai':'hyundai.com','Kia':'kia.com','SsangYong':'ssangyong.com',
+  'BMW':'bmw.com','Mercedes-Benz':'mercedes-benz.com','Volkswagen':'vw.com',
+  'Audi':'audi.com','Porsche':'porsche.com','Opel':'opel.com','Škoda':'skoda-auto.com',
+  'MINI':'mini.com','Ford':'ford.com','Chevrolet':'chevrolet.com','Cadillac':'cadillac.com',
+  'GMC':'gmc.com','Dodge':'dodge.com','Jeep':'jeep.com','Lincoln':'lincoln.com',
+  'Tesla':'tesla.com','Hummer':'hummer.com','Land Rover':'landrover.com',
+  'Jaguar':'jaguar.com','Bentley':'bentley.com','Rolls Royce':'rolls-royce.com',
+  'Peugeot':'peugeot.com','Citroën':'citroen.com','Renault':'renault.com',
+  'Fiat':'fiat.com','Lamborghini':'lamborghini.com','BYD':'byd.com',
+  'Geely':'geely.com','Haval':'haval.com','Chery':'chery.com','Changan':'changan.com',
+  'GAC':'gacmotor.com','Dongfeng':'dfmc.com.cn','Foton':'foton.com',
+  'MG':'mgmotor.com','Volvo':'volvo.com','Saab':'saab.com','Lada':'lada.ru','UAZ':'uaz.ru',
+  'Acura':'acura.com','Daewoo':'daewoo.com','Chrysler':'chrysler.com',
+  'Li Auto':'li-auto.com','Neta':'hozonauto.com','Leapmotor':'leapmotor.com',
+  'Huawei':'huawei.com','Lynk & Co':'lynkco.com','Wuling':'sgmw.com.cn'
+};
+
 var BRAND_ICONS = {
   'Toyota':'🇯🇵','Honda':'🇯🇵','Nissan':'🇯🇵','Mazda':'🇯🇵','Subaru':'🇯🇵','Suzuki':'🇯🇵',
   'Mitsubishi':'🇯🇵','Isuzu':'🇯🇵','Daihatsu':'🇯🇵','Lexus':'🇯🇵','Infiniti':'🇯🇵',
@@ -952,8 +973,11 @@ function selectTier2(sub, el) {
     return;
   }
   document.getElementById('catTier3Grid').innerHTML = items.map(function(item) {
-    var icon = BRAND_ICONS[item] || SUB_ICONS[item] || '📌';
-    return '<div class="cat-pill" onclick="selectTier3(\''+item+'\',this)" style="font-size:12px">'+icon+' '+item+'</div>';
+    var domain = BRAND_DOMAINS[item];
+    var logoHtml = domain
+      ? '<img src="https://logo.clearbit.com/'+domain+'" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;border-radius:3px" onerror="this.style.display=\'none\'">'
+      : (SUB_ICONS[item] || '📌');
+    return '<div class="cat-pill" onclick="selectTier3(\''+item+'\',this)" style="font-size:12px;display:flex;align-items:center;gap:5px">'+logoHtml+' '+item+'</div>';
   }).join('');
   tier3.style.display = 'block';
   formFields.style.display = 'block';
