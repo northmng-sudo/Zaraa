@@ -369,6 +369,56 @@ select.form-input{cursor:pointer}
   <div id="chatsList"><div class="empty" style="padding-top:80px"><div class="empty-icon">💬</div><p>Чат байхгүй байна</p></div></div>
 </div>
 
+<!-- SHOP EDIT MODAL -->
+<div class="modal-overlay" id="shopEditModal">
+  <div class="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal('shopEditModal')">×</button>
+    <div class="modal-title">🏪 Дэлгүүрийн мэдээлэл</div>
+    <div class="form-group"><label class="form-label">Дэлгүүрийн нэр</label><input class="form-input" type="text" id="shopEditName"></div>
+    <div class="form-group">
+      <label class="form-label">Ангилал</label>
+      <select class="form-input" id="shopEditCategory">
+        <option value="">Сонгох</option>
+        <option>Хүнс</option><option>Мах</option><option>Хүнсний бараа</option>
+        <option>Хувцас</option><option>Гоо сайхан</option><option>Эм</option>
+        <option>Электроник</option><option>Бусад</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дүүрэг</label>
+      <select class="form-input" id="shopEditDistrict">
+        <option value="">Сонгох</option>
+        <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
+        <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
+        <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Дэлгэрэнгүй хаяг</label><input class="form-input" type="text" id="shopEditAddress"></div>
+    <div class="form-group">
+      <label class="form-label">Ажиллах цаг</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="form-input" type="time" id="shopEditOpen" style="flex:1">
+        <span style="color:var(--m)">—</span>
+        <input class="form-input" type="time" id="shopEditClose" style="flex:1">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="toggle-row">
+        <span class="toggle-label">🚚 Хүргэлт хийдэг</span>
+        <label class="toggle"><input type="checkbox" id="shopEditDelivery"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="saveShopProfile()">Хадгалах</button>
+  </div>
+</div>
+
+<!-- SHOP MANAGE PAGE -->
+<div class="page" id="page-shopManage">
+  <div class="back-btn" onclick="showPage('profile')">←</div>
+  <div style="padding:20px 16px 10px"><div class="section-title">🏪 Дэлгүүрээ удирдах</div></div>
+  <div class="section" id="shopManageContent"><div class="loading"><div class="spinner"></div></div></div>
+</div>
+
 <div class="page" id="page-shops">
   <div style="position:sticky;top:50px;z-index:50;background:white;border-bottom:1px solid #f0f0f0;padding:12px 16px">
     <div style="font-size:17px;font-weight:800;margin-bottom:10px">🏪 Дэлгүүрүүд</div>
@@ -1277,7 +1327,7 @@ async function loadListings() {
   var grid = document.getElementById('listingsGrid');
   grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
   await sb.rpc('check_featured_expiry');
-  var r = await sb.from('listings').select('*, users(name,rating,is_verified)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false});
+  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false});
   if (r.error) { grid.innerHTML = '<div class="empty"><div class="empty-icon">😕</div><p>Алдаа гарлаа</p></div>'; return; }
   AL = r.data || [];
   AL.sort(function(a, b) { return (b.is_featured?1:0) - (a.is_featured?1:0); });
@@ -1315,6 +1365,7 @@ function renderListings(arr) {
         '<div style="padding:10px">'+
         '<div style="color:#E62B05;font-size:18px;font-weight:800;margin-bottom:4px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
         '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;line-height:1.3">'+l.title+'</div>'+
+        (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-bottom:4px">🏪 '+(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
         '<div style="font-size:11px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
         '</div></div></div>';
     });
@@ -1371,6 +1422,7 @@ function renderListings(arr) {
       '<div style="padding:6px 8px 8px;background:white">'+
       '<div style="color:#111;font-size:15px;font-weight:800">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
       '<div class="card-title" style="margin-top:4px">'+l.title+'</div>'+
+      (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🏪 '+(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
       '<div style="display:flex;justify-content:space-between;margin-top:3px">'+
       '<div style="font-size:10px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
       '<div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div>'+
@@ -1383,7 +1435,7 @@ function renderListings(arr) {
 
 async function showDetail(id) {
   showPage('detail');
-  var r = await sb.from('listings').select('*, users(name,rating,phone)').eq('id',id).single();
+  var r = await sb.from('listings').select('*, users(name,rating,phone,is_verified,is_shop,shop_name,shop_is_verified)').eq('id',id).single();
   var l = r.data;
   if (!l) return;
   var imgs = l.images&&l.images.length ? l.images : null;
@@ -1427,8 +1479,8 @@ async function showDetail(id) {
       }).join('')+
       '</div>' : '')+
     (l.video_url?'<div style="margin-bottom:16px"><video src="'+l.video_url+'" controls style="width:100%;border-radius:10px;max-height:220px;background:#333"></video></div>':'')+
-    '<div class="seller-card"><div class="seller-avatar">'+((l.users&&l.users.name?l.users.name:'?')[0].toUpperCase())+'</div>'+
-    '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.name?l.users.name:'Хэрэглэгч')+(l.users&&l.users.is_verified?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+'</div>'+
+    '<div class="seller-card"><div class="seller-avatar">'+((l.users&&l.users.is_shop&&l.users.shop_name?l.users.shop_name:l.users&&l.users.name?l.users.name:'?')[0].toUpperCase())+'</div>'+
+    '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.is_shop?'🏪 '+(l.users.shop_name||'Дэлгүүр'):(l.users&&l.users.name?l.users.name:'Хэрэглэгч'))+(l.users&&(l.users.is_verified||l.users.shop_is_verified)?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+'</div>'+
     '<div class="seller-rating">⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+' • Найдвартай</div></div></div>'+
     '<div class="action-btns">'+
     '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none"><button class="btn btn-ghost btn-full" style="width:100%">📞 Холбоо барих</button></a>'+
@@ -3023,6 +3075,7 @@ function showPage(name) {
   if (name === 'profile') { loadProfile(); }
   if (name === 'notifications') loadNotifications();
   if (name === 'shops') loadShops();
+  if (name === 'shopManage') loadShopManage();
 }
 
 var SHOPS_CACHE = [];
@@ -3147,9 +3200,96 @@ async function showShopDetail(shopId) {
     '</div>';
 }
 
-async function startChatWithShop(shopId) {
-  if (!CU) { openAuth('login'); return; }
-  openChat(null, shopId);
+async function loadShopManage() {
+  if (!CU) return;
+  var u = await sb.from('users').select('*').eq('id', CU.id).single();
+  var s = u.data;
+  if (!s || !s.is_shop) {
+    document.getElementById('shopManageContent').innerHTML = '<div class="empty"><p>Та дэлгүүр эзэмшигч биш байна</p></div>';
+    return;
+  }
+  var ls = await sb.from('listings').select('*').eq('user_id', CU.id).order('created_at',{ascending:false});
+  var listings = ls.data || [];
+  var isOpen = isShopOpenNow(s.shop_hours_open, s.shop_hours_close);
+  var icon = SHOP_CAT_ICONS[s.shop_category] || '🏪';
+
+  document.getElementById('shopManageContent').innerHTML =
+    '<div style="background:#f9f9f9;border-radius:14px;padding:16px;margin-bottom:16px;display:flex;gap:12px;align-items:center">'+
+    '<div style="width:56px;height:56px;border-radius:14px;background:white;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">'+icon+'</div>'+
+    '<div style="flex:1">'+
+    '<div style="font-weight:800;font-size:16px">'+(s.shop_name||'')+(s.shop_is_verified?' ✔️':'')+'</div>'+
+    '<div style="font-size:12px;color:#999;margin-top:2px">'+(s.shop_category||'')+' • '+(s.shop_district||'')+'</div>'+
+    '<div style="font-size:11px;margin-top:4px;color:'+(isOpen?'#00875a':'#e53e3e')+';font-weight:600">'+(isOpen?'🟢 Одоо нээгдсэн':'🔴 Одоо хаалттай')+'</div>'+
+    '</div></div>'+
+
+    '<div class="stats" style="margin:0 0 16px">'+
+    '<div class="stat"><div class="stat-num">'+listings.length+'</div><div class="stat-label">Бараа</div></div>'+
+    '<div class="stat"><div class="stat-num">'+listings.filter(function(l){return l.status==='active';}).length+'</div><div class="stat-label">Идэвхтэй</div></div>'+
+    '<div class="stat"><div class="stat-num">⭐ '+(s.shop_rating||5.0)+'</div><div class="stat-label">Үнэлгээ</div></div>'+
+    '</div>'+
+
+    '<div class="menu-item" onclick="editShopProfile()"><div class="menu-left"><div class="menu-icon">✏️</div>Дэлгүүрийн мэдээлэл засах</div></div>'+
+    '<div class="menu-item" onclick="toggleShopOpenStatus()"><div class="menu-left"><div class="menu-icon">🕐</div>Ажиллах цаг: '+(s.shop_hours_open||'?')+' - '+(s.shop_hours_close||'?')+'</div></div>'+
+    '<div class="menu-item" onclick="showPostModal()"><div class="menu-left"><div class="menu-icon">➕</div>Шинэ бараа нэмэх</div></div>'+
+
+    '<div style="font-weight:700;margin:20px 0 10px">Бүх бараа ('+listings.length+')</div>'+
+    (listings.length ? listings.map(function(l) {
+      var statusLabel = l.status === 'active' ? '<span style="color:#00875a">✅ Идэвхтэй</span>' : '<span style="color:#e53e3e">⏳ Хүлээгдэж байна</span>';
+      return '<div style="display:flex;gap:10px;align-items:center;background:white;border:1px solid #eee;border-radius:12px;padding:10px;margin-bottom:8px">'+
+        '<div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+
+        (l.images&&l.images[0]?'<img src="'+l.images[0]+'" style="width:100%;height:100%;object-fit:cover">':'📦')+'</div>'+
+        '<div style="flex:1;min-width:0" onclick="showDetail(\''+l.id+'\')">'+
+        '<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+l.title+'</div>'+
+        '<div style="font-size:12px;color:#999">₮'+Number(l.price||0).toLocaleString()+' • '+statusLabel+'</div>'+
+        '</div>'+
+        '<button onclick="editListing(\''+l.id+'\')" style="background:none;border:none;font-size:16px;cursor:pointer;padding:6px">✏️</button>'+
+        '<button onclick="deleteListing(\''+l.id+'\')" style="background:none;border:none;font-size:16px;cursor:pointer;padding:6px">🗑️</button>'+
+        '</div>';
+    }).join('') : '<div class="empty"><p>Одоогоор бараа нэмээгүй байна</p></div>');
+}
+
+async function editShopProfile() {
+  var u = await sb.from('users').select('*').eq('id', CU.id).single();
+  var s = u.data;
+  if (!s) return;
+  document.getElementById('shopEditName').value = s.shop_name || '';
+  document.getElementById('shopEditCategory').value = s.shop_category || '';
+  document.getElementById('shopEditDistrict').value = s.shop_district || '';
+  document.getElementById('shopEditAddress').value = s.shop_address || '';
+  document.getElementById('shopEditOpen').value = s.shop_hours_open || '09:00';
+  document.getElementById('shopEditClose').value = s.shop_hours_close || '21:00';
+  document.getElementById('shopEditDelivery').checked = s.shop_has_delivery || false;
+  openModal('shopEditModal');
+}
+
+async function saveShopProfile() {
+  var data = {
+    shop_name: document.getElementById('shopEditName').value,
+    shop_category: document.getElementById('shopEditCategory').value,
+    shop_district: document.getElementById('shopEditDistrict').value,
+    shop_address: document.getElementById('shopEditAddress').value,
+    shop_hours_open: document.getElementById('shopEditOpen').value,
+    shop_hours_close: document.getElementById('shopEditClose').value,
+    shop_has_delivery: document.getElementById('shopEditDelivery').checked
+  };
+  if (!data.shop_name || !data.shop_category) { showToast('Дэлгүүрийн нэр, ангилал заавал бөглөнө үү', true); return; }
+  var r = await sb.from('users').update(data).eq('id', CU.id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  closeModal('shopEditModal');
+  showToast('Дэлгүүрийн мэдээлэл хадгалагдлаа! ✅');
+  loadShopManage();
+}
+
+function toggleShopOpenStatus() {
+  editShopProfile();
+}
+
+async function deleteListing(id) {
+  if (!confirm('Энэ барааг устгах уу?')) return;
+  var r = await sb.from('listings').delete().eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Бараа устгагдлаа');
+  loadShopManage();
 }
 
 function mTime(dateStr) {
