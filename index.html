@@ -2144,9 +2144,9 @@ async function updateAdSpace(isCourier) {
           content = '<img src="'+ad.image_url+'" style="width:100%;height:100%;object-fit:cover">';
         }
         var adLink = ad.link_url ? (ad.link_url.startsWith('http') ? ad.link_url : 'https://'+ad.link_url) : '';
-        box.innerHTML = '<div style="width:80px;height:100%;background:#111;position:relative;cursor:pointer;overflow:hidden;min-height:56px" onclick="'+(adLink?'window.open(\''+adLink+'\',\'_blank\')':'')+'" >'+
+        box.innerHTML = '<div style="width:100%;height:100%;background:#111;position:relative;cursor:pointer;overflow:hidden" onclick="'+(adLink?'window.open(\''+adLink+'\',\'_blank\')':'')+'" >'+
           content+
-          '<div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.6);color:white;border-radius:3px;padding:1px 4px;font-size:9px">Реклам</div>'+
+          '<div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.6);color:white;border-radius:4px;padding:2px 6px;font-size:10px">Реклам</div>'+
           '</div>';
       }
       showAd(0);
@@ -2158,7 +2158,7 @@ async function updateAdSpace(isCourier) {
         }, 5000);
       }
     } else {
-      box.innerHTML = '<div style="width:80px;min-height:56px;height:100%;background:linear-gradient(135deg,#1a1a2e,#2a2a3e);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:6px;cursor:pointer" onclick="showToast(\'Реклам байршуулах: admin@zaraa.mn\')">'+
+      box.innerHTML = '<div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#2a2a3e);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:6px;cursor:pointer" onclick="showToast(\'Реклам байршуулах: admin@zaraa.mn\')">'+
         '<div style="font-size:18px">📺</div>'+
         '<div style="font-size:8px;opacity:0.7;margin-top:2px">Реклам</div>'+
         '</div>';
