@@ -3210,6 +3210,11 @@ async function showShopDetail(shopId) {
     '</div>';
 }
 
+async function startChatWithShop(shopId) {
+  if (!CU) { openAuth('login'); return; }
+  openChat(null, shopId);
+}
+
 async function loadShopManage() {
   if (!CU) return;
   var u = await sb.from('users').select('*').eq('id', CU.id).single();
