@@ -65,16 +65,15 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .stack-img-wrap:hover .si-1{transform:rotate(2.5deg) translate(4px,4px);opacity:0.65}
 .flow-v:last-child{border-bottom:none}
 .flow-v::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#E62B05,#FF8C00);opacity:0;transition:opacity 0.25s}
-.flow-v:hover::before,.flow-v.active::before{opacity:1}
-.flow-v:hover span,.flow-v.active span{color:white!important;position:relative;z-index:1}
+.flow-v:hover::before,.flow-v.active::before{opacity:1}.flow-v:hover span,.flow-v.active span{color:white!important;position:relative;z-index:1}
 .flow-v span{position:relative;z-index:1;transition:color 0.2s}
 .flow-h{flex-shrink:0;padding:8px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:10px;transition:background 0.2s}
 .flow-h .fh-icon{font-size:20px;line-height:1;display:block}
 .flow-h .fh-text{font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);transition:color 0.2s;white-space:nowrap;display:block}
 .flow-h:hover{background:rgba(255,255,255,0.08)}
 .flow-h:hover .fh-text{color:white}
-.flow-h.active{background:linear-gradient(135deg,#E62B05,#FF8C00)}
-.flow-h.active .fh-text{color:white}
+.flow-h.active{background:rgba(230,43,5,0.85);border-radius:8px}
+.flow-h.active .fh-text{color:white!important}
 .tier3-pill{flex-shrink:0;background:#f5f5f5;border:2px solid transparent;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#333;white-space:nowrap}
 .tier3-pill:hover{border-color:#E62B05;color:#E62B05}
 .tier3-pill.active{background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border-color:transparent}
@@ -116,7 +115,7 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .nav-item.post-btn{background:var(--a);border-radius:14px;margin:-12px 8px 0;padding:8px 0 5px;color:white}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
-.modal{background:var(--s);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-height:90vh;overflow-y:auto}
+.modal{background:white;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-height:90vh;overflow-y:auto}
 .modal-title{font-size:18px;font-weight:800;margin-bottom:20px;letter-spacing:-0.3px}
 .form-group{margin-bottom:16px}
 .form-label{font-size:12px;font-weight:600;color:var(--m);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.5px}
@@ -254,7 +253,7 @@ select.form-input{cursor:pointer}
       <div class="cat" data-cat='Гэр ахуй'>🏡 Гэр ахуй</div>
       <div class="cat" data-cat='Тоглоом'>🎮 Тоглоом</div>
       <div class="cat" data-cat='Спорт'>⚽ Спорт</div>
-      <div class="cat" data-cat='Хүүхдийн бараа'>🧸 Хүүхэд</div>
+      <div class="cat" data-cat='Хүүхдийн бараа'><span class="fh-icon">🧸</span><span class="fh-text">Хүүхэд</span></div>
       <div class="cat" data-cat='Эрүүл мэнд'>💊 Эрүүл мэнд</div>
       <div class="cat" data-cat='Хоол хүнс'>🍎 Хоол хүнс</div>
       <div class="cat" data-cat='Амьтад'>🐾 Амьтад</div>
@@ -524,20 +523,20 @@ select.form-input{cursor:pointer}
           <div class="flow-h active" onclick="selectTier1('Үл хөдлөх','🏠',this)"><span class="fh-icon">🏠</span><span class="fh-text">Үл хөдлөх</span></div>
           <div class="flow-h" onclick="selectTier1('Авто','🚗',this)"><span class="fh-icon">🚗</span><span class="fh-text">Авто</span></div>
           <div class="flow-h" onclick="selectTier1('Ажлын байр','💼',this)"><span class="fh-icon">💼</span><span class="fh-text">Ажлын байр</span></div>
-          <div class="flow-h" onclick="selectTier1('Гар утас','📱',this)"><span class="fh-icon">📱</span><span class="fh-text">Гар ут</span></div>
-          <div class="flow-h" onclick="selectTier1('Компьютер','💻',this)"><span class="fh-icon">💻</span><span class="fh-text">Компью</span></div>
+          <div class="flow-h" onclick="selectTier1('Гар утас','📱',this)"><span class="fh-icon">📱</span><span class="fh-text">Гар утас</span></div>
+          <div class="flow-h" onclick="selectTier1('Компьютер','💻',this)"><span class="fh-icon">💻</span><span class="fh-text">Компьютер</span></div>
           <div class="flow-h" onclick="selectTier1('ТВ & Дагалдах','📺',this)"><span class="fh-icon">📺</span><span class="fh-text">ТВ</span></div>
           <div class="flow-h" onclick="selectTier1('Хувцас','👗',this)"><span class="fh-icon">👗</span><span class="fh-text">Хувцас</span></div>
           <div class="flow-h" onclick="selectTier1('Гутал','👟',this)"><span class="fh-icon">👟</span><span class="fh-text">Гутал</span></div>
-          <div class="flow-h" onclick="selectTier1('Гоо сайхан','💄',this)"><span class="fh-icon">💄</span><span class="fh-text">Гоо са</span></div>
-          <div class="flow-h" onclick="selectTier1('Тавилга','🪑',this)"><span class="fh-icon">🪑</span><span class="fh-text">Тавилг</span></div>
-          <div class="flow-h" onclick="selectTier1('Гэр ахуй','🏡',this)"><span class="fh-icon">🏡</span><span class="fh-text">Гэр ах</span></div>
+          <div class="flow-h" onclick="selectTier1('Гоо сайхан','💄',this)"><span class="fh-icon">💄</span><span class="fh-text">Гоо сайхан</span></div>
+          <div class="flow-h" onclick="selectTier1('Тавилга','🪑',this)"><span class="fh-icon">🪑</span><span class="fh-text">Тавилга</span></div>
+          <div class="flow-h" onclick="selectTier1('Гэр ахуй','🏡',this)"><span class="fh-icon">🏡</span><span class="fh-text">Гэр ахуй</span></div>
           <div class="flow-h" onclick="selectTier1('Спорт','⚽',this)"><span class="fh-icon">⚽</span><span class="fh-text">Спорт</span></div>
-          <div class="flow-h" onclick="selectTier1('Тоглоом','🎮',this)"><span class="fh-icon">🎮</span><span class="fh-text">Тоглоо</span></div>
-          <div class="flow-h" onclick="selectTier1('Хүүхдийн бараа','🧸',this)">🧸 Хүүхэд</div>
+          <div class="flow-h" onclick="selectTier1('Тоглоом','🎮',this)"><span class="fh-icon">🎮</span><span class="fh-text">Тоглоом</span></div>
+          <div class="flow-h" onclick="selectTier1('Хүүхдийн бараа','🧸',this)"><span class="fh-icon">🧸</span><span class="fh-text">Хүүхэд</span></div>
           <div class="flow-h" onclick="selectTier1('Амьтад','🐾',this)"><span class="fh-icon">🐾</span><span class="fh-text">Амьтад</span></div>
           <div class="flow-h" onclick="selectTier1('Ном','📚',this)"><span class="fh-icon">📚</span><span class="fh-text">Ном</span></div>
-          <div class="flow-h" onclick="selectTier1('Үйлчилгээ','🔧',this)"><span class="fh-icon">🔧</span><span class="fh-text">Үйлчил</span></div>
+          <div class="flow-h" onclick="selectTier1('Үйлчилгээ','🔧',this)"><span class="fh-icon">🔧</span><span class="fh-text">Үйлчилгээ</span></div>
           <div class="flow-h" onclick="selectTier1('Бусад','📦',this)"><span class="fh-icon">📦</span><span class="fh-text">Бусад</span></div>
         </div>
       </div>
