@@ -266,12 +266,16 @@ select.form-input{cursor:pointer}
   </div>
 
   <!-- SEARCH STICKY -->
-  <div id="searchWrap" style="position:sticky;top:50px;z-index:90;background:#f5f5f5;padding:20px 16px 24px">
-    <div id="searchInner" style="background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.12);border:2px solid #FF8C00;display:flex;align-items:center;overflow:hidden;padding:18px 8px 18px 14px;gap:6px">
-      <svg style="flex-shrink:0;color:#999" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:14px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
-      <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px 8px;color:#999;font-size:13px;border-radius:8px;flex-shrink:0">⚙️</button>
-      <button onclick="doSearch()" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
+  <div id="searchWrap" style="position:sticky;top:50px;z-index:90;background:#f5f5f5;padding:12px 16px">
+    <div style="display:flex;gap:8px;align-items:stretch">
+      <div id="searchInner" style="flex:1;background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.12);border:2px solid #FF8C00;display:flex;align-items:center;overflow:hidden;padding:10px 8px 10px 14px;gap:6px">
+        <svg style="flex-shrink:0;color:#999" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:14px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
+        <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px 8px;color:#999;font-size:13px;border-radius:8px;flex-shrink:0">⚙️</button>
+        <button onclick="doSearch()" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
+      </div>
+      <!-- Реклам баруун талд -->
+      <div id="adSpace" style="width:80px;flex-shrink:0;border-radius:12px;overflow:hidden;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.1)"></div>
     </div>
     <div id="filterPanel" style="display:none;background:white;border-radius:12px;padding:16px;margin-top:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1)">
       <div style="font-weight:700;margin-bottom:12px;font-size:14px">🔍 Шүүлтүүр</div>
@@ -305,7 +309,6 @@ select.form-input{cursor:pointer}
   </div>
 
   <!-- AD SPACE -->
-  <div id="adSpace" style="max-width:600px;margin:0 auto"></div>
 </div>
 
 <div class="page" id="page-deliveries">
@@ -2130,12 +2133,9 @@ async function updateAdSpace(isCourier) {
           content = '<img src="'+ad.image_url+'" style="width:100%;height:100%;object-fit:cover">';
         }
         var adLink = ad.link_url ? (ad.link_url.startsWith('http') ? ad.link_url : 'https://'+ad.link_url) : '';
-        box.innerHTML = '<div style="margin:0 16px 24px;max-width:560px;margin-left:auto;margin-right:auto;border-radius:18px;overflow:hidden;background:#111;position:relative;aspect-ratio:16/9;cursor:pointer" onclick="'+(adLink?'window.open(\''+adLink+'\',\'_blank\')':'')+'" >'+
+        box.innerHTML = '<div style="width:80px;height:100%;background:#111;position:relative;cursor:pointer;overflow:hidden;min-height:56px" onclick="'+(adLink?'window.open(\''+adLink+'\',\'_blank\')':'')+'" >'+
           content+
-          '<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);color:white;border-radius:4px;padding:2px 6px;font-size:10px">Реклам</div>'+
-          (ads.length>1?'<div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px">'+
-          ads.map(function(_,j){ return '<div style="width:6px;height:6px;border-radius:50%;background:'+(j===i?'white':'rgba(255,255,255,0.4)')+'"></div>'; }).join('')+
-          '</div>':'')+
+          '<div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.6);color:white;border-radius:3px;padding:1px 4px;font-size:9px">Реклам</div>'+
           '</div>';
       }
       showAd(0);
@@ -2147,11 +2147,9 @@ async function updateAdSpace(isCourier) {
         }, 5000);
       }
     } else {
-      box.innerHTML = '<div style="margin:0 16px 24px;border-radius:18px;overflow:hidden;background:#111;position:relative;aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:20px">'+
-        '<div style="font-size:32px;margin-bottom:8px">📺</div>'+
-        '<div style="font-size:14px;font-weight:700;margin-bottom:4px">Видео реклам</div>'+
-        '<div style="font-size:11px;opacity:0.6">Энд таны бизнесийн реклам харагдана</div>'+
-        '<div style="margin-top:12px;background:var(--a);color:white;border-radius:50px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer" onclick="showToast(\'Реклам байршуулах: admin@zaraa.mn\')">Реклам байршуулах</div>'+
+      box.innerHTML = '<div style="width:80px;min-height:56px;height:100%;background:linear-gradient(135deg,#1a1a2e,#2a2a3e);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:6px;cursor:pointer" onclick="showToast(\'Реклам байршуулах: admin@zaraa.mn\')">'+
+        '<div style="font-size:18px">📺</div>'+
+        '<div style="font-size:8px;opacity:0.7;margin-top:2px">Реклам</div>'+
         '</div>';
     }
   } else if (!CU) {
