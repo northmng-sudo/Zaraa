@@ -2348,6 +2348,7 @@ async function register() {
   var r = await sb.functions.invoke('bright-api', {
     body: {email, password:pass, name, phone, register_number:regNum, is_courier:role==='courier'}
   });
+  console.log('bright-api response:', r);
   if (r.error || (r.data && r.data.error)) { 
     showToast('Алдаа: '+(r.data&&r.data.error||r.error.message), true); 
     return; 
