@@ -62,10 +62,13 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .flow-v:hover::before,.flow-v.active::before{opacity:1}
 .flow-v:hover span,.flow-v.active span{color:white!important;position:relative;z-index:1}
 .flow-v span{position:relative;z-index:1;transition:color 0.2s}
-.flow-h{flex-shrink:0;position:relative;overflow:hidden;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);border-radius:8px;transition:color 0.2s;white-space:nowrap}
-.flow-h::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#E62B05,#FF8C00);opacity:0;transition:opacity 0.25s;border-radius:8px}
-.flow-h:hover::before,.flow-h.active::before{opacity:1}
-.flow-h:hover,.flow-h.active{color:white}
+.flow-h{flex-shrink:0;padding:8px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;border-radius:10px;transition:background 0.2s;min-width:58px}
+.flow-h .fh-icon{font-size:22px;line-height:1;display:block}
+.flow-h .fh-text{font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);transition:color 0.2s;white-space:nowrap;display:block}
+.flow-h:hover{background:rgba(255,255,255,0.08)}
+.flow-h:hover .fh-text{color:white}
+.flow-h.active{background:linear-gradient(135deg,#E62B05,#FF8C00)}
+.flow-h.active .fh-text{color:white}
 .tier3-pill{flex-shrink:0;background:#f5f5f5;border:2px solid transparent;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#333;white-space:nowrap}
 .tier3-pill:hover{border-color:#E62B05;color:#E62B05}
 .tier3-pill.active{background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border-color:transparent}
@@ -512,24 +515,24 @@ select.form-input{cursor:pointer}
       <div style="margin-bottom:12px">
         <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:8px">АНГИЛАЛ</div>
         <div id="catTier1" style="display:flex;gap:0;overflow-x:auto;scrollbar-width:none;background:#1a1a2e;border-radius:12px;padding:6px 8px">
-          <div class="flow-h active" onclick="selectTier1('Үл хөдлөх','🏠',this)">🏠 Үл хөдлөх</div>
-          <div class="flow-h" onclick="selectTier1('Авто','🚗',this)">🚗 Авто</div>
-          <div class="flow-h" onclick="selectTier1('Ажлын байр','💼',this)">💼 Ажлын байр</div>
-          <div class="flow-h" onclick="selectTier1('Гар утас','📱',this)">📱 Гар утас</div>
-          <div class="flow-h" onclick="selectTier1('Компьютер','💻',this)">💻 Компьютер</div>
-          <div class="flow-h" onclick="selectTier1('ТВ & Дагалдах','📺',this)">📺 ТВ</div>
-          <div class="flow-h" onclick="selectTier1('Хувцас','👗',this)">👗 Хувцас</div>
-          <div class="flow-h" onclick="selectTier1('Гутал','👟',this)">👟 Гутал</div>
-          <div class="flow-h" onclick="selectTier1('Гоо сайхан','💄',this)">💄 Гоо сайхан</div>
-          <div class="flow-h" onclick="selectTier1('Тавилга','🪑',this)">🪑 Тавилга</div>
-          <div class="flow-h" onclick="selectTier1('Гэр ахуй','🏡',this)">🏡 Гэр ахуй</div>
-          <div class="flow-h" onclick="selectTier1('Спорт','⚽',this)">⚽ Спорт</div>
-          <div class="flow-h" onclick="selectTier1('Тоглоом','🎮',this)">🎮 Тоглоом</div>
+          <div class="flow-h active" onclick="selectTier1('Үл хөдлөх','🏠',this)"><span class="fh-icon">🏠</span><span class="fh-text">Үл хөд</span></div>
+          <div class="flow-h" onclick="selectTier1('Авто','🚗',this)"><span class="fh-icon">🚗</span><span class="fh-text">Авто</span></div>
+          <div class="flow-h" onclick="selectTier1('Ажлын байр','💼',this)"><span class="fh-icon">💼</span><span class="fh-text">Ажлын </span></div>
+          <div class="flow-h" onclick="selectTier1('Гар утас','📱',this)"><span class="fh-icon">📱</span><span class="fh-text">Гар ут</span></div>
+          <div class="flow-h" onclick="selectTier1('Компьютер','💻',this)"><span class="fh-icon">💻</span><span class="fh-text">Компью</span></div>
+          <div class="flow-h" onclick="selectTier1('ТВ & Дагалдах','📺',this)"><span class="fh-icon">📺</span><span class="fh-text">ТВ</span></div>
+          <div class="flow-h" onclick="selectTier1('Хувцас','👗',this)"><span class="fh-icon">👗</span><span class="fh-text">Хувцас</span></div>
+          <div class="flow-h" onclick="selectTier1('Гутал','👟',this)"><span class="fh-icon">👟</span><span class="fh-text">Гутал</span></div>
+          <div class="flow-h" onclick="selectTier1('Гоо сайхан','💄',this)"><span class="fh-icon">💄</span><span class="fh-text">Гоо са</span></div>
+          <div class="flow-h" onclick="selectTier1('Тавилга','🪑',this)"><span class="fh-icon">🪑</span><span class="fh-text">Тавилг</span></div>
+          <div class="flow-h" onclick="selectTier1('Гэр ахуй','🏡',this)"><span class="fh-icon">🏡</span><span class="fh-text">Гэр ах</span></div>
+          <div class="flow-h" onclick="selectTier1('Спорт','⚽',this)"><span class="fh-icon">⚽</span><span class="fh-text">Спорт</span></div>
+          <div class="flow-h" onclick="selectTier1('Тоглоом','🎮',this)"><span class="fh-icon">🎮</span><span class="fh-text">Тоглоо</span></div>
           <div class="flow-h" onclick="selectTier1('Хүүхдийн бараа','🧸',this)">🧸 Хүүхэд</div>
-          <div class="flow-h" onclick="selectTier1('Амьтад','🐾',this)">🐾 Амьтад</div>
-          <div class="flow-h" onclick="selectTier1('Ном','📚',this)">📚 Ном</div>
-          <div class="flow-h" onclick="selectTier1('Үйлчилгээ','🔧',this)">🔧 Үйлчилгээ</div>
-          <div class="flow-h" onclick="selectTier1('Бусад','📦',this)">📦 Бусад</div>
+          <div class="flow-h" onclick="selectTier1('Амьтад','🐾',this)"><span class="fh-icon">🐾</span><span class="fh-text">Амьтад</span></div>
+          <div class="flow-h" onclick="selectTier1('Ном','📚',this)"><span class="fh-icon">📚</span><span class="fh-text">Ном</span></div>
+          <div class="flow-h" onclick="selectTier1('Үйлчилгээ','🔧',this)"><span class="fh-icon">🔧</span><span class="fh-text">Үйлчил</span></div>
+          <div class="flow-h" onclick="selectTier1('Бусад','📦',this)"><span class="fh-icon">📦</span><span class="fh-text">Бусад</span></div>
         </div>
       </div>
 
