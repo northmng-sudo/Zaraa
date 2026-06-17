@@ -951,6 +951,10 @@ var BRAND_ICONS = {
 };
 
 var SUB_ICONS = {
+  'Орон сууц':'🏢','Монгол гэр':'⛺','Хашаа байшин':'🏡','Газар':'🌍',
+  'Оффис':'🏢','Граф контейнер/зуслан':'📦','АОС хаус':'🏚️',
+  'Худалдаа үйлчилгээний талбай':'🏬','Үйлдвэр/агуулах':'🏭',
+  '00 өрөө В1 подвал':'🏠','Бусад':'📦',
   'Зарна':'🏷️','Түрээслүүлнэ':'🔑','Зорчигч машин':'🚗','Ачааны машин':'🚛',
   'Автобус/микробус':'🚌','Мотоцикл':'🏍️','Спецтехник':'🚜','Эд анги':'🔧',
   'Бүтэн цагийн':'💼','Хагас цагийн':'⏰','Зайнаас':'💻','Дадлага':'📚','Хувиараа':'👤',
@@ -1018,7 +1022,7 @@ function selectTier2(sub, el) {
     return;
   }
   document.getElementById('catTier3Grid').innerHTML = items.map(function(item) {
-    var icon = BRAND_ICONS[item] || SUB_ICONS[item] || '🚗';
+    var icon = BRAND_ICONS[item] || SUB_ICONS[item] || '📌';
     return '<div class="tier3-pill" onclick="selectTier3(\''+item+'\',this)">'+icon+' '+item+'</div>';
   }).join('');
   tier3.style.display = 'block';
