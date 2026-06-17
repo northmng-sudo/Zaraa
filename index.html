@@ -2994,14 +2994,17 @@ function positionAd() {
   var ad = document.getElementById('adSideWrap');
   var search = document.getElementById('searchInner');
   if (!ad || !search || window.innerWidth < 768) return;
-  var rect = search.getBoundingClientRect();
-  ad.style.left = (rect.width + 12) + 'px';
-  ad.style.right = (-rect.left) + 'px';
-  ad.style.width = 'auto';
+  var searchRect = search.getBoundingClientRect();
+  var wrapRect = search.closest('#searchWrap') ? search.closest('#searchWrap').getBoundingClientRect() : {right: searchRect.right};
+  var adLeft = searchRect.right + 12;
+  var adWidth = window.innerWidth - adLeft;
+  ad.style.left = (searchRect.right - search.closest('[style*="position:relative"]').getBoundingClientRect().left + 12) + 'px';
+  ad.style.width = adWidth + 'px';
+  ad.style.right = '0';
 }
 window.addEventListener('load', positionAd);
 window.addEventListener('resize', positionAd);
-setTimeout(positionAd, 200);
+setTimeout(positionAd, 300);
 
 function toggleAdSpace() {
   var wrap = document.getElementById('adSpace');
