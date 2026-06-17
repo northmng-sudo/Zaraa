@@ -117,9 +117,9 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .delivery-cta p{font-size:12px;opacity:0.85;margin-bottom:16px;max-width:200px;line-height:1.5}
 .btn-white{background:white;color:var(--a);font-weight:700;padding:9px 20px;border-radius:50px;border:none;font-size:13px;cursor:pointer}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #f0f0f0;display:flex;justify-content:space-around;padding:6px 0 16px;z-index:100;padding-bottom:max(16px,env(safe-area-inset-bottom))}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--m);cursor:pointer;transition:color 0.2s;flex:1}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--m);cursor:pointer;transition:color 0.2s;flex:1;padding:0 1px}
 .nav-item.active{color:var(--a)}
-.nav-item svg{width:20px;height:20px}
+.nav-item svg{width:18px;height:18px}
 .nav-item.post-btn{background:var(--a);border-radius:14px;margin:-12px 8px 0;padding:8px 0 5px;color:white}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
@@ -369,6 +369,36 @@ select.form-input{cursor:pointer}
   <div id="chatsList"><div class="empty" style="padding-top:80px"><div class="empty-icon">💬</div><p>Чат байхгүй байна</p></div></div>
 </div>
 
+<div class="page" id="page-shops">
+  <div style="position:sticky;top:50px;z-index:50;background:white;border-bottom:1px solid #f0f0f0;padding:12px 16px">
+    <div style="font-size:17px;font-weight:800;margin-bottom:10px">🏪 Дэлгүүрүүд</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <select class="form-input" id="shopFilterDistrict" onchange="filterShops()" style="flex:1;font-size:13px">
+        <option value="">Бүх дүүрэг</option>
+        <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
+        <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
+        <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
+      </select>
+      <select class="form-input" id="shopFilterCategory" onchange="filterShops()" style="flex:1;font-size:13px">
+        <option value="">Бүх ангилал</option>
+        <option>Хүнс</option><option>Мах</option><option>Хүнсний бараа</option>
+        <option>Хувцас</option><option>Гоо сайхан</option><option>Эм</option>
+        <option>Электроник</option><option>Бусад</option>
+      </select>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--m);cursor:pointer">
+      <input type="checkbox" id="shopFilterDelivery" onchange="filterShops()"> 🚚 Зөвхөн хүргэлттэй
+    </label>
+  </div>
+  <div id="shopsList" style="padding:14px"><div class="empty" style="padding-top:60px"><div class="empty-icon">🏪</div><p>Ачааллаж байна...</p></div></div>
+</div>
+
+<!-- SHOP DETAIL PAGE -->
+<div class="page" id="page-shopDetail">
+  <div class="back-btn" onclick="showPage('shops')">←</div>
+  <div id="shopDetailContent"></div>
+</div>
+
 <div class="page" id="page-listings">
   <div style="padding:20px 16px 10px"><div class="section-title">Миний зарууд</div></div>
   <div class="section"><div id="myListings"><div class="empty"><div class="empty-icon">📋</div><p>Зар байхгүй<br><br><button class="btn btn-primary" onclick="showPostModal()">+ Зар байршуулах</button></p></div></div></div>
@@ -452,16 +482,19 @@ select.form-input{cursor:pointer}
   <div class="nav-item active" id="nav-home" onclick="showPage('home')">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Нүүр
   </div>
-  <div class="nav-item" id="nav-chats" onclick="showPage('chats')" style="position:relative">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-    Чат
-    <span id="chatBadge" style="display:none;position:absolute;top:4px;right:12px;background:#e53e3e;color:white;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;align-items:center;justify-content:center">0</span>
+  <div class="nav-item" id="nav-shops" onclick="showPage('shops')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l1-6h16l1 6"/><path d="M3 9a2 2 0 002 2h0a2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2h0a2 2 0 002-2"/><path d="M5 11v9h14v-9"/></svg>Дэлгүүр
   </div>
   <div class="nav-item post-btn" onclick="showPostModal()">
     <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Зар
   </div>
   <div class="nav-item" id="nav-deliveries" onclick="showPage('deliveries')">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Хүргэлт
+  </div>
+  <div class="nav-item" id="nav-chats" onclick="showPage('chats')" style="position:relative">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    Чат
+    <span id="chatBadge" style="display:none;position:absolute;top:4px;right:12px;background:#e53e3e;color:white;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;align-items:center;justify-content:center">0</span>
   </div>
   <div class="nav-item" id="nav-profile" onclick="showPage('profile')">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профайл
@@ -486,21 +519,69 @@ select.form-input{cursor:pointer}
       <!-- ROLE SELECTION -->
       <div class="form-group">
         <label class="form-label">Та хэн бэ?</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px">
-          <div id="roleUser" onclick="selectRole('user')" style="border:2px solid var(--a);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;background:rgba(255,92,0,0.08)">
-            <div style="font-size:32px">🛍️</div>
-            <div style="font-size:13px;font-weight:700;margin-top:6px">Худалдан авагч</div>
-            <div style="font-size:11px;color:var(--m);margin-top:2px">Зар үзэх, захиалах</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px">
+          <div id="roleUser" onclick="selectRole('user')" style="border:2px solid var(--a);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;background:rgba(255,92,0,0.08)">
+            <div style="font-size:28px">🛍️</div>
+            <div style="font-size:12px;font-weight:700;margin-top:6px">Худалдан авагч</div>
           </div>
-          <div id="roleCourier" onclick="selectRole('courier')" style="border:2px solid var(--b);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer">
-            <div style="font-size:32px">🚚</div>
-            <div style="font-size:13px;font-weight:700;margin-top:6px">Хүргэгч</div>
-            <div style="font-size:11px;color:var(--m);margin-top:2px">Захиалга хүлээн авах</div>
+          <div id="roleCourier" onclick="selectRole('courier')" style="border:2px solid var(--b);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer">
+            <div style="font-size:28px">🚚</div>
+            <div style="font-size:12px;font-weight:700;margin-top:6px">Хүргэгч</div>
+          </div>
+          <div id="roleShop" onclick="selectRole('shop')" style="border:2px solid var(--b);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer">
+            <div style="font-size:28px">🏪</div>
+            <div style="font-size:12px;font-weight:700;margin-top:6px">Дэлгүүр</div>
           </div>
         </div>
         <input type="hidden" id="regRole" value="user">
       </div>
       <div class="form-group"><label class="form-label">Нэр</label><input class="form-input" type="text" id="regName" placeholder="Таны нэр"></div>
+
+      <!-- ДЭЛГҮҮРИЙН НЭМЭЛТ МЭДЭЭЛЭЛ -->
+      <div id="shopFields" style="display:none">
+        <div style="height:1px;background:#f0f0f0;margin:12px 0"></div>
+        <div style="font-size:12px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:10px">🏪 ДЭЛГҮҮРИЙН МЭДЭЭЛЭЛ</div>
+        <div class="form-group"><label class="form-label">Дэлгүүрийн нэр</label><input class="form-input" type="text" id="shopName" placeholder="Жишээ: Алтан мах"></div>
+        <div class="form-group">
+          <label class="form-label">Ангилал</label>
+          <select class="form-input" id="shopCategory">
+            <option value="">Сонгох</option>
+            <option>Хүнс</option><option>Мах</option><option>Хүнсний бараа</option>
+            <option>Хувцас</option><option>Гоо сайхан</option><option>Эм</option>
+            <option>Электроник</option><option>Бусад</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Байршил</label>
+          <div style="display:flex;gap:8px">
+            <select class="form-input" id="shopDistrict" onchange="updateShopKhoroo()" style="flex:1">
+              <option value="">Дүүрэг</option>
+              <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
+              <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
+              <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
+            </select>
+            <select class="form-input" id="shopKhoroo" style="flex:1">
+              <option value="">Хороо</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Дэлгэрэнгүй хаяг</label><input class="form-input" type="text" id="shopAddress" placeholder="Гудамж, байр, давхар..."></div>
+        <div class="form-group">
+          <label class="form-label">Ажиллах цаг</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input class="form-input" type="time" id="shopOpen" value="09:00" style="flex:1">
+            <span style="color:var(--m)">—</span>
+            <input class="form-input" type="time" id="shopClose" value="21:00" style="flex:1">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="toggle-row">
+            <span class="toggle-label">🚚 Хүргэлт хийдэг</span>
+            <label class="toggle"><input type="checkbox" id="shopDelivery"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group"><label class="form-label">Регистрийн дугаар</label><input class="form-input" type="text" id="regNumber" placeholder="АА00000000" maxlength="10" oninput="this.value=this.value.toUpperCase()"></div>
       <div class="form-group"><label class="form-label">Имэйл</label><input class="form-input" type="email" id="regEmail" placeholder="email@example.com"></div>
       <div class="form-group"><label class="form-label">Утас</label><input class="form-input" type="tel" id="regPhone" placeholder="99xxxxxx"></div>
@@ -2187,18 +2268,27 @@ async function updateAdSpace(isCourier) {
 
 function selectRole(role) {
   document.getElementById('regRole').value = role;
-  var userCard = document.getElementById('roleUser');
-  var courierCard = document.getElementById('roleCourier');
-  if (role === 'user') {
-    userCard.style.border = '2px solid var(--a)';
-    userCard.style.background = 'rgba(255,92,0,0.08)';
-    courierCard.style.border = '2px solid var(--b)';
-    courierCard.style.background = 'transparent';
-  } else {
-    courierCard.style.border = '2px solid var(--a)';
-    courierCard.style.background = 'rgba(255,92,0,0.08)';
-    userCard.style.border = '2px solid var(--b)';
-    userCard.style.background = 'transparent';
+  var cards = {user: document.getElementById('roleUser'), courier: document.getElementById('roleCourier'), shop: document.getElementById('roleShop')};
+  Object.keys(cards).forEach(function(key) {
+    if (key === role) {
+      cards[key].style.border = '2px solid var(--a)';
+      cards[key].style.background = 'rgba(255,92,0,0.08)';
+    } else {
+      cards[key].style.border = '2px solid var(--b)';
+      cards[key].style.background = 'transparent';
+    }
+  });
+  document.getElementById('shopFields').style.display = role === 'shop' ? 'block' : 'none';
+}
+
+function updateShopKhoroo() {
+  var district = document.getElementById('shopDistrict').value;
+  var khorooSelect = document.getElementById('shopKhoroo');
+  var khorooCounts = {'Баянгол':23,'Баянзүрх':28,'Сүхбаатар':20,'Хан-Уул':18,'Чингэлтэй':19,'Сонгинохайрхан':32,'Налайх':8,'Багануур':5,'Багахангай':2};
+  var count = khorooCounts[district] || 0;
+  khorooSelect.innerHTML = '<option value="">Хороо</option>';
+  for (var i = 1; i <= count; i++) {
+    khorooSelect.innerHTML += '<option>'+i+'-р хороо</option>';
   }
 }
 
@@ -2233,6 +2323,25 @@ async function register() {
   if (!name||!email||!pass) { showToast('Бүх талбарыг бөглөнө үү',true); return; }
   if (!regNum) { showToast('Регистрийн дугаар оруулна уу',true); return; }
   if (!/^[А-ЯЁӨҮ]{2}\d{8}$/.test(regNum)) { showToast('Регистрийн дугаар буруу байна (АА00000000)',true); return; }
+  // Дэлгүүрийн мэдээлэл шалгах
+  var shopData = {};
+  if (role === 'shop') {
+    var shopName = document.getElementById('shopName').value;
+    var shopCategory = document.getElementById('shopCategory').value;
+    var shopDistrict = document.getElementById('shopDistrict').value;
+    if (!shopName || !shopCategory || !shopDistrict) { showToast('Дэлгүүрийн мэдээллийг бөглөнө үү',true); return; }
+    shopData = {
+      is_shop: true,
+      shop_name: shopName,
+      shop_category: shopCategory,
+      shop_district: shopDistrict,
+      shop_khoroo: document.getElementById('shopKhoroo').value,
+      shop_address: document.getElementById('shopAddress').value,
+      shop_hours_open: document.getElementById('shopOpen').value,
+      shop_hours_close: document.getElementById('shopClose').value,
+      shop_has_delivery: document.getElementById('shopDelivery').checked
+    };
+  }
   // Давхар регистр шалгах
   var existing = await sb.from('users').select('id').eq('register_number', regNum).single();
   if (existing.data) { showToast('Энэ регистрийн дугаар аль хэдийн бүртгэлтэй байна',true); return; }
@@ -2247,12 +2356,16 @@ async function register() {
   var login = await sb.auth.signInWithPassword({email:email, password:pass});
   if (login.error) { showToast('Алдаа: '+login.error.message, true); return; }
   CU = login.data.user;
+  // Дэлгүүрийн мэдээлэл хадгалах
+  if (role === 'shop') {
+    await sb.from('users').update(shopData).eq('id', CU.id);
+  }
   closeModal('authModal');
   await updateNav();
   showPage('profile');
   await loadProfile();
   loadNotifications();
-  showToast(role==='courier'?'Хүргэгчээр бүртгэгдлээ! 🚚':'Бүртгэл амжилттай! 🎉');
+  showToast(role==='courier'?'Хүргэгчээр бүртгэгдлээ! 🚚':role==='shop'?'Дэлгүүр амжилттай бүртгэгдлээ! 🏪':'Бүртгэл амжилттай! 🎉');
   // Admin-д мэдэгдэл
   var admins = await sb.from('users').select('id').eq('is_admin', true);
   if (admins.data) {
@@ -2288,6 +2401,8 @@ async function updateNav() {
     nav.innerHTML =
       '<div class="nav-item active" id="nav-home" onclick="showPage(\'home\')">'+
       '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Нүүр</div>'+
+      '<div class="nav-item" id="nav-shops" onclick="showPage(\'shops\')">'+
+      '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l1-6h16l1 6"/><path d="M3 9a2 2 0 002 2h0a2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2h0a2 2 0 002-2"/><path d="M5 11v9h14v-9"/></svg>Дэлгүүр</div>'+
       '<div class="nav-item" id="nav-deliveries" onclick="showPage(\'deliveries\')">'+
       '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Захиалга</div>'+
       '<div class="nav-item post-btn" id="courierToggleBtn" onclick="quickToggleAvailability()">'+
@@ -2301,15 +2416,18 @@ async function updateNav() {
     updateCourierNavStatus();
   } else {
     updateAdSpace(false);
+    nav.innerHTML =
       '<div class="nav-item active" id="nav-home" onclick="showPage(\'home\')">'+
       '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Нүүр</div>'+
-      '<div class="nav-item" id="nav-chats" onclick="showPage(\'chats\')" style="position:relative">'+
-      '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Чат'+
-      '<span id="chatBadge" style="display:none;position:absolute;top:4px;right:12px;background:#e53e3e;color:white;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;align-items:center;justify-content:center">0</span></div>'+
+      '<div class="nav-item" id="nav-shops" onclick="showPage(\'shops\')">'+
+      '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l1-6h16l1 6"/><path d="M3 9a2 2 0 002 2h0a2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2h0a2 2 0 002-2"/><path d="M5 11v9h14v-9"/></svg>Дэлгүүр</div>'+
       '<div class="nav-item post-btn" onclick="showPostModal()">'+
       '<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Зар</div>'+
       '<div class="nav-item" id="nav-deliveries" onclick="showPage(\'deliveries\')">'+
       '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Хүргэлт</div>'+
+      '<div class="nav-item" id="nav-chats" onclick="showPage(\'chats\')" style="position:relative">'+
+      '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Чат'+
+      '<span id="chatBadge" style="display:none;position:absolute;top:4px;right:12px;background:#e53e3e;color:white;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;align-items:center;justify-content:center">0</span></div>'+
       '<div class="nav-item" id="nav-profile" onclick="showPage(\'profile\')">'+
       '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профайл</div>';
   }
@@ -2524,6 +2642,7 @@ async function loadProfile() {
     '<div class="menu-item" onclick="showPage(\'chats\')"><div class="menu-left"><div class="menu-icon">💬</div>Миний чатууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'deliveries\')"><div class="menu-left"><div class="menu-icon">📦</div>Миний захиалгууд</div></div>'+
     '<div class="menu-item" onclick="editProfile()"><div class="menu-left"><div class="menu-icon">✏️</div>Профайл засах</div></div>'+
+    (user.is_shop?'<div class="menu-item" onclick="showPage(\'shopManage\')"><div class="menu-left"><div class="menu-icon">🏪</div>Дэлгүүрээ удирдах</div></div>':'')+
     '<div class="menu-item" onclick="toggleCourierMode()"><div class="menu-left"><div class="menu-icon">🚚</div>'+(user.is_courier?'Хүргэгч горим — Идэвхтэй':'Хүргэгч болох')+'</div><div style="font-size:11px;color:'+(user.is_courier?'#00C96B':'var(--m)')+'">'+( user.is_courier?'Дарж болиулах':'→')+'</div></div>'+
     (user.is_admin?'<div class="menu-item" onclick="showPage(\'admin\')"><div class="menu-left"><div class="menu-icon">🛡️</div>Admin Panel</div></div>':'')+
     '<div class="menu-item" onclick="logout()"><div class="menu-left"><div class="menu-icon">🚪</div>Гарах</div></div>';
@@ -2891,6 +3010,107 @@ function showPage(name) {
   if (name === 'deliveries') loadDeliveriesPage();
   if (name === 'profile') { loadProfile(); }
   if (name === 'notifications') loadNotifications();
+  if (name === 'shops') loadShops();
+}
+
+var SHOPS_CACHE = [];
+
+async function loadShops() {
+  var r = await sb.from('users').select('id,name,shop_name,shop_category,shop_district,shop_khoroo,shop_address,shop_hours_open,shop_hours_close,shop_logo_url,shop_has_delivery,shop_is_verified,shop_rating,phone').eq('is_shop', true);
+  SHOPS_CACHE = r.data || [];
+  renderShops(SHOPS_CACHE);
+}
+
+function filterShops() {
+  var district = document.getElementById('shopFilterDistrict').value;
+  var category = document.getElementById('shopFilterCategory').value;
+  var deliveryOnly = document.getElementById('shopFilterDelivery').checked;
+  var filtered = SHOPS_CACHE.filter(function(s) {
+    if (district && s.shop_district !== district) return false;
+    if (category && s.shop_category !== category) return false;
+    if (deliveryOnly && !s.shop_has_delivery) return false;
+    return true;
+  });
+  renderShops(filtered);
+}
+
+function isShopOpenNow(open, close) {
+  if (!open || !close) return null;
+  var now = new Date();
+  var ulaanbaatarTime = new Date(now.toLocaleString('en-US', {timeZone:'Asia/Ulaanbaatar'}));
+  var hh = ulaanbaatarTime.getHours();
+  var mm = ulaanbaatarTime.getMinutes();
+  var nowMin = hh*60+mm;
+  var openParts = open.split(':'); var openMin = parseInt(openParts[0])*60+parseInt(openParts[1]);
+  var closeParts = close.split(':'); var closeMin = parseInt(closeParts[0])*60+parseInt(closeParts[1]);
+  return nowMin >= openMin && nowMin <= closeMin;
+}
+
+var SHOP_CAT_ICONS = {'Хүнс':'🍎','Мах':'🥩','Хүнсний бараа':'🛒','Хувцас':'👗','Гоо сайхан':'💄','Эм':'💊','Электроник':'📱','Бусад':'📦'};
+
+function renderShops(shops) {
+  var box = document.getElementById('shopsList');
+  if (!shops.length) {
+    box.innerHTML = '<div class="empty" style="padding-top:60px"><div class="empty-icon">🏪</div><p>Дэлгүүр олдсонгүй</p></div>';
+    return;
+  }
+  box.innerHTML = shops.map(function(s) {
+    var isOpen = isShopOpenNow(s.shop_hours_open, s.shop_hours_close);
+    var icon = SHOP_CAT_ICONS[s.shop_category] || '🏪';
+    return '<div onclick="showShopDetail(\''+s.id+'\')" style="background:white;border:1px solid #eee;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center;cursor:pointer">'+
+      '<div style="width:52px;height:52px;border-radius:12px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">'+icon+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+      '<div style="display:flex;align-items:center;gap:6px"><div style="font-weight:700;font-size:14px">'+(s.shop_name||s.name)+'</div>'+
+      (s.shop_is_verified?'<span style="color:#1a73e8;font-size:13px">✔️</span>':'')+'</div>'+
+      '<div style="font-size:12px;color:#999;margin-top:2px">📍 '+(s.shop_district||'')+(s.shop_khoroo?', '+s.shop_khoroo:'')+'</div>'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-top:4px">'+
+      (isOpen!==null?'<span style="font-size:11px;color:'+(isOpen?'#00875a':'#e53e3e')+';font-weight:600">'+(isOpen?'🟢 Нээгдсэн':'🔴 Хаалттай')+'</span>':'')+
+      (s.shop_has_delivery?'<span style="font-size:11px;color:#1a73e8">🚚 Хүргэлттэй</span>':'')+
+      '</div></div>'+
+      '<div style="color:#ccc;font-size:18px">›</div>'+
+      '</div>';
+  }).join('');
+}
+
+async function showShopDetail(shopId) {
+  showPage('shopDetail');
+  var box = document.getElementById('shopDetailContent');
+  box.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  var r = await sb.from('users').select('*').eq('id', shopId).single();
+  var s = r.data;
+  if (!s) { box.innerHTML = '<div class="empty"><p>Дэлгүүр олдсонгүй</p></div>'; return; }
+  var isOpen = isShopOpenNow(s.shop_hours_open, s.shop_hours_close);
+  var icon = SHOP_CAT_ICONS[s.shop_category] || '🏪';
+  // Тухайн дэлгүүрийн зарууд
+  var ls = await sb.from('listings').select('*').eq('user_id', shopId).eq('status','active');
+  var listings = ls.data || [];
+  box.innerHTML =
+    '<div style="background:linear-gradient(135deg,#1a1a2e,#2a2a3e);padding:24px 16px;color:white;text-align:center">'+
+    '<div style="width:72px;height:72px;border-radius:18px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 10px">'+icon+'</div>'+
+    '<div style="font-size:18px;font-weight:800">'+(s.shop_name||s.name)+(s.shop_is_verified?' ✔️':'')+'</div>'+
+    '<div style="font-size:13px;opacity:0.8;margin-top:4px">'+(s.shop_category||'')+'</div>'+
+    '</div>'+
+    '<div style="padding:16px">'+
+    '<div style="background:#f9f9f9;border-radius:12px;padding:14px;margin-bottom:14px">'+
+    '<div style="font-size:13px;margin-bottom:8px">📍 '+(s.shop_district||'')+(s.shop_khoroo?', '+s.shop_khoroo:'')+(s.shop_address?', '+s.shop_address:'')+'</div>'+
+    '<div style="font-size:13px;margin-bottom:8px">🕐 '+(s.shop_hours_open||'?')+' - '+(s.shop_hours_close||'?')+
+    (isOpen!==null?' <span style="color:'+(isOpen?'#00875a':'#e53e3e')+';font-weight:600">'+(isOpen?'(Нээгдсэн)':'(Хаалттай)')+'</span>':'')+'</div>'+
+    (s.shop_has_delivery?'<div style="font-size:13px;color:#1a73e8">🚚 Хүргэлт хийдэг</div>':'')+
+    (s.phone?'<div style="font-size:13px;margin-top:8px">📞 '+s.phone+'</div>':'')+
+    '</div>'+
+    (CU?'<button class="btn btn-primary btn-full" onclick="startChatWithShop(\''+shopId+'\')" style="margin-bottom:16px">💬 Дэлгүүртэй чатлах</button>':'')+
+    '<div style="font-weight:700;margin-bottom:10px">Бараанууд ('+listings.length+')</div>'+
+    (listings.length?'<div class="grid" style="padding:0">'+listings.map(function(l) {
+      return '<div class="card" onclick="showDetail(\''+l.id+'\')"><div class="card-img">'+(l.images&&l.images[0]?'<img src="'+l.images[0]+'">':(EMOJIS[l.category]||'📦'))+'</div>'+
+        '<div style="padding:6px 8px"><div style="font-size:13px;font-weight:700">₮'+Number(l.price||0).toLocaleString()+'</div>'+
+        '<div class="card-title">'+l.title+'</div></div></div>';
+    }).join('')+'</div>':'<div class="empty"><p>Одоогоор бараа байхгүй</p></div>')+
+    '</div>';
+}
+
+async function startChatWithShop(shopId) {
+  if (!CU) { openAuth('login'); return; }
+  openChat(null, shopId);
 }
 
 function mTime(dateStr) {
