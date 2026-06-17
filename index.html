@@ -789,13 +789,21 @@ select.form-input{cursor:pointer}
     <!-- Messages -->
     <div id="chatMessages" style="flex:1;overflow-y:auto;background:#f5f5f5;padding:12px;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain"></div>
     <!-- Input -->
-    <div style="padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));background:white;border-top:1px solid #f0f0f0;display:flex;gap:8px;align-items:center;flex-shrink:0">
+    <div style="padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));background:white;border-top:1px solid #f0f0f0;display:flex;gap:6px;align-items:center;flex-shrink:0">
+      <input type="file" id="chatImageInput" accept="image/*" style="display:none" onchange="sendChatImage(this)">
+      <button onclick="document.getElementById('chatImageInput').click()" style="background:#f0f0f0;color:#666;border:none;width:38px;height:38px;border-radius:50%;font-size:17px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">📷</button>
+      <button id="chatVoiceBtn" onmousedown="startVoiceRecording()" ontouchstart="startVoiceRecording(event)" onmouseup="stopVoiceRecording()" ontouchend="stopVoiceRecording(event)" ontouchcancel="stopVoiceRecording(event)" style="background:#f0f0f0;color:#666;border:none;width:38px;height:38px;border-radius:50%;font-size:17px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">🎤</button>
       <input class="form-input" id="chatInput" placeholder="Мессеж бичих..." 
         style="flex:1;border-radius:50px;padding:10px 16px;font-size:14px" 
         onkeypress="if(event.key==='Enter')sendMessage()"
         onfocus="scrollChatToBottom()"
       >
       <button onclick="sendMessage()" style="background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border:none;width:42px;height:42px;border-radius:50%;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">➤</button>
+    </div>
+    <div id="voiceRecordingBar" style="display:none;padding:10px 16px;background:#fff0eb;align-items:center;gap:10px;border-top:1px solid #f0f0f0">
+      <div style="width:10px;height:10px;border-radius:50%;background:#e53e3e;animation:pulse 1s infinite"></div>
+      <span style="font-size:13px;color:#e53e3e;font-weight:600">Бичиж байна... <span id="voiceTimer">0:00</span></span>
+      <span style="font-size:12px;color:#999;margin-left:auto">Гарыг тавихад илгээгдэнэ</span>
     </div>
   </div>
 </div>
@@ -1853,13 +1861,125 @@ async function loadChat(listingId, sellerId) {
   box.innerHTML = msgs.length ? msgs.map(function(m){
     var isMine = m.sender_id === CU.id;
     var time = mTime(m.created_at);
+    var bubbleContent = '';
+    if (m.message_type === 'image' && m.image_url) {
+      bubbleContent = '<img src="'+m.image_url+'" onclick="viewChatImage(\''+m.image_url+'\')" style="max-width:200px;border-radius:12px;display:block;cursor:pointer">';
+    } else if (m.message_type === 'audio' && m.audio_url) {
+      bubbleContent = '<audio src="'+m.audio_url+'" controls style="width:200px;height:36px"></audio>';
+    } else {
+      bubbleContent = '<div>'+(m.content||'')+'</div>';
+    }
     return '<div style="display:flex;justify-content:'+(isMine?'flex-end':'flex-start')+'">'+
-      '<div style="max-width:75%;background:'+(isMine?'linear-gradient(135deg,#E62B05,#FF8C00)':'white')+';color:'+(isMine?'white':'#111')+';padding:10px 14px;border-radius:'+(isMine?'18px 18px 4px 18px':'18px 18px 18px 4px')+';font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,0.1)">'+
-      '<div>'+m.content+'</div>'+
-      '<div style="font-size:10px;opacity:0.7;margin-top:3px;text-align:right">'+time+'</div>'+
+      '<div style="max-width:75%;background:'+(isMine&&m.message_type==='text'?'linear-gradient(135deg,#E62B05,#FF8C00)':(m.message_type!=='text'?'transparent':'white'))+';color:'+(isMine?'white':'#111')+';padding:'+(m.message_type==='text'?'10px 14px':'4px')+';border-radius:'+(isMine?'18px 18px 4px 18px':'18px 18px 18px 4px')+';font-size:13px;box-shadow:'+(m.message_type==='text'?'0 1px 4px rgba(0,0,0,0.1)':'none')+'">'+
+      bubbleContent+
+      '<div style="font-size:10px;opacity:0.7;margin-top:3px;text-align:right;color:'+(isMine&&m.message_type==='text'?'white':'#999')+'">'+time+'</div>'+
       '</div></div>';
   }).join('') : '<div style="text-align:center;color:#999;font-size:13px;padding:40px 20px">Чат эхлүүлэх</div>';
   box.scrollTop = box.scrollHeight;
+}
+
+function viewChatImage(url) {
+  window.open(url, '_blank');
+}
+
+async function sendChatImage(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 10*1024*1024) { showToast('Зураг 10MB-аас бага байх ёстой', true); return; }
+  showToast('Зураг илгээж байна...');
+  var ext = file.name.split('.').pop();
+  var path = CU.id+'/chat_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.'+ext;
+  var up = await sb.storage.from('listings').upload(path, file, {cacheControl:'3600', upsert:true});
+  input.value = '';
+  if (up.error) { showToast('Зураг илгээхэд алдаа гарлаа', true); return; }
+  var url = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
+  var r = await sb.from('messages').insert({
+    listing_id: window._chatListingId,
+    sender_id: CU.id,
+    receiver_id: window._chatSellerId,
+    message_type: 'image',
+    image_url: url
+  });
+  if (!r.error) {
+    loadChat(window._chatListingId, window._chatSellerId);
+    notifyChatPartner('📷 Зураг илгээсэн');
+  }
+}
+
+var _voiceRecorder = null;
+var _voiceChunks = [];
+var _voiceStartTime = null;
+var _voiceTimerInterval = null;
+var _voiceStream = null;
+
+async function startVoiceRecording(e) {
+  if (e && e.cancelable) e.preventDefault();
+  if (_voiceRecorder && _voiceRecorder.state === 'recording') return;
+  try {
+    _voiceStream = await navigator.mediaDevices.getUserMedia({audio:true});
+  } catch(e) {
+    showToast('Микрофон зөвшөөрөл өгөгдөөгүй', true);
+    return;
+  }
+  _voiceChunks = [];
+  _voiceRecorder = new MediaRecorder(_voiceStream);
+  _voiceRecorder.ondataavailable = function(e) { if (e.data.size > 0) _voiceChunks.push(e.data); };
+  _voiceRecorder.start();
+  _voiceStartTime = Date.now();
+  document.getElementById('voiceRecordingBar').style.display = 'flex';
+  document.getElementById('chatVoiceBtn').style.background = '#e53e3e';
+  document.getElementById('chatVoiceBtn').style.color = 'white';
+  _voiceTimerInterval = setInterval(function() {
+    var secs = Math.floor((Date.now()-_voiceStartTime)/1000);
+    var m = Math.floor(secs/60), s = secs%60;
+    document.getElementById('voiceTimer').textContent = m+':'+(s<10?'0':'')+s;
+    if (secs >= 60) stopVoiceRecording(); // max 60 sec
+  }, 200);
+}
+
+function stopVoiceRecording(e) {
+  if (e) e.preventDefault();
+  if (!_voiceRecorder || _voiceRecorder.state === 'inactive') return;
+  clearInterval(_voiceTimerInterval);
+  document.getElementById('voiceRecordingBar').style.display = 'none';
+  document.getElementById('chatVoiceBtn').style.background = '#f0f0f0';
+  document.getElementById('chatVoiceBtn').style.color = '#666';
+  var duration = Date.now() - _voiceStartTime;
+  _voiceRecorder.onstop = async function() {
+    if (_voiceStream) { _voiceStream.getTracks().forEach(function(t){t.stop();}); _voiceStream = null; }
+    if (duration < 800) { showToast('Хэт богино дуу хоолой', true); return; } // ignore accidental taps
+    var blob = new Blob(_voiceChunks, {type:'audio/webm'});
+    await sendChatAudio(blob);
+  };
+  _voiceRecorder.stop();
+}
+
+async function sendChatAudio(blob) {
+  showToast('Дуу мессеж илгээж байна...');
+  var path = CU.id+'/voice_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.webm';
+  var up = await sb.storage.from('listings').upload(path, blob, {cacheControl:'3600', upsert:true, contentType:'audio/webm'});
+  if (up.error) { showToast('Дуу илгээхэд алдаа гарлаа', true); return; }
+  var url = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
+  var r = await sb.from('messages').insert({
+    listing_id: window._chatListingId,
+    sender_id: CU.id,
+    receiver_id: window._chatSellerId,
+    message_type: 'audio',
+    audio_url: url
+  });
+  if (!r.error) {
+    loadChat(window._chatListingId, window._chatSellerId);
+    notifyChatPartner('🎤 Дуу мессеж илгээсэн');
+  }
+}
+
+async function notifyChatPartner(text) {
+  var me = await sb.from('users').select('name').eq('id', CU.id).single();
+  await sb.from('notifications').insert({
+    user_id: window._chatSellerId,
+    title: '💬 Шинэ мессеж',
+    body: (me.data&&me.data.name||'Хэрэглэгч')+': '+text
+  });
 }
 
 async function sendMessage() {
