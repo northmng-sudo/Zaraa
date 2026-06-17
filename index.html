@@ -63,10 +63,12 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .stack-img-wrap .si-0{transform:rotate(0);z-index:3}
 .stack-img-wrap:hover .si-2{transform:rotate(5deg) translate(7px,7px);opacity:0.4}
 .stack-img-wrap:hover .si-1{transform:rotate(2.5deg) translate(4px,4px);opacity:0.65}
+.flow-v{position:relative;padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06);-webkit-tap-highlight-color:transparent;z-index:0}
 .flow-v:last-child{border-bottom:none}
-.flow-v::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#E62B05,#c0392b);opacity:0;transition:opacity 0.25s}
-.flow-v:hover::before,.flow-v.active::before{opacity:1}.flow-v:hover span,.flow-v.active span{color:white!important;position:relative;z-index:1}
-.flow-v span{position:relative;z-index:1;transition:color 0.2s}
+.flow-v::before{content:'';position:absolute;inset:0;background:rgba(230,43,5,0.85);opacity:0;transition:opacity 0.25s;pointer-events:none;z-index:0}
+.flow-v:hover::before,.flow-v.active::before{opacity:1}
+.flow-v span{position:relative;z-index:2;transition:color 0.2s}
+.flow-v:hover span,.flow-v.active span{color:white!important}
 .flow-h{flex-shrink:0;padding:8px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:10px;transition:background 0.2s}
 .flow-h .fh-icon{font-size:20px;line-height:1;display:block}
 .flow-h .fh-text{font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);transition:color 0.2s;white-space:nowrap;display:block}
@@ -544,7 +546,7 @@ select.form-input{cursor:pointer}
       <!-- 2. ДЭД АНГИЛАЛ -->
       <div id="catTier2" style="margin-bottom:12px;display:none">
         <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:8px">📂 ДЭД АНГИЛАЛ</div>
-        <div id="catTier2Grid" style="background:#1a1a2e;border-radius:12px;overflow:hidden"></div>
+        <div id="catTier2Grid" style="background:#1a1a2e;border-radius:12px;overflow:visible"></div>
 
       <!-- 3. НАРИЙН АНГИЛАЛ -->
       <div id="catTier3" style="margin-bottom:12px;display:none">
