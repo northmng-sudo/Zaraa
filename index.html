@@ -1869,13 +1869,37 @@ async function loadChat(listingId, sellerId) {
     } else {
       bubbleContent = '<div>'+(m.content||'')+'</div>';
     }
+    var longPressAttrs = isMine ? ' oncontextmenu="event.preventDefault();confirmDeleteMessage(\''+m.id+'\')" ontouchstart="chatLongPressStart(\''+m.id+'\')" ontouchend="chatLongPressEnd()" ontouchmove="chatLongPressEnd()"' : '';
     return '<div style="display:flex;justify-content:'+(isMine?'flex-end':'flex-start')+'">'+
-      '<div style="max-width:75%;background:'+(isMine&&m.message_type==='text'?'linear-gradient(135deg,#E62B05,#FF8C00)':(m.message_type!=='text'?'transparent':'white'))+';color:'+(isMine?'white':'#111')+';padding:'+(m.message_type==='text'?'10px 14px':'4px')+';border-radius:'+(isMine?'18px 18px 4px 18px':'18px 18px 18px 4px')+';font-size:13px;box-shadow:'+(m.message_type==='text'?'0 1px 4px rgba(0,0,0,0.1)':'none')+'">'+
+      '<div'+longPressAttrs+' style="max-width:75%;background:'+(isMine&&m.message_type==='text'?'linear-gradient(135deg,#E62B05,#FF8C00)':(m.message_type!=='text'?'transparent':'white'))+';color:'+(isMine?'white':'#111')+';padding:'+(m.message_type==='text'?'10px 14px':'4px')+';border-radius:'+(isMine?'18px 18px 4px 18px':'18px 18px 18px 4px')+';font-size:13px;box-shadow:'+(m.message_type==='text'?'0 1px 4px rgba(0,0,0,0.1)':'none')+(isMine?';cursor:pointer':'')+'">'+
       bubbleContent+
       '<div style="font-size:10px;opacity:0.7;margin-top:3px;text-align:right;color:'+(isMine&&m.message_type==='text'?'white':'#999')+'">'+time+'</div>'+
       '</div></div>';
   }).join('') : '<div style="text-align:center;color:#999;font-size:13px;padding:40px 20px">Чат эхлүүлэх</div>';
   box.scrollTop = box.scrollHeight;
+}
+
+var _chatLongPressTimer = null;
+function chatLongPressStart(msgId) {
+  _chatLongPressTimer = setTimeout(function() {
+    confirmDeleteMessage(msgId);
+  }, 500);
+}
+function chatLongPressEnd() {
+  clearTimeout(_chatLongPressTimer);
+}
+
+function confirmDeleteMessage(msgId) {
+  if (confirm('Энэ мессежийг устгах уу?')) {
+    deleteMessage(msgId);
+  }
+}
+
+async function deleteMessage(msgId) {
+  var r = await sb.from('messages').delete().eq('id', msgId);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Мессеж устгагдлаа');
+  loadChat(window._chatListingId, window._chatSellerId);
 }
 
 function viewChatImage(url) {
