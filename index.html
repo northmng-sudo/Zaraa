@@ -87,10 +87,14 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .featured-shimmer{position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;pointer-events:none}
 .featured-shimmer::after{content:'';position:absolute;top:0;left:0;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);animation:shimmer 2s infinite}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;background:#f0f0f0;border-top:1px solid #f0f0f0;padding:14px}
-@media(min-width:768px){#searchWrap{padding:20px 200px 24px!important}}
+#adSideWrap{display:none;flex-direction:column;margin-right:-16px}
+@media(min-width:768px){
+  #searchWrap{padding:20px 200px 24px!important}
+  #searchInner{padding:36px 18px!important;border-radius:20px!important;background:linear-gradient(white,white) padding-box,linear-gradient(90deg,#E62B05,#FF8C00) border-box!important;border:2px solid transparent!important;box-shadow:0 4px 20px rgba(230,43,5,0.15)!important}
+  #adSideWrap{display:flex!important}
+}
 @media(min-width:1024px){#searchWrap{padding:20px 360px 24px!important}}
 @media(min-width:1440px){#searchWrap{padding:20px 480px 24px!important}}
-@media(min-width:768px){#searchInner{padding:36px 18px!important;border-radius:20px!important;background:linear-gradient(white,white) padding-box,linear-gradient(90deg,#E62B05,#FF8C00) border-box!important;border:2px solid transparent!important;box-shadow:0 4px 20px rgba(230,43,5,0.15)!important}}
 @media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr);padding:0 80px}}
 @media(min-width:1024px){.grid{grid-template-columns:repeat(6,1fr);padding:0 150px}}
@@ -267,21 +271,18 @@ select.form-input{cursor:pointer}
 
   <!-- SEARCH STICKY -->
   <div id="searchWrap" style="position:sticky;top:50px;z-index:90;background:#f5f5f5;padding:12px 16px">
-    <div style="display:flex;gap:8px;align-items:stretch">
+    <div style="display:flex;align-items:stretch;gap:0">
       <div id="searchInner" style="flex:1;background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.12);border:2px solid #FF8C00;display:flex;align-items:center;overflow:hidden;padding:10px 8px 10px 14px;gap:6px">
         <svg style="flex-shrink:0;color:#999" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:14px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
         <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px 8px;color:#999;font-size:13px;border-radius:8px;flex-shrink:0">⚙️</button>
         <button onclick="doSearch()" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
       </div>
-    </div>
-    <!-- Реклам хэсэг -->
-    <div id="adWrap" style="margin-top:8px;display:block">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <span style="font-size:10px;color:#999">📺 Реклам</span>
-        <button onclick="toggleAdSpace()" style="background:none;border:none;font-size:10px;color:#bbb;cursor:pointer;padding:2px 6px" id="adToggleBtn">Нуух ✕</button>
+      <!-- Реклам: зөвхөн desktop, searchWrap-аас гадна баруун тийш -->
+      <div id="adSideWrap" style="display:none;flex-direction:column;margin-right:-16px;margin-left:48px;flex-shrink:0">
+        <div id="adSpace" style="flex:1;background:#111;overflow:hidden;width:440px"></div>
+        <button onclick="toggleAdSpace()" id="adToggleBtn" style="background:rgba(0,0,0,0.7);border:none;color:white;font-size:10px;cursor:pointer;padding:4px 0;width:440px;text-align:center">Нуух ✕</button>
       </div>
-      <div id="adSpace" style="border-radius:12px;overflow:hidden;background:#111;height:80px"></div>
     </div>
     <div id="filterPanel" style="display:none;background:white;border-radius:12px;padding:16px;margin-top:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1)">
       <div style="font-weight:700;margin-bottom:12px;font-size:14px">🔍 Шүүлтүүр</div>
@@ -1108,7 +1109,7 @@ async function init() {
     var adEl = document.getElementById('adSpace');
     var adBtn = document.getElementById('adToggleBtn');
     if (adEl) adEl.style.display = 'none';
-    if (adBtn) adBtn.textContent = 'Харуулах ↓';
+    if (adBtn) adBtn.textContent = 'Харуулах +';
   }
   // Pill indicator эхлүүлэх
   setTimeout(function() {
@@ -2999,7 +3000,7 @@ function toggleAdSpace() {
     localStorage.setItem('zaraa_ad_hidden', '0');
   } else {
     wrap.style.display = 'none';
-    btn.textContent = 'Харуулах ↓';
+    btn.textContent = 'Харуулах +';
     localStorage.setItem('zaraa_ad_hidden', '1');
   }
 }
