@@ -2348,10 +2348,21 @@ async function register() {
   var r = await sb.functions.invoke('bright-api', {
     body: {email, password:pass, name, phone, register_number:regNum, is_courier:role==='courier'}
   });
-  console.log('bright-api response:', r);
-  if (r.error || (r.data && r.data.error)) { 
-    showToast('Алдаа: '+(r.data&&r.data.error||r.error.message), true); 
-    return; 
+  window._lastBrightApiResponse = r;
+  if (r.error) {
+    var errBody = null;
+    try {
+      if (r.error.context && r.error.context.json) errBody = await r.error.context.json();
+      else if (r.error.context) errBody = await r.error.context.text();
+    } catch(e) { errBody = 'parse failed: ' + e.message; }
+    console.log('bright-api FULL ERROR:', JSON.stringify({message:r.error.message, name:r.error.name, status:r.error.context&&r.error.context.status, body:errBody}, null, 2));
+    showToast('Алдаа: '+(errBody&&errBody.error || r.error.message), true);
+    return;
+  }
+  if (r.data && r.data.error) {
+    console.log('bright-api data error:', JSON.stringify(r.data, null, 2));
+    showToast('Алдаа: '+r.data.error, true);
+    return;
   }
   // Шууд нэвтрэх
   var login = await sb.auth.signInWithPassword({email:email, password:pass});
