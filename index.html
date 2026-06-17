@@ -3453,9 +3453,15 @@ if (window.visualViewport) {
   });
 }
 
-function openModal(id) { document.getElementById(id).classList.add('open'); }
+function openModal(id) {
+  var m = document.getElementById(id);
+  m.classList.add('open');
+  m.style.display = 'flex';
+}
 function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
+  var m = document.getElementById(id);
+  m.classList.remove('open');
+  m.style.display = 'none';
   if (id === 'chatModal' && window._chatChannel) {
     sb.removeChannel(window._chatChannel);
     window._chatChannel = null;
@@ -3463,7 +3469,7 @@ function closeModal(id) {
 }
 
 document.querySelectorAll('.modal-overlay').forEach(function(m){
-  m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
+  m.addEventListener('click', function(e){ if(e.target===m) { m.classList.remove('open'); m.style.display='none'; } });
 });
 
 function showToast(msg, isError) {
