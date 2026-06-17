@@ -89,7 +89,6 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;background:#f0f0f0;border-top:1px solid #f0f0f0;padding:14px}
 #adSideWrap{display:none;flex-direction:column}
 @media(min-width:768px){
-  #searchInner{padding:36px 18px!important;border-radius:20px!important;background:linear-gradient(white,white) padding-box,linear-gradient(90deg,#E62B05,#FF8C00) border-box!important;border:2px solid transparent!important;box-shadow:0 4px 20px rgba(230,43,5,0.15)!important}
   #adSideWrap{display:flex!important}
 }
 @media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
@@ -267,20 +266,20 @@ select.form-input{cursor:pointer}
   </div>
 
   <!-- SEARCH STICKY -->
-  <div id="searchWrap" style="position:sticky;top:50px;z-index:90;background:#f5f5f5;padding:12px 0 12px 0">
-    <div style="display:flex;align-items:stretch;height:56px">
-      <!-- Хайх — зүүн талаас 16px зай, тогтмол өргөн -->
-      <div id="searchInner" style="margin-left:16px;flex:0 0 min(55vw,560px);background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.12);border:2px solid #FF8C00;display:flex;align-items:center;overflow:hidden;padding:8px 8px 8px 14px;gap:6px">
-        <svg style="flex-shrink:0;color:#999" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:14px;font-family:'Inter',sans-serif;min-width:0">
-        <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px 8px;color:#999;font-size:13px;border-radius:8px;flex-shrink:0">⚙️</button>
-        <button onclick="doSearch()" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
+  <div id="searchWrap" style="position:sticky;top:50px;z-index:90;background:#f5f5f5;padding:20px 16px 12px">
+    <div id="searchInner" style="background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.12);border:2px solid #FF8C00;display:flex;align-items:center;overflow:hidden;padding:18px 8px 18px 14px;gap:6px;max-width:600px;margin:0 auto">
+      <svg style="flex-shrink:0;color:#999" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:14px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
+      <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px 8px;color:#999;font-size:13px;border-radius:8px;flex-shrink:0">⚙️</button>
+      <button onclick="doSearch()" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
+    </div>
+    <!-- Реклам — доор, бүтэн өргөн, зөвхөн desktop -->
+    <div id="adSideWrap" style="display:none;flex-direction:column;max-width:900px;margin:10px auto 0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:10px;color:#aaa">📺 Реклам</span>
+        <button onclick="toggleAdSpace()" id="adToggleBtn" style="background:none;border:none;font-size:10px;color:#bbb;cursor:pointer;padding:2px 6px">Нуух ✕</button>
       </div>
-      <!-- Реклам — хайхаас 12px зай, баруун тийш бүхэлдээ -->
-      <div id="adSideWrap" style="display:none;flex-direction:column;margin-left:12px;flex:1;min-width:0;overflow:hidden">
-        <div id="adSpace" style="flex:1;background:#111;overflow:hidden"></div>
-        <button onclick="toggleAdSpace()" id="adToggleBtn" style="background:rgba(0,0,0,0.7);border:none;color:white;font-size:10px;cursor:pointer;padding:3px 0;width:100%;text-align:center;flex-shrink:0">Нуух ✕</button>
-      </div>
+      <div id="adSpace" style="width:100%;aspect-ratio:21/5;border-radius:14px;overflow:hidden;background:#111"></div>
     </div>
     <div id="filterPanel" style="display:none;background:white;border-radius:12px;padding:16px;margin-top:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1)">
       <div style="font-weight:700;margin-bottom:12px;font-size:14px">🔍 Шүүлтүүр</div>
