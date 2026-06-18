@@ -266,7 +266,7 @@ select.form-input{cursor:pointer}
       <div class="cat" data-cat='Барилгын төхөөрөмж, материал, түлш'>🏗️ Барилгын материал</div>
       <div class="cat" data-cat='Амралт, спорт, хобби'>⚽ Амралт, спорт, хобби</div>
       <div class="cat" data-cat='Хүүхдийн бараа'>🧸 Хүүхэд</div>
-      <div class="cat" data-cat='Амьтад'>🐾 Амьтад</div>
+      <div class="cat" data-cat='Мал амьтан, ургамал'>🐾 Мал амьтан, ургамал</div>
       <div class="cat" data-cat='Ном'>📚 Ном</div>
       <div class="cat" data-cat='Үйлчилгээ'>🔧 Үйлчилгээ</div>
       <div class="cat" data-cat='Бусад'>📦 Бусад</div>
@@ -680,7 +680,7 @@ select.form-input{cursor:pointer}
           <div class="flow-h" onclick="selectTier1('Амралт, спорт, хобби','⚽',this)"><span class="fh-icon">⚽</span><span class="fh-text">Амралт, спорт</span></div>
           <div class="flow-h" onclick="selectTier1('Барилгын төхөөрөмж, материал, түлш','🏗️',this)"><span class="fh-icon">🏗️</span><span class="fh-text">Барилгын материал</span></div>
           <div class="flow-h" onclick="selectTier1('Хүүхдийн бараа','🧸',this)"><span class="fh-icon">🧸</span><span class="fh-text">Хүүхэд</span></div>
-          <div class="flow-h" onclick="selectTier1('Амьтад','🐾',this)"><span class="fh-icon">🐾</span><span class="fh-text">Амьтад</span></div>
+          <div class="flow-h" onclick="selectTier1('Мал амьтан, ургамал','🐾',this)"><span class="fh-icon">🐾</span><span class="fh-text">Амьтан</span></div>
           <div class="flow-h" onclick="selectTier1('Ном','📚',this)"><span class="fh-icon">📚</span><span class="fh-text">Ном</span></div>
           <div class="flow-h" onclick="selectTier1('Үйлчилгээ','🔧',this)"><span class="fh-icon">🔧</span><span class="fh-text">Үйлчилгээ</span></div>
           <div class="flow-h" onclick="selectTier1('Бусад','📦',this)"><span class="fh-icon">📦</span><span class="fh-text">Бусад</span></div>
@@ -844,7 +844,7 @@ const sb = supabase.createClient(SURL, SKEY);
 var CU = null;
 var AL = [];
 var CC = '';
-var EMOJIS = {'Авто':'🚗','Үл хөдлөх':'🏠','Ажлын байр':'💼','Гар утас':'📱','Компьютер':'💻','Цахилгаан бараа':'🔌','Хувцас':'👗','Гутал':'👟','Эрүүл мэнд, гоо сайхан, хүнс':'💄','Гэр ахуйн бараа':'🪑','Барилгын төхөөрөмж, материал, түлш':'🏗️','Амралт, спорт, хобби':'⚽','Хүүхдийн бараа':'🧸','Эрүүл мэнд':'💊','Хоол хүнс':'🍎','Амьтад':'🐾','Ном':'📚','Үйлчилгээ':'🔧','Техник':'📱','Бусад':'📦'};
+var EMOJIS = {'Авто':'🚗','Үл хөдлөх':'🏠','Ажлын байр':'💼','Гар утас':'📱','Компьютер':'💻','Цахилгаан бараа':'🔌','Хувцас':'👗','Гутал':'👟','Эрүүл мэнд, гоо сайхан, хүнс':'💄','Гэр ахуйн бараа':'🪑','Барилгын төхөөрөмж, материал, түлш':'🏗️','Амралт, спорт, хобби':'⚽','Хүүхдийн бараа':'🧸','Эрүүл мэнд':'💊','Хоол хүнс':'🍎','Мал амьтан, ургамал':'🐾','Ном':'📚','Үйлчилгээ':'🔧','Техник':'📱','Бусад':'📦'};
 
 // Category click
 document.getElementById('catList').addEventListener('click', function(e) {
@@ -903,7 +903,7 @@ var CAT_FILTERS = {
   'Эрүүл мэнд, гоо сайхан, хүнс': [
     {id:'cf_type', label:'Төрөл', type:'select', options:['','Арьс халамж','Үс засал','Хумс','Нүүр будалт','Үнэр','Бусад']}
   ],
-  'Амьтад': [
+  'Мал амьтан, ургамал': [
     {id:'cf_type', label:'Амьтны төрөл', type:'select', options:['','Нохой','Муур','Шувуу','Загас','Туулай','Бусад']},
     {id:'cf_age', label:'Нас (сар)', type:'number', placeholder:'6'}
   ],
@@ -1074,11 +1074,11 @@ var CAT_SUBS = {
     'Ванн, горшок': null,
     'Бусад': null
   },
-  'Амьтад': {
-    'Нохой': null,
-    'Муур': null,
-    'Шувуу': null,
-    'Загас': null,
+  'Мал амьтан, ургамал': {
+    'Мал амьтан': ['Таван хошуу мал','ХАА-н бусад амьтан','Тэжээвэр амьтад','Амьтны бараа','Мал амьтны хоол тэжээл','Олсон гээсэн амьтад'],
+    'Түүхий эд, ноос': null,
+    'Ургамал, мод, цэцэг': null,
+    'Хөрс, бордоо, ургамал хамгаалал': null,
     'Бусад': null
   },
   'Ном': {
@@ -1165,6 +1165,9 @@ var BRAND_ICONS = {
 };
 
 var SUB_ICONS = {
+  'Мал амьтан':'🐄','Түүхий эд, ноос':'🧶','Ургамал, мод, цэцэг':'🌱',
+  'Хөрс, бордоо, ургамал хамгаалал':'🌾','Таван хошуу мал':'🐑','ХАА-н бусад амьтан':'🐔',
+  'Тэжээвэр амьтад':'🐕','Амьтны бараа':'🦴','Мал амьтны хоол тэжээл':'🌽','Олсон гээсэн амьтад':'🔍',
   'Архи, тамхинаас гаргах':'🚭','Биеийн жин':'⚖️','Гэмтлийн үеийн хэрэгсэл':'🩹',
   'Даралтны аппарат':'🩺','Массажны аппарат':'💆','Нүдний арчилгаа':'👁️',
   'Толгой, ядаргааны':'🤕','Тураах хэрэгсэл':'⚖️','Харшлын эсрэг':'🤧',
