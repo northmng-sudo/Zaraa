@@ -2161,6 +2161,15 @@ async function adminDeleteUser(id) {
   loadAdmin();
 }
 
+function goToNextAdGlobal() {
+  if (window._goToNextAd) window._goToNextAd();
+  else {
+    // Зөвхөн 1 реклам байгаа бол video-г дахин тоглуул
+    var v = document.querySelector('#adSpace video');
+    if (v) { v.currentTime = 0; v.play(); }
+  }
+}
+
 function toggleAdSound(i) {
   var video = document.getElementById('adVideo_'+i);
   var btn = document.getElementById('adMuteBtn_'+i);
@@ -2433,11 +2442,16 @@ async function updateAdSpace(isCourier) {
     var ads = await loadAds();
     if (ads.length) {
       var idx = 0;
+      function goToNextAd() {
+        idx = (idx + 1) % ads.length;
+        showAd(idx);
+      }
       function showAd(i) {
+        if (window._adTimer) { clearTimeout(window._adTimer); window._adTimer = null; }
         var ad = ads[i];
         var content = '';
         if (ad.video_url) {
-          content = '<video id="adVideo_'+i+'" src="'+ad.video_url+'" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain;background:#000"></video>'+
+          content = '<video id="adVideo_'+i+'" src="'+ad.video_url+'" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;background:#000" onended="goToNextAdGlobal()"></video>'+
             '<div id="adMuteBtn_'+i+'" style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,0.6);color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px" onclick="event.stopPropagation();toggleAdSound(\''+i+'\')">🔇</div>';
         } else if (ad.image_url) {
           content = '<img src="'+ad.image_url+'" style="width:100%;height:100%;object-fit:cover">';
@@ -2447,15 +2461,13 @@ async function updateAdSpace(isCourier) {
           content+
           '<div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.6);color:white;border-radius:4px;padding:2px 6px;font-size:10px">Реклам</div>'+
           '</div>';
+        // Зураг бол 5 секундын дараа шилжих; видео бол onended event-ээр шилжинэ
+        if (ads.length > 1 && !ad.video_url) {
+          window._adTimer = setTimeout(goToNextAd, 5000);
+        }
       }
+      window._goToNextAd = ads.length > 1 ? goToNextAd : null;
       showAd(0);
-      if (ads.length > 1) {
-        if (window._adTimer) clearInterval(window._adTimer);
-        window._adTimer = setInterval(function() {
-          idx = (idx + 1) % ads.length;
-          showAd(idx);
-        }, 5000);
-      }
     } else {
       box.innerHTML = '<div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#2a2a3e);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:6px;cursor:pointer" onclick="showToast(\'Реклам байршуулах: admin@zaraa.mn\')">'+
         '<div style="font-size:18px">📺</div>'+
