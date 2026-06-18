@@ -262,8 +262,7 @@ select.form-input{cursor:pointer}
       <div class="cat" data-cat='Хувцас'>👗 Хувцас</div>
       <div class="cat" data-cat='Гутал'>👟 Гутал</div>
       <div class="cat" data-cat='Гоо сайхан'>💄 Гоо сайхан</div>
-      <div class="cat" data-cat='Тавилга'>🪑 Тавилга</div>
-      <div class="cat" data-cat='Гэр ахуй'>🏡 Гэр ахуй</div>
+      <div class="cat" data-cat='Гэр ахуйн бараа'>🪑 Гэр ахуйн бараа</div>
       <div class="cat" data-cat='Тоглоом'>🎮 Тоглоом</div>
       <div class="cat" data-cat='Спорт'>⚽ Спорт</div>
       <div class="cat" data-cat='Хүүхдийн бараа'>🧸 Хүүхэд</div>
@@ -677,8 +676,7 @@ select.form-input{cursor:pointer}
           <div class="flow-h" onclick="selectTier1('Хувцас','👗',this)"><span class="fh-icon">👗</span><span class="fh-text">Хувцас</span></div>
           <div class="flow-h" onclick="selectTier1('Гутал','👟',this)"><span class="fh-icon">👟</span><span class="fh-text">Гутал</span></div>
           <div class="flow-h" onclick="selectTier1('Гоо сайхан','💄',this)"><span class="fh-icon">💄</span><span class="fh-text">Гоо сайхан</span></div>
-          <div class="flow-h" onclick="selectTier1('Тавилга','🪑',this)"><span class="fh-icon">🪑</span><span class="fh-text">Тавилга</span></div>
-          <div class="flow-h" onclick="selectTier1('Гэр ахуй','🏡',this)"><span class="fh-icon">🏡</span><span class="fh-text">Гэр ахуй</span></div>
+          <div class="flow-h" onclick="selectTier1('Гэр ахуйн бараа','🪑',this)"><span class="fh-icon">🪑</span><span class="fh-text">Гэр ахуй</span></div>
           <div class="flow-h" onclick="selectTier1('Спорт','⚽',this)"><span class="fh-icon">⚽</span><span class="fh-text">Спорт</span></div>
           <div class="flow-h" onclick="selectTier1('Тоглоом','🎮',this)"><span class="fh-icon">🎮</span><span class="fh-text">Тоглоом</span></div>
           <div class="flow-h" onclick="selectTier1('Хүүхдийн бараа','🧸',this)"><span class="fh-icon">🧸</span><span class="fh-text">Хүүхэд</span></div>
@@ -846,7 +844,7 @@ const sb = supabase.createClient(SURL, SKEY);
 var CU = null;
 var AL = [];
 var CC = '';
-var EMOJIS = {'Авто':'🚗','Үл хөдлөх':'🏠','Ажлын байр':'💼','Гар утас':'📱','Компьютер':'💻','Цахилгаан бараа':'🔌','Хувцас':'👗','Гутал':'👟','Гоо сайхан':'💄','Тавилга':'🪑','Гэр ахуй':'🏡','Тоглоом':'🎮','Спорт':'⚽','Хүүхдийн бараа':'🧸','Эрүүл мэнд':'💊','Хоол хүнс':'🍎','Амьтад':'🐾','Ном':'📚','Үйлчилгээ':'🔧','Техник':'📱','Бусад':'📦'};
+var EMOJIS = {'Авто':'🚗','Үл хөдлөх':'🏠','Ажлын байр':'💼','Гар утас':'📱','Компьютер':'💻','Цахилгаан бараа':'🔌','Хувцас':'👗','Гутал':'👟','Гоо сайхан':'💄','Гэр ахуйн бараа':'🪑','Тоглоом':'🎮','Спорт':'⚽','Хүүхдийн бараа':'🧸','Эрүүл мэнд':'💊','Хоол хүнс':'🍎','Амьтад':'🐾','Ном':'📚','Үйлчилгээ':'🔧','Техник':'📱','Бусад':'📦'};
 
 // Category click
 document.getElementById('catList').addEventListener('click', function(e) {
@@ -898,7 +896,7 @@ var CAT_FILTERS = {
     {id:'cf_salary_min', label:'Цалин доод (₮)', type:'number', placeholder:'500000'},
     {id:'cf_salary_max', label:'Цалин дээд (₮)', type:'number', placeholder:'5000000'}
   ],
-  'Тавилга': [
+  'Гэр ахуйн бараа': [
     {id:'cf_condition', label:'Нөхцөл', type:'select', options:['','Шинэ','Маш сайн','Сайн','Дунд']},
     {id:'cf_material', label:'Материал', type:'select', options:['','Мод','Металл','Шил','Хавтан','Бусад']}
   ],
@@ -1030,19 +1028,18 @@ var CAT_SUBS = {
     'Хумс': null,
     'Үнэр': null
   },
-  'Тавилга': {
-    'Унтлагын өрөө': null,
-    'Зочны өрөө': null,
-    'Гал тогоо': null,
-    'Оффис': null,
-    'Бусад': null
-  },
-  'Гэр ахуй': {
-    'Гал тогооны хэрэгсэл': null,
-    'Угаалгын машин': null,
-    'Хөргөгч': null,
-    'Тоос сорогч': null,
-    'Бусад': null
+  'Гэр ахуйн бараа': {
+    'Абажур, гэрэл, чийдэн': null,
+    'Угаалгын өрөө, цэвэрлэгээний хэрэгсэл': null,
+    'Бөс бараа, торго': null,
+    'Гал тогооны хэрэгсэл, сав суулга': null,
+    'Гэрийн чимэглэл, тохижилт': null,
+    'Тавилга': ['Зочны өрөөний','Унтлагын өрөөний','Гал тогооны','Үүдний өрөөний','Оффисын тавилга','Буйдан, кресло','Ор, матрас','Шкаф, комод, авдар','Ширээ, сандал','Тавиур, полк','Толь','Сейф','Бусад'],
+    'Хивс, дорож, дэвсгэр': null,
+    'Цагаан хэрэглэл, хөнжил, дэр': null,
+    'Хөшиг, тюль, бүтээлэг': null,
+    'Зуух, пийшин': null,
+    'Өлгүүр': null
   },
   'Спорт': {
     'Фитнесс': null,
@@ -1163,6 +1160,13 @@ var BRAND_ICONS = {
 };
 
 var SUB_ICONS = {
+  'Абажур, гэрэл, чийдэн':'💡','Угаалгын өрөө, цэвэрлэгээний хэрэгсэл':'🧽','Бөс бараа, торго':'🧵',
+  'Гал тогооны хэрэгсэл, сав суулга':'🍽️','Гэрийн чимэглэл, тохижилт':'🖼️',
+  'Хивс, дорож, дэвсгэр':'🟫','Цагаан хэрэглэл, хөнжил, дэр':'🛏️','Хөшиг, тюль, бүтээлэг':'🪟',
+  'Зуух, пийшин':'🔥','Өлгүүр':'🧥',
+  'Зочны өрөөний':'🛋️','Унтлагын өрөөний':'🛏️','Гал тогооны':'🍳','Үүдний өрөөний':'🚪',
+  'Оффисын тавилга':'🪑','Буйдан, кресло':'🛋️','Ор, матрас':'🛏️','Шкаф, комод, авдар':'🗄️',
+  'Ширээ, сандал':'🪑','Тавиур, полк':'📚','Толь':'🪞','Сейф':'🔒',
   'Фото, видео камер':'📷','ТВ, Аudio + Video':'📺','Гал тогооны цахилгаан бараа':'🍳',
   'Тень, халаагуур':'🔥','Угаалгын машин':'🧺','Тоос сорогч, хивс угаагч, индүү':'🧹',
   'Агааржуулагч, сэнс':'❄️','Оёдлын машин':'🪡','Хөргөгч, хөлдөөгч':'🧊',
