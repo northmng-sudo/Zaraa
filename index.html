@@ -56,6 +56,8 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .cats::-webkit-scrollbar{display:none}
 .cat{flex-shrink:0;white-space:nowrap;background:none;border:none;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:color 0.2s;color:#666;position:relative;z-index:1;border-radius:50px}
 .cat.active{color:white}
+.subcat-pill{display:inline-flex;align-items:center;gap:4px;background:#f5f5f5;border:1px solid #eee;border-radius:50px;padding:6px 12px;margin-right:6px;font-size:12px;font-weight:600;color:#555;cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.subcat-pill.active{background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border-color:transparent}
 .cat:hover,.cat.active{color:#E62B05;border-bottom-color:#E62B05;font-weight:600}
 .stack-img-wrap{position:relative;aspect-ratio:1;overflow:visible!important;margin:8px}
 .stack-img-wrap .si{position:absolute;inset:0;border-radius:inherit;overflow:hidden;transition:transform 0.35s cubic-bezier(0.34,1.2,0.64,1),opacity 0.35s ease;will-change:transform;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
@@ -272,6 +274,9 @@ select.form-input{cursor:pointer}
       <div class="cat" data-cat='Бусад'>📦 Бусад</div>
     </div>
   </div>
+
+  <!-- SUBCATEGORY ROW -->
+  <div id="subCatRow" style="display:none;background:white;border-bottom:1px solid #f0f0f0;padding:8px 12px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;white-space:nowrap"></div>
 
   <!-- SEARCH STICKY -->
   <div id="searchWrap" style="position:sticky;top:50px;z-index:90;background:#f5f5f5;padding:20px 16px 12px 320px">
@@ -1527,6 +1532,8 @@ function clearFilter() {
   document.getElementById('filterDelivery').checked = false;
   document.getElementById('filterNegotiable').checked = false;
   if (document.getElementById('filterVerified')) document.getElementById('filterVerified').checked = false;
+  window._subCat = '';
+  document.querySelectorAll('.subcat-pill').forEach(function(p){ p.classList.remove('active'); });
   var catFilters = CAT_FILTERS[CC] || [];
   catFilters.forEach(function(f) {
     var el = document.getElementById(f.id);
@@ -1546,6 +1553,14 @@ function doSearch() {
   var verified = document.getElementById('filterVerified') && document.getElementById('filterVerified').checked;
   var arr = AL.slice();
   if (CC) arr = arr.filter(function(l){ return l.category === CC; });
+  if (window._subCat) arr = arr.filter(function(l){
+    var sub = window._subCat.toLowerCase();
+    var extra = l.extra_data || {};
+    if (extra._subcat && extra._subcat.toLowerCase() === sub) return true;
+    if (extra._subcat2 && extra._subcat2.toLowerCase() === sub) return true;
+    return (l.title||'').toLowerCase().indexOf(sub) > -1 ||
+           (l.description||'').toLowerCase().indexOf(sub) > -1;
+  });
   if (q) arr = arr.filter(function(l){ return (l.title||'').toLowerCase().indexOf(q) > -1 || (l.description||'').toLowerCase().indexOf(q) > -1; });
   if (minP) arr = arr.filter(function(l){ return l.price >= minP; });
   if (maxP < Infinity) arr = arr.filter(function(l){ return l.price <= maxP; });
@@ -2165,11 +2180,41 @@ function updatePillIndicator(el) {
 
 function filterCat(cat) {
   CC = cat;
+  window._subCat = '';
   document.querySelectorAll('.cat').forEach(function(c) {
     c.classList.toggle('active', c.getAttribute('data-cat') === cat);
   });
+  renderSubCatRow(cat);
   doSearch();
   window.scrollTo(0, 0);
+}
+
+function renderSubCatRow(cat) {
+  var row = document.getElementById('subCatRow');
+  var subs = CAT_SUBS[cat];
+  if (!cat || !subs) {
+    row.style.display = 'none';
+    row.innerHTML = '';
+    return;
+  }
+  var keys = Object.keys(subs);
+  row.innerHTML = keys.map(function(k) {
+    var icon = SUB_ICONS[k] || '📌';
+    return '<span class="subcat-pill" onclick="filterSubCat(\''+k.replace(/'/g,"\\'")+'\')" data-subcat="'+k.replace(/"/g,'&quot;')+'">'+icon+' '+k+'</span>';
+  }).join('');
+  row.style.display = 'block';
+}
+
+function filterSubCat(sub) {
+  if (window._subCat === sub) {
+    window._subCat = ''; // toggle off if already selected
+  } else {
+    window._subCat = sub;
+  }
+  document.querySelectorAll('.subcat-pill').forEach(function(p) {
+    p.classList.toggle('active', p.getAttribute('data-subcat') === window._subCat);
+  });
+  doSearch();
 }
 
 function setRating(n) {
@@ -3197,6 +3242,8 @@ async function postListing() {
     var el = document.getElementById('df_'+f.id);
     if (el && el.value) extra[f.id] = el.value;
   });
+  if (window._catSub) extra._subcat = window._catSub;
+  if (window._catSub2) extra._subcat2 = window._catSub2;
   showToast('🖼️ Зураг байршуулж байна...', false, 60000);
   var imgUrls = imgFiles.length ? await uploadImages(imgFiles) : [];
   if (vidFile) showToast('🎥 Бичлэг байршуулж байна...', false, 60000);
