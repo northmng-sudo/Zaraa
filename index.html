@@ -950,9 +950,12 @@ var CAT_SUBS = {
     'Хувиараа': null
   },
   'Гар утас': {
-    'Зарна': ['iPhone','Samsung','Xiaomi','Huawei','Бусад'],
-    'Худалдан авна': null,
-    'Дагалдах хэрэгсэл': ['Чихэвч','Цэнэглэгч','Бүрхүүл','Бусад']
+    'Гар утас ба утаснууд': ['Blackberry','HTC','Huawei','iPhone','LG','Nokia','Oppo','Realme','Redmi','Samsung','Sky','Sony','Xiaomi','Бусад смарт утас','Энгийн гар утас','Суурин утас +факс'],
+    'Гар утасны дугаар': ['Мобиком','Unitel','Skytel','Gmobile','Мон Цах Холбоо','Ondo','Lime'],
+    'Гар утасны сэлбэг': null,
+    'Ухаалаг цаг – Smart watch': null,
+    'Дагалдах хэрэгсэл': ['Байршил тогтоогч','Гар, controller','Дүрс тогтворжуулагч','Мемори кард','Цэнэглэгч, power bank, adapter, usb','Чихэвч','Утасны гэр','VR','Утасны чимэглэл','Бусад'],
+    'Богино долгионы радио станц': null
   },
   'Компьютер': {
     'Зөөврийн': ['MacBook','Dell','HP','Lenovo','Бусад'],
@@ -1063,6 +1066,13 @@ var BRAND_DOMAINS = {
   'Huawei':'huawei.com','Lynk & Co':'lynkco.com','Wuling':'sgmw.com.cn'
 };
 
+var PHONE_BRAND_ICONS = {
+  'Blackberry':'🫐','HTC':'🟢','Huawei':'🌸','iPhone':'🍎','LG':'🔴','Nokia':'🔵',
+  'Oppo':'🟢','Realme':'🟡','Redmi':'🔴','Samsung':'🔵','Sky':'🌤️','Sony':'🔵',
+  'Xiaomi':'🟠','Бусад смарт утас':'📱','Энгийн гар утас':'📞','Суурин утас +факс':'☎️',
+  'Мобиком':'📡','Unitel':'📡','Skytel':'📡','Gmobile':'📡','Мон Цах Холбоо':'📡','Ondo':'📡','Lime':'📡'
+};
+
 var BRAND_ICONS = {
   // Японы брэнд
   'Toyota':'🔵','Honda':'🔴','Nissan':'🔷','Mazda':'🔴','Subaru':'⭐','Suzuki':'🟡',
@@ -1095,6 +1105,11 @@ var BRAND_ICONS = {
 };
 
 var SUB_ICONS = {
+  'Гар утас ба утаснууд':'📱','Гар утасны дугаар':'🔢','Гар утасны сэлбэг':'🔧',
+  'Ухаалаг цаг – Smart watch':'⌚','Богино долгионы радио станц':'📻',
+  'Байршил тогтоогч':'📍','Гар, controller':'🎮','Дүрс тогтворжуулагч':'🎥',
+  'Мемори кард':'💾','Цэнэглэгч, power bank, adapter, usb':'🔌','Чихэвч':'🎧',
+  'Утасны гэр':'📦','Утасны чимэглэл':'✨',
   'Орон сууц':'🏢','Монгол гэр':'⛺','Хашаа байшин':'🏡','Газар':'🌍',
   'Оффис':'🏢','Граф контейнер/зуслан':'📦','АОС хаус':'🏚️',
   'Худалдаа үйлчилгээний талбай':'🏬','Үйлдвэр/агуулах':'🏭',
@@ -1166,7 +1181,7 @@ function selectTier2(sub, el) {
     return;
   }
   document.getElementById('catTier3Grid').innerHTML = items.map(function(item) {
-    var icon = BRAND_ICONS[item] || SUB_ICONS[item] || '📌';
+    var icon = PHONE_BRAND_ICONS[item] || BRAND_ICONS[item] || SUB_ICONS[item] || '📌';
     return '<div class="tier3-pill" onclick="selectTier3(\''+item+'\',this)">'+icon+' '+item+'</div>';
   }).join('');
   tier3.style.display = 'block';
