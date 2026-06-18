@@ -958,10 +958,15 @@ var CAT_SUBS = {
     'Богино долгионы радио станц': null
   },
   'Компьютер': {
-    'Зөөврийн': ['MacBook','Dell','HP','Lenovo','Бусад'],
-    'Суурин': null,
-    'Монитор': null,
-    'Эд анги': ['Процессор','Видео карт','RAM','SSD','Бусад']
+    'Суурин компьютер': ['Иж бүрэн компьютер','Дэлгэц','Процессор, сервер төрөл'],
+    'Notebook': ['Apple','Acer','Asus','Compaq','Dell','Dere','Evoo','Fujitsu','Gateway','Haier','HP','Lenovo','LG','Microsoft Surface','MSI','Onn','Samsung','Sony','Redmi','Razer blade','Toshiba','Huawei','Бусад'],
+    'PS, XBox, Nintendo': ['Xbox','Xbox-ны тоглоомууд','Playstation','Playstation-ны тоглоомууд','Nintendo, тоглоомууд','Бусад'],
+    'Принтер, хувилагч, сканнер, ламинатор': null,
+    'Сэлбэг': null,
+    'iPad, tablet, kindle': null,
+    'Принтер, хувилагчийн хор': null,
+    'Чихэвч, 3D шил': null,
+    'Дагалдах хэрэгсэл': ['Зөөврийн хард, флаш','Модем','Свич','Программ, тоглоом','Проектор','Тог баригч','Audio Video','Keyboard, mouse, pad','Notebook цүнх','Notebook тавиур, сэнс','Бусад']
   },
   'ТВ & Дагалдах': {
     'Телевизор': ['Samsung','LG','Sony','Бусад'],
@@ -1066,6 +1071,13 @@ var BRAND_DOMAINS = {
   'Huawei':'huawei.com','Lynk & Co':'lynkco.com','Wuling':'sgmw.com.cn'
 };
 
+var NOTEBOOK_BRAND_ICONS = {
+  'Apple':'🍎','Acer':'🟢','Asus':'🔵','Compaq':'🔵','Dell':'🔵','Dere':'⬜',
+  'Evoo':'🟣','Fujitsu':'🔴','Gateway':'🟠','Haier':'🔵','HP':'🔵','Lenovo':'🔴',
+  'LG':'🔴','Microsoft Surface':'🟦','MSI':'🔴','Onn':'⬜','Samsung':'🔵','Sony':'🔵',
+  'Redmi':'🔴','Razer blade':'🟢','Toshiba':'🔴','Huawei':'🌸','Бусад':'📦'
+};
+
 var PHONE_BRAND_ICONS = {
   'Blackberry':'🫐','HTC':'🟢','Huawei':'🌸','iPhone':'🍎','LG':'🔴','Nokia':'🔵',
   'Oppo':'🟢','Realme':'🟡','Redmi':'🔴','Samsung':'🔵','Sky':'🌤️','Sony':'🔵',
@@ -1105,6 +1117,14 @@ var BRAND_ICONS = {
 };
 
 var SUB_ICONS = {
+  'Суурин компьютер':'🖥️','Notebook':'💻','PS, XBox, Nintendo':'🎮',
+  'Принтер, хувилагч, сканнер, ламинатор':'🖨️','Сэлбэг':'🔧','iPad, tablet, kindle':'📱',
+  'Принтер, хувилагчийн хор':'🖨️','Чихэвч, 3D шил':'🎧',
+  'Иж бүрэн компьютер':'🖥️','Дэлгэц':'🖥️','Процессор, сервер төрөл':'⚙️',
+  'Xbox':'🎮','Xbox-ны тоглоомууд':'💿','Playstation':'🎮','Playstation-ны тоглоомууд':'💿',
+  'Nintendo, тоглоомууд':'🎮','Зөөврийн хард, флаш':'💾','Модем':'📡','Свич':'🔌',
+  'Программ, тоглоом':'💿','Проектор':'📽️','Тог баригч':'🔋','Audio Video':'🔊',
+  'Keyboard, mouse, pad':'⌨️','Notebook цүнх':'🎒','Notebook тавиур, сэнс':'🌀',
   'Гар утас ба утаснууд':'📱','Гар утасны дугаар':'🔢','Гар утасны сэлбэг':'🔧',
   'Ухаалаг цаг – Smart watch':'⌚','Богино долгионы радио станц':'📻',
   'Байршил тогтоогч':'📍','Гар, controller':'🎮','Дүрс тогтворжуулагч':'🎥',
@@ -1181,7 +1201,7 @@ function selectTier2(sub, el) {
     return;
   }
   document.getElementById('catTier3Grid').innerHTML = items.map(function(item) {
-    var icon = PHONE_BRAND_ICONS[item] || BRAND_ICONS[item] || SUB_ICONS[item] || '📌';
+    var icon = NOTEBOOK_BRAND_ICONS[item] || PHONE_BRAND_ICONS[item] || BRAND_ICONS[item] || SUB_ICONS[item] || '📌';
     return '<div class="tier3-pill" onclick="selectTier3(\''+item+'\',this)">'+icon+' '+item+'</div>';
   }).join('');
   tier3.style.display = 'block';
