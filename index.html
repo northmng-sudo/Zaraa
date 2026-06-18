@@ -295,12 +295,32 @@ select.form-input{cursor:pointer}
         <div><label class="form-label">Дээд үнэ (₮)</label><input class="form-input" type="number" id="filterMaxPrice" placeholder="∞" oninput="doSearch()"></div>
       </div>
       <div style="margin-bottom:12px">
+        <label class="form-label">Хот/Аймаг</label>
+        <select class="form-input" id="filterProvince" onchange="updateFilterProvinceFields()">
+          <option value="">Бүгд</option>
+          <option>Улаанбаатар</option>
+          <option>Архангай</option><option>Баян-Өлгий</option><option>Баянхонгор</option>
+          <option>Булган</option><option>Говь-Алтай</option><option>Говьсүмбэр</option>
+          <option>Дархан-Уул</option><option>Дорноговь</option><option>Дорнод</option>
+          <option>Дундговь</option><option>Завхан</option><option>Орхон</option>
+          <option>Өвөрхангай</option><option>Өмнөговь</option><option>Сүхбаатар</option>
+          <option>Сэлэнгэ</option><option>Төв</option><option>Увс</option>
+          <option>Ховд</option><option>Хөвсгөл</option><option>Хэнтий</option>
+        </select>
+      </div>
+      <div id="filterUbWrap" style="margin-bottom:12px;display:none">
         <label class="form-label">Дүүрэг</label>
         <select class="form-input" id="filterDistrict" onchange="doSearch()">
           <option value="">Бүгд</option>
           <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
           <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
           <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
+        </select>
+      </div>
+      <div id="filterSumWrap" style="margin-bottom:12px;display:none">
+        <label class="form-label">Сум</label>
+        <select class="form-input" id="filterSum" onchange="doSearch()">
+          <option value="">Бүгд</option>
         </select>
       </div>
       <div id="catFilters"></div>
@@ -426,6 +446,19 @@ select.form-input{cursor:pointer}
   <div style="position:sticky;top:50px;z-index:50;background:white;border-bottom:1px solid #f0f0f0;padding:12px 16px">
     <div style="font-size:17px;font-weight:800;margin-bottom:10px">🏪 Дэлгүүрүүд</div>
     <div style="display:flex;gap:8px;margin-bottom:8px">
+      <select class="form-input" id="shopFilterProvince" onchange="updateShopFilterProvince()" style="flex:1;font-size:13px">
+        <option value="">Бүх аймаг/хот</option>
+        <option>Улаанбаатар</option>
+        <option>Архангай</option><option>Баян-Өлгий</option><option>Баянхонгор</option>
+        <option>Булган</option><option>Говь-Алтай</option><option>Говьсүмбэр</option>
+        <option>Дархан-Уул</option><option>Дорноговь</option><option>Дорнод</option>
+        <option>Дундговь</option><option>Завхан</option><option>Орхон</option>
+        <option>Өвөрхангай</option><option>Өмнөговь</option><option>Сүхбаатар</option>
+        <option>Сэлэнгэ</option><option>Төв</option><option>Увс</option>
+        <option>Ховд</option><option>Хөвсгөл</option><option>Хэнтий</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
       <select class="form-input" id="shopFilterDistrict" onchange="filterShops()" style="flex:1;font-size:13px">
         <option value="">Бүх дүүрэг</option>
         <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
@@ -437,6 +470,11 @@ select.form-input{cursor:pointer}
         <option>Хүнс</option><option>Мах</option><option>Хүнсний бараа</option>
         <option>Хувцас</option><option>Гоо сайхан</option><option>Эм</option>
         <option>Электроник</option><option>Бусад</option>
+      </select>
+    </div>
+    <div id="shopFilterSumWrap" style="display:none;margin-bottom:8px">
+      <select class="form-input" id="shopFilterSum" onchange="filterShops()" style="width:100%;font-size:13px">
+        <option value="">Бүх сум</option>
       </select>
     </div>
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--m);cursor:pointer">
@@ -606,7 +644,17 @@ select.form-input{cursor:pointer}
         </div>
         <div class="form-group">
           <label class="form-label">Байршил</label>
-          <div style="display:flex;gap:8px">
+          <select class="form-input" id="shopProvince" onchange="updateShopRegProvince()" style="margin-bottom:8px">
+            <option value="Улаанбаатар">Улаанбаатар хот</option>
+            <option>Архангай</option><option>Баян-Өлгий</option><option>Баянхонгор</option>
+            <option>Булган</option><option>Говь-Алтай</option><option>Говьсүмбэр</option>
+            <option>Дархан-Уул</option><option>Дорноговь</option><option>Дорнод</option>
+            <option>Дундговь</option><option>Завхан</option><option>Орхон</option>
+            <option>Өвөрхангай</option><option>Өмнөговь</option><option>Сүхбаатар</option>
+            <option>Сэлэнгэ</option><option>Төв</option><option>Увс</option>
+            <option>Ховд</option><option>Хөвсгөл</option><option>Хэнтий</option>
+          </select>
+          <div id="shopUbFields" style="display:flex;gap:8px">
             <select class="form-input" id="shopDistrict" onchange="updateShopKhoroo()" style="flex:1">
               <option value="">Дүүрэг</option>
               <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
@@ -615,6 +663,11 @@ select.form-input{cursor:pointer}
             </select>
             <select class="form-input" id="shopKhoroo" style="flex:1">
               <option value="">Хороо</option>
+            </select>
+          </div>
+          <div id="shopAimagFields" style="display:none">
+            <select class="form-input" id="shopSum">
+              <option value="">Сум сонгох</option>
             </select>
           </div>
         </div>
@@ -1435,6 +1488,29 @@ function selectTier3(item, el) {
   window._catSub2 = item;
 }
 
+function updateFilterProvinceFields() {
+  var province = document.getElementById('filterProvince').value;
+  var ubWrap = document.getElementById('filterUbWrap');
+  var sumWrap = document.getElementById('filterSumWrap');
+  if (province === 'Улаанбаатар') {
+    ubWrap.style.display = 'block';
+    sumWrap.style.display = 'none';
+    document.getElementById('filterSum').value = '';
+  } else if (province && AIMAG_SUMS[province]) {
+    ubWrap.style.display = 'none';
+    document.getElementById('filterDistrict').value = '';
+    sumWrap.style.display = 'block';
+    var sums = AIMAG_SUMS[province] || [];
+    document.getElementById('filterSum').innerHTML = '<option value="">Бүгд</option>' + sums.map(function(s){ return '<option>'+s+'</option>'; }).join('');
+  } else {
+    ubWrap.style.display = 'none';
+    sumWrap.style.display = 'none';
+    document.getElementById('filterDistrict').value = '';
+    document.getElementById('filterSum').value = '';
+  }
+  doSearch();
+}
+
 function toggleFilter() {
   var panel = document.getElementById('filterPanel');
   panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -1444,6 +1520,10 @@ function clearFilter() {
   document.getElementById('filterMinPrice').value = '';
   document.getElementById('filterMaxPrice').value = '';
   document.getElementById('filterDistrict').value = '';
+  if (document.getElementById('filterProvince')) document.getElementById('filterProvince').value = '';
+  if (document.getElementById('filterSum')) document.getElementById('filterSum').value = '';
+  if (document.getElementById('filterUbWrap')) document.getElementById('filterUbWrap').style.display = 'none';
+  if (document.getElementById('filterSumWrap')) document.getElementById('filterSumWrap').style.display = 'none';
   document.getElementById('filterDelivery').checked = false;
   document.getElementById('filterNegotiable').checked = false;
   if (document.getElementById('filterVerified')) document.getElementById('filterVerified').checked = false;
@@ -1460,6 +1540,7 @@ function doSearch() {
   var minP = Number(document.getElementById('filterMinPrice').value) || 0;
   var maxP = Number(document.getElementById('filterMaxPrice').value) || Infinity;
   var district = document.getElementById('filterDistrict').value;
+  var sum = document.getElementById('filterSum') ? document.getElementById('filterSum').value : '';
   var delivery = document.getElementById('filterDelivery').checked;
   var negotiable = document.getElementById('filterNegotiable').checked;
   var verified = document.getElementById('filterVerified') && document.getElementById('filterVerified').checked;
@@ -1469,6 +1550,7 @@ function doSearch() {
   if (minP) arr = arr.filter(function(l){ return l.price >= minP; });
   if (maxP < Infinity) arr = arr.filter(function(l){ return l.price <= maxP; });
   if (district) arr = arr.filter(function(l){ return (l.location||'').indexOf(district) > -1; });
+  if (sum) arr = arr.filter(function(l){ return (l.location||'').indexOf(sum) > -1; });
   if (delivery) arr = arr.filter(function(l){ return l.has_delivery; });
   if (negotiable) arr = arr.filter(function(l){ return l.is_negotiable; });
   if (verified) arr = arr.filter(function(l){ return l.users && l.users.is_verified; });
@@ -2809,6 +2891,22 @@ function selectRole(role) {
   document.getElementById('shopFields').style.display = role === 'shop' ? 'block' : 'none';
 }
 
+function updateShopRegProvince() {
+  var province = document.getElementById('shopProvince').value;
+  var ubFields = document.getElementById('shopUbFields');
+  var aimagFields = document.getElementById('shopAimagFields');
+  if (province === 'Улаанбаатар') {
+    ubFields.style.display = 'flex';
+    aimagFields.style.display = 'none';
+  } else {
+    ubFields.style.display = 'none';
+    aimagFields.style.display = 'block';
+    var sums = AIMAG_SUMS[province] || [];
+    var sumSelect = document.getElementById('shopSum');
+    sumSelect.innerHTML = '<option value="">Сум сонгох</option>' + sums.map(function(s){ return '<option>'+s+'</option>'; }).join('');
+  }
+}
+
 function updateShopKhoroo() {
   var district = document.getElementById('shopDistrict').value;
   var khorooSelect = document.getElementById('shopKhoroo');
@@ -2856,14 +2954,22 @@ async function register() {
   if (role === 'shop') {
     var shopName = document.getElementById('shopName').value;
     var shopCategory = document.getElementById('shopCategory').value;
-    var shopDistrict = document.getElementById('shopDistrict').value;
+    var province = document.getElementById('shopProvince').value;
+    var shopDistrict, shopKhoroo;
+    if (province === 'Улаанбаатар') {
+      shopDistrict = document.getElementById('shopDistrict').value;
+      shopKhoroo = document.getElementById('shopKhoroo').value;
+    } else {
+      shopDistrict = province;
+      shopKhoroo = document.getElementById('shopSum').value;
+    }
     if (!shopName || !shopCategory || !shopDistrict) { showToast('Дэлгүүрийн мэдээллийг бөглөнө үү',true); return; }
     shopData = {
       is_shop: true,
       shop_name: shopName,
       shop_category: shopCategory,
       shop_district: shopDistrict,
-      shop_khoroo: document.getElementById('shopKhoroo').value,
+      shop_khoroo: shopKhoroo,
       shop_address: document.getElementById('shopAddress').value,
       shop_hours_open: document.getElementById('shopOpen').value,
       shop_hours_close: document.getElementById('shopClose').value,
@@ -3570,12 +3676,40 @@ async function loadShops() {
   await renderShops(SHOPS_CACHE);
 }
 
+function updateShopFilterProvince() {
+  var province = document.getElementById('shopFilterProvince').value;
+  var districtSelect = document.getElementById('shopFilterDistrict');
+  var sumWrap = document.getElementById('shopFilterSumWrap');
+  var sumSelect = document.getElementById('shopFilterSum');
+  if (province === 'Улаанбаатар') {
+    districtSelect.style.display = '';
+    sumWrap.style.display = 'none';
+    sumSelect.value = '';
+  } else if (province && AIMAG_SUMS[province]) {
+    districtSelect.style.display = 'none';
+    districtSelect.value = '';
+    sumWrap.style.display = 'block';
+    var sums = AIMAG_SUMS[province] || [];
+    sumSelect.innerHTML = '<option value="">Бүх сум</option>' + sums.map(function(s){ return '<option>'+s+'</option>'; }).join('');
+  } else {
+    districtSelect.style.display = '';
+    sumWrap.style.display = 'none';
+    districtSelect.value = '';
+    sumSelect.value = '';
+  }
+  filterShops();
+}
+
 async function filterShops() {
+  var province = document.getElementById('shopFilterProvince').value;
   var district = document.getElementById('shopFilterDistrict').value;
+  var sum = document.getElementById('shopFilterSum') ? document.getElementById('shopFilterSum').value : '';
   var category = document.getElementById('shopFilterCategory').value;
   var deliveryOnly = document.getElementById('shopFilterDelivery').checked;
   var filtered = SHOPS_CACHE.filter(function(s) {
-    if (district && s.shop_district !== district) return false;
+    if (province === 'Улаанбаатар' && district && s.shop_district !== district) return false;
+    if (province && province !== 'Улаанбаатар' && sum && s.shop_khoroo !== sum) return false;
+    if (province && province !== 'Улаанбаатар' && !sum && s.shop_district !== province) return false;
     if (category && s.shop_category !== category) return false;
     if (deliveryOnly && !s.shop_has_delivery) return false;
     return true;
