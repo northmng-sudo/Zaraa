@@ -716,7 +716,17 @@ select.form-input{cursor:pointer}
 
         <div class="form-group">
           <label class="form-label">📍 Байршил *</label>
-          <div style="display:flex;gap:8px">
+          <select class="form-input" id="postProvince" onchange="updateProvinceFields()" style="margin-bottom:8px">
+            <option value="Улаанбаатар">Улаанбаатар хот</option>
+            <option>Архангай</option><option>Баян-Өлгий</option><option>Баянхонгор</option>
+            <option>Булган</option><option>Говь-Алтай</option><option>Говьсүмбэр</option>
+            <option>Дархан-Уул</option><option>Дорноговь</option><option>Дорнод</option>
+            <option>Дундговь</option><option>Завхан</option><option>Орхон</option>
+            <option>Өвөрхангай</option><option>Өмнөговь</option><option>Сүхбаатар</option>
+            <option>Сэлэнгэ</option><option>Төв</option><option>Увс</option>
+            <option>Ховд</option><option>Хөвсгөл</option><option>Хэнтий</option>
+          </select>
+          <div id="ubLocationFields" style="display:flex;gap:8px">
             <select class="form-input" id="postDistrict" onchange="updateKhoroo()" style="flex:1">
               <option value="">Дүүрэг</option>
               <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
@@ -725,6 +735,11 @@ select.form-input{cursor:pointer}
             </select>
             <select class="form-input" id="postKhoroo" style="flex:1">
               <option value="">Хороо</option>
+            </select>
+          </div>
+          <div id="aimagLocationFields" style="display:none">
+            <select class="form-input" id="postSum">
+              <option value="">Сум сонгох</option>
             </select>
           </div>
           <input class="form-input" id="postAddress" placeholder="Дэлгэрэнгүй хаяг" style="margin-top:8px">
@@ -1849,6 +1864,46 @@ var KHOROO = {
   'Чингэлтэй': 12, 'Сонгинохайрхан': 32, 'Налайх': 5, 'Багануур': 5, 'Багахангай': 3
 };
 
+var AIMAG_SUMS = {
+  'Архангай': ['Цэцэрлэг','Эрдэнэбулган','Батцэнгэл','Булган','Жаргалант','Их тамир','Кашаат','Намивай','Олзвой','Өгийнуур','Өлзийт','Тариат','Төвшрүүлэх','Хайрхан','Хангай','Хашаат','Хотонт','Цахир','Цэнхэр','Чулуут','Эрдэнэмандал'],
+  'Баян-Өлгий': ['Өлгий','Алтай','Алтанцөгц','Баяннуур','Булган','Буянт','Дэлүүн','Сагсай','Толбо','Улаанхус','Цагааннуур','Цэнгэл'],
+  'Баянхонгор': ['Баянхонгор','Баацагаан','Баянбулаг','Баянговь','Баянлиг','Баян-Овоо','Баянцагаан','Богд','Бууцагаан','Галуут','Гурванбулаг','Заг','Жаргалант','Жинст','Өлзийт','Хүрээмарал','Шинэжинст','Эрдэнэцогт'],
+  'Булган': ['Булган','Баяннуур','Баян-Агт','Бугат','Гурванбулаг','Дашинчилэн','Могод','Орхон','Рашаант','Сайхан','Сэлэнгэ','Тэшиг','Хангал','Хишиг-Өндөр','Хутаг-Өндөр','Чулуут орчлон'],
+  'Говь-Алтай': ['Алтай','Алтай уул','Баян-Уул','Бигэр','Боргио','Дэлгэр','Жаргалан','Тайшир','Төгрөг','Тонхил','Хөхморьт','Цогт','Цээл','Чандмань','Шарга','Эрдэнэ'],
+  'Говьсүмбэр': ['Чойр','Баянтал','Сүмбэр'],
+  'Дархан-Уул': ['Дархан','Хонгор','Шарын гол','Орхон'],
+  'Дорноговь': ['Сайншанд','Айраг','Алтанширээ','Даланжаргалан','Дэлгэрэх','Замын-Үүд','Иххэт','Мандах','Өргөн','Сайхандулаан','Улаанбадрах','Хатанбулаг','Хөвсгөл','Эрдэнэ'],
+  'Дорнод': ['Чойбалсан','Баяндун','Баян-Уул','Булган','Гурванзагал','Дашбалбар','Матад','Сэргэлэн','Халхгол','Хөлөнбуйр','Цагаан-Овоо','Чулуунхороот'],
+  'Дундговь': ['Мандалговь','Адаацаг','Баянжаргалан','Говь-Угтаал','Дэлгэрхангай','Дэлгэрцогт','Луус','Өлзийт','Өндөршил','Сайхан-Овоо','Сайнцагаан','Хулд','Цагаандэлгэр','Эрдэнэдалай'],
+  'Завхан': ['Улиастай','Алдархаан','Асгат','Баянтэс','Дөргөн','Завханмандал','Идэр','Их-Уул','Нөмрөг','Отгон','Сонгино','Тосонцэнгэл','Түдэвтэй','Тэлмэн','Ургамал','Цагаанхайрхан','Цэцэн-Уул','Шилүүстэй','Эрдэнэхайрхан','Яруу'],
+  'Орхон': ['Баян-Өндөр','Жаргалант'],
+  'Өвөрхангай': ['Арвайхээр','Баруунбаян-Улаан','Бат-Өлзий','Богд','Бүрд','Гучин-Ус','Зүүнбаян-Улаан','Нарийнтээл','Өлзийт','Сант','Тарагт','Төгрөг','Хайрхандулаан','Хархорин','Хужирт','Уянга','Хархорин','Баянгол'],
+  'Өмнөговь': ['Даланзадгад','Баяндалай','Булган','Гурвантэс','Манлай','Мандал-Овоо','Ноён','Номгон','Сэврэй','Ханбогд','Ханхонгор','Цогтцэций','Цогт-Овоо'],
+  'Сүхбаатар': ['Баруун-Урт','Асгат','Баяндэлгэр','Дарьганга','Мөнххаан','Наран','Онгон','Сүхбаатар','Түвшинширээ','Туменцогт','Уулбаян','Халзан','Эрдэнэцагаан'],
+  'Сэлэнгэ': ['Сүхбаатар','Алтанбулаг','Баруунбүрэн','Баянгол','Жавхлант','Зүүнбүрэн','Мандал','Орхонтуул','Орхон','Сайхан','Сант','Хушаат','Цагааннуур','Шаамар'],
+  'Төв': ['Зуунмод','Алтанбулаг','Аргалант','Архуст','Баян','Баянжаргалан','Баянцагаан','Баяндэлгэр','Баянхангай','Баян-Өнжүүл','Борнуур','Бүрэн','Дэлгэрхаан','Жаргалант','Заамар','Лүн','Мөнгөнморьт','Өндөрширээт','Сэргэлэн','Сүмбэр','Угтаалцайдам','Цээл','Эрдэнэ','Эрдэнэсант'],
+  'Увс': ['Улаангом','Баруунтуруун','Бөхмөрөн','Давст','Завхан','Зүүнговь','Зүүнхангай','Малчин','Наранбулаг','Өлгий','Өмнөговь','Сагил','Тариалан','Тэс','Ховд','Хяргас','Цагаанхайрхан'],
+  'Ховд': ['Ховд','Алтай','Булган','Буянт','Дөргөн','Дуут','Жаргалант','Зэрэг','Манхан','Мөст','Мянгад','Үенч','Ховд','Чандмань','Эрдэнэбүрэн'],
+  'Хөвсгөл': ['Мөрөн','Алаг-Эрдэнэ','Баянзүрх','Бүрэнтогтох','Галт','Жаргалант','Их-Уул','Рэнчинлхүмбэ','Тариалан','Тосонцэнгэл','Түнэл','Тэс','Улаан-Уул','Цагааннуур','Цагаан-Үүр','Цэцэрлэг','Чандмань-Өндөр','Шинэ-Идэр'],
+  'Хэнтий': ['Өндөрхаан','Батноров','Батширээт','Биндэр','Баянхутаг','Баянмөнх','Баян-Адарга','Дэлгэрхаан','Жаргалтхаан','Мөрөн','Норовлин','Үмнэдэлгэр','Хэрлэн','Цэнхэрмандал']
+};
+
+function updateProvinceFields() {
+  var province = document.getElementById('postProvince').value;
+  var ubFields = document.getElementById('ubLocationFields');
+  var aimagFields = document.getElementById('aimagLocationFields');
+  if (province === 'Улаанбаатар') {
+    ubFields.style.display = 'flex';
+    aimagFields.style.display = 'none';
+  } else {
+    ubFields.style.display = 'none';
+    aimagFields.style.display = 'block';
+    var sums = AIMAG_SUMS[province] || [];
+    var sumSelect = document.getElementById('postSum');
+    sumSelect.innerHTML = '<option value="">Сум сонгох</option>' + sums.map(function(s){ return '<option>'+s+'</option>'; }).join('');
+  }
+}
+
 function updateKhoroo() {
   var d = document.getElementById('postDistrict').value;
   var sel = document.getElementById('postKhoroo');
@@ -2643,12 +2698,27 @@ async function editListing(id) {
   document.getElementById('postDelivery').checked = l.has_delivery||false;
   if (l.location) {
     var parts = l.location.split(', ');
-    if (document.getElementById('postDistrict')) document.getElementById('postDistrict').value = parts[0]||'';
-    if (parts[1] && document.getElementById('postKhoroo')) {
-      updateKhoroo();
-      setTimeout(function(){ document.getElementById('postKhoroo').value = parts[1]; }, 100);
+    var ubDistricts = ['Баянгол','Баянзүрх','Сүхбаатар','Хан-Уул','Чингэлтэй','Сонгинохайрхан','Налайх','Багануур','Багахангай'];
+    if (ubDistricts.indexOf(parts[0]) !== -1) {
+      document.getElementById('postProvince').value = 'Улаанбаатар';
+      updateProvinceFields();
+      if (document.getElementById('postDistrict')) document.getElementById('postDistrict').value = parts[0]||'';
+      if (parts[1] && document.getElementById('postKhoroo')) {
+        updateKhoroo();
+        setTimeout(function(){ document.getElementById('postKhoroo').value = parts[1]; }, 100);
+      }
+      if (document.getElementById('postAddress')) document.getElementById('postAddress').value = parts.slice(2).join(', ')||'';
+    } else if (AIMAG_SUMS[parts[0]]) {
+      document.getElementById('postProvince').value = parts[0];
+      updateProvinceFields();
+      setTimeout(function(){
+        if (document.getElementById('postSum')) document.getElementById('postSum').value = parts[1]||'';
+      }, 100);
+      if (document.getElementById('postAddress')) document.getElementById('postAddress').value = parts.slice(2).join(', ')||'';
+    } else {
+      // Хуучин format, эсвэл тодорхойгүй — зөвхөн хаягийн талбарт хадгалах
+      if (document.getElementById('postAddress')) document.getElementById('postAddress').value = l.location;
     }
-    if (document.getElementById('postAddress')) document.getElementById('postAddress').value = parts.slice(2).join(', ')||'';
   }
   // Одоогийн зурагнуудыг жижиг хэмжээтэй харуулах
   if (l.images && l.images.length) {
@@ -2995,10 +3065,14 @@ async function postListing() {
   var desc = document.getElementById('postDesc').value;
   var price = document.getElementById('postPrice').value;
   var negotiable = document.getElementById('postNegotiable').checked;
+  var province = document.getElementById('postProvince').value;
   var district = document.getElementById('postDistrict').value;
   var khoroo = document.getElementById('postKhoroo').value;
+  var sum = document.getElementById('postSum') ? document.getElementById('postSum').value : '';
   var address = document.getElementById('postAddress') ? document.getElementById('postAddress').value : '';
-  var loc = [district, khoroo, address].filter(Boolean).join(', ');
+  var loc = province === 'Улаанбаатар' ?
+    [district, khoroo, address].filter(Boolean).join(', ') :
+    [province, sum, address].filter(Boolean).join(', ');
   var cat = document.getElementById('postCategory').value;
   var hasD = document.getElementById('postDelivery').checked;
   var imgFiles = document.getElementById('postImages').files;
@@ -3057,6 +3131,10 @@ async function postListing() {
   document.getElementById('postNegotiable').checked=false;
   document.getElementById('postDistrict').value='';
   document.getElementById('postKhoroo').innerHTML='<option value="">Хороо сонгох</option>';
+  if (document.getElementById('postProvince')) document.getElementById('postProvince').value='Улаанбаатар';
+  if (document.getElementById('postSum')) document.getElementById('postSum').innerHTML='<option value="">Сум сонгох</option>';
+  if (document.getElementById('ubLocationFields')) document.getElementById('ubLocationFields').style.display='flex';
+  if (document.getElementById('aimagLocationFields')) document.getElementById('aimagLocationFields').style.display='none';
   showToast(editId?'⏳ Зар засагдлаа! Admin шалгаад нийтэлнэ':'⏳ Зар илгээгдлээ! Admin шалгаад зөвшөөрнө');
   // Admin-д мэдэгдэл
   await notifyAdmins(
