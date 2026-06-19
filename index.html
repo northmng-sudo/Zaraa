@@ -927,11 +927,13 @@ document.getElementById('catList').addEventListener('click', function(e) {
   var el = e.target.closest('.cat');
   if (!el) return;
   CC = el.getAttribute('data-cat');
+  window._subCat = '';
   document.querySelectorAll('.cat').forEach(function(c){ c.classList.remove('active'); });
   el.classList.add('active');
   updatePillIndicator(el);
   // Active pill scroll into view
   el.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  renderSubCatRow(CC);
   applyFilter();
 });
 
