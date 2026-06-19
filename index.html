@@ -276,7 +276,7 @@ select.form-input{cursor:pointer}
   </div>
 
   <!-- SUBCATEGORY ROW -->
-  <div id="subCatRow" style="display:none;background:white;border-bottom:1px solid #f0f0f0;padding:8px 12px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;white-space:nowrap"></div>
+  <div id="subCatRow" style="display:none;position:sticky;top:50px;z-index:91;background:white;border-bottom:1px solid #f0f0f0;padding:8px 12px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;white-space:nowrap"></div>
 
   <!-- SEARCH STICKY -->
   <div id="searchWrap" style="position:sticky;top:50px;z-index:90;background:#f5f5f5;padding:20px 16px 12px 320px">
@@ -2191,10 +2191,12 @@ function filterCat(cat) {
 
 function renderSubCatRow(cat) {
   var row = document.getElementById('subCatRow');
+  var searchWrap = document.getElementById('searchWrap');
   var subs = CAT_SUBS[cat];
   if (!cat || !subs) {
     row.style.display = 'none';
     row.innerHTML = '';
+    if (searchWrap) searchWrap.style.top = '50px';
     return;
   }
   var keys = Object.keys(subs);
@@ -2203,6 +2205,7 @@ function renderSubCatRow(cat) {
     return '<span class="subcat-pill" onclick="filterSubCat(\''+k.replace(/'/g,"\\'")+'\')" data-subcat="'+k.replace(/"/g,'&quot;')+'">'+icon+' '+k+'</span>';
   }).join('');
   row.style.display = 'block';
+  if (searchWrap) searchWrap.style.top = '97px';
 }
 
 function filterSubCat(sub) {
