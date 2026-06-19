@@ -2382,38 +2382,55 @@ async function startVoiceRecording(e) {
 }
 
 function stopVoiceRecording(e) {
-  if (e) e.preventDefault();
-  if (!_voiceRecorder || _voiceRecorder.state === 'inactive') return;
+  if (e && e.cancelable) e.preventDefault();
+  if (!_voiceRecorder || _voiceRecorder.state === 'inactive' || _voiceRecorder.state === undefined) return;
+  if (window._voiceStopping) return; // давхар дуудлагаас хамгаалах
+  window._voiceStopping = true;
   clearInterval(_voiceTimerInterval);
   document.getElementById('voiceRecordingBar').style.display = 'none';
   document.getElementById('chatVoiceBtn').style.background = '#f0f0f0';
   document.getElementById('chatVoiceBtn').style.color = '#666';
   var duration = Date.now() - _voiceStartTime;
   _voiceRecorder.onstop = async function() {
-    if (_voiceStream) { _voiceStream.getTracks().forEach(function(t){t.stop();}); _voiceStream = null; }
-    if (duration < 800) { showToast('Хэт богино дуу хоолой', true); return; } // ignore accidental taps
-    var blob = new Blob(_voiceChunks, {type:'audio/webm'});
-    await sendChatAudio(blob);
+    window._voiceStopping = false;
+    try {
+      if (_voiceStream) { _voiceStream.getTracks().forEach(function(t){t.stop();}); _voiceStream = null; }
+      if (duration < 800) { showToast('Хэт богино дуу хоолой', true); return; } // ignore accidental taps
+      var blob = new Blob(_voiceChunks, {type:'audio/webm'});
+      await sendChatAudio(blob);
+    } catch(err) {
+      console.error('Voice send error:', err);
+      showToast('Дуу мессеж илгээхэд алдаа гарлаа', true);
+    }
   };
-  _voiceRecorder.stop();
+  try {
+    _voiceRecorder.stop();
+  } catch(err) {
+    window._voiceStopping = false;
+    console.error('Recorder stop error:', err);
+  }
 }
 
 async function sendChatAudio(blob) {
-  showToast('Дуу мессеж илгээж байна...');
-  var path = CU.id+'/voice_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.webm';
-  var up = await sb.storage.from('listings').upload(path, blob, {cacheControl:'3600', upsert:true, contentType:'audio/webm'});
-  if (up.error) { showToast('Дуу илгээхэд алдаа гарлаа', true); return; }
-  var url = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
-  var r = await sb.from('messages').insert({
-    listing_id: window._chatListingId,
-    sender_id: CU.id,
-    receiver_id: window._chatSellerId,
-    message_type: 'audio',
-    audio_url: url
-  });
-  if (!r.error) {
+  try {
+    showToast('Дуу мессеж илгээж байна...');
+    var path = CU.id+'/voice_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.webm';
+    var up = await sb.storage.from('listings').upload(path, blob, {cacheControl:'3600', upsert:true, contentType:'audio/webm'});
+    if (up.error) { showToast('Дуу илгээхэд алдаа гарлаа: '+up.error.message, true); return; }
+    var url = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
+    var r = await sb.from('messages').insert({
+      listing_id: window._chatListingId,
+      sender_id: CU.id,
+      receiver_id: window._chatSellerId,
+      message_type: 'audio',
+      audio_url: url
+    });
+    if (r.error) { showToast('Мессеж хадгалахад алдаа: '+r.error.message, true); return; }
     loadChat(window._chatListingId, window._chatSellerId);
     notifyChatPartner('🎤 Дуу мессеж илгээсэн');
+  } catch(err) {
+    console.error('sendChatAudio error:', err);
+    showToast('Алдаа гарлаа: '+err.message, true);
   }
 }
 
