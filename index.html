@@ -1763,9 +1763,10 @@ function renderListings(arr) {
       html += '<div class="card card-featured" onclick="showDetail(\''+l.id+'\')" style="position:relative;min-width:320px;max-width:320px;scroll-snap-align:start;flex-shrink:0">'+
         '<div class="featured-shimmer"></div>'+
         '<div class="card-inner" style="border-color:#FFD700">'+
-        '<div class="card-img" style="aspect-ratio:4/3">'+
+        '<div class="card-img" style="aspect-ratio:4/3" '+(l.video_url?'onmouseenter="cardVideoPlay(this,\''+l.video_url+'\')" onmouseleave="cardVideoStop(this)" ':'')+'>'+
         (l.images&&l.images[0]?'<img src="'+l.images[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
         (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
+        (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
         '<div style="position:absolute;top:0;left:0;right:0;background:linear-gradient(90deg,#FF8C00,#FFD700);color:white;font-size:12px;font-weight:800;padding:6px 10px;text-align:center;letter-spacing:1px">⭐ ОНЦЛОХ ЗАР ⭐</div>'+
         '</div>'+
         '<div style="padding:10px">'+
@@ -1816,7 +1817,7 @@ function renderListings(arr) {
       '<div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;pointer-events:none;z-index:4" class="img-dots">'+
       imgs.map(function(_,i){ return '<div style="width:5px;height:5px;border-radius:50%;background:'+(i===0?'white':'rgba(255,255,255,0.5)')+'"></div>'; }).join('')+
       '</div></div>' :
-      '<div class="card-img">'+
+      '<div class="card-img" '+(l.video_url?'onmouseenter="cardVideoPlay(this,\''+l.video_url+'\')" onmouseleave="cardVideoStop(this)" ':'')+'>'+
       (imgs?'<img src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
@@ -4196,6 +4197,33 @@ function toggleAdSpace() {
     wrap.style.display = 'none';
     btn.textContent = 'Харуулах +';
     localStorage.setItem('zaraa_ad_hidden', '1');
+  }
+}
+
+function cardVideoPlay(el, videoUrl) {
+  if (el.querySelector('video')) return; // already playing
+  var video = document.createElement('video');
+  video.src = videoUrl;
+  video.muted = true;
+  video.loop = true;
+  video.playsInline = true;
+  video.autoplay = true;
+  video.style.position = 'absolute';
+  video.style.top = '0';
+  video.style.left = '0';
+  video.style.width = '100%';
+  video.style.height = '100%';
+  video.style.objectFit = 'cover';
+  video.style.zIndex = '2';
+  el.appendChild(video);
+  video.play().catch(function(){});
+}
+
+function cardVideoStop(el) {
+  var video = el.querySelector('video');
+  if (video) {
+    video.pause();
+    video.remove();
   }
 }
 
