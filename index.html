@@ -791,6 +791,11 @@ select.form-input{cursor:pointer}
         <div id="catTier3Grid" style="display:flex;gap:6px;flex-wrap:wrap"></div>
       </div>
 
+      <div id="catTier4" style="margin-bottom:12px;display:none">
+        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:6px">🚗 МОДЕЛЬ</div>
+        <div id="catTier4Grid" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+
       <!-- ФОРМ ТАЛБАРУУД -->
       <div id="formFields" style="display:none">
         <div style="height:1px;background:#f0f0f0;margin:8px 0 16px"></div>
@@ -1486,12 +1491,16 @@ function selectTier1(cat, emoji, el) {
   window._catEmoji = emoji;
   window._catSub = '';
   window._catSub2 = '';
+  window._catSub3 = '';
   var subs = CAT_SUBS[cat];
   var tier2 = document.getElementById('catTier2');
   var tier3 = document.getElementById('catTier3');
+  var tier4 = document.getElementById('catTier4');
   var formFields = document.getElementById('formFields');
   tier3.style.display = 'none';
   document.getElementById('catTier3Grid').innerHTML = '';
+  tier4.style.display = 'none';
+  document.getElementById('catTier4Grid').innerHTML = '';
   if (!subs) {
     tier2.style.display = 'none';
     formFields.style.display = 'block';
@@ -1515,6 +1524,10 @@ function selectTier2(sub, el) {
   document.querySelectorAll('#catTier2Grid .flow-v-grid').forEach(function(s){ s.classList.remove('active'); });
   el.classList.add('active');
   window._catSub = sub;
+  window._catSub2 = '';
+  window._catSub3 = '';
+  document.getElementById('catTier4').style.display = 'none';
+  document.getElementById('catTier4Grid').innerHTML = '';
   var cat = document.getElementById('postCategory').value;
   var subs = CAT_SUBS[cat];
   var items = subs && subs[sub];
@@ -1541,6 +1554,25 @@ function selectTier3(item, el) {
   document.querySelectorAll('#catTier3Grid .tier3-pill').forEach(function(p){ p.classList.remove('active'); });
   el.classList.add('active');
   window._catSub2 = item;
+  window._catSub3 = '';
+  var tier4 = document.getElementById('catTier4');
+  var models = CAR_MODELS[item];
+  if (!models || !models.length) {
+    tier4.style.display = 'none';
+    document.getElementById('catTier4Grid').innerHTML = '';
+    return;
+  }
+  document.getElementById('catTier4Grid').innerHTML = models.map(function(m) {
+    return '<div class="tier3-pill" onclick="selectTier4(\''+m.replace(/'/g,"\\'")+'\',this)">🚗 '+m+'</div>';
+  }).join('');
+  tier4.style.display = 'block';
+  tier4.style.animation = 'slideIn 0.25s ease';
+}
+
+function selectTier4(model, el) {
+  document.querySelectorAll('#catTier4Grid .tier3-pill').forEach(function(p){ p.classList.remove('active'); });
+  el.classList.add('active');
+  window._catSub3 = model;
 }
 
 function updateFilterProvinceFields() {
@@ -3501,6 +3533,7 @@ async function postListing() {
   });
   if (window._catSub) extra._subcat = window._catSub;
   if (window._catSub2) extra._subcat2 = window._catSub2;
+  if (window._catSub3) extra._subcat3 = window._catSub3;
   showToast('🖼️ Зураг байршуулж байна...', false, 60000);
   var imgUrls = imgFiles.length ? await uploadImages(imgFiles) : [];
   if (vidFile) showToast('🎥 Бичлэг байршуулж байна...', false, 60000);
