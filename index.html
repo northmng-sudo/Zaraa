@@ -105,7 +105,8 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 @media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr);padding:0 80px}}
 @media(min-width:1024px){.grid{grid-template-columns:repeat(6,1fr);padding:0 150px}}
-.card{background:white;border:2px solid #ddd;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s;position:relative}
+.card{background:white;border:2px solid #ddd;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s,transform 0.2s;position:relative}
+.card:hover{transform:scale(1.03);box-shadow:0 6px 16px rgba(0,0,0,0.12);z-index:5}
 .card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.12);border-color:#ccc}
 .card-inner{margin:10px;border:1px solid #eee;border-radius:6px;overflow:visible}
 .card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.1)}
