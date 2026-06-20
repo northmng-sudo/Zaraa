@@ -164,11 +164,11 @@ select.form-input{cursor:pointer}
 @media (min-width:900px){
   #detailContent{max-width:1400px;margin:0 auto;padding:0 24px}
   #detailContent .detail-two-col{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:40px;align-items:start}
-  #detailContent .detail-media-col{grid-column:1;position:sticky;top:70px;max-width:520px;max-height:60vh}
-  #detailContent .detail-media-col #imgSlider{max-height:60vh}
-  #detailContent .detail-media-col .detail-img{max-height:60vh}
+  #detailContent .detail-media-col{grid-column:1;position:sticky;top:70px;max-height:65vh}
+  #detailContent .detail-media-col #imgSlider{max-height:65vh}
+  #detailContent .detail-media-col .detail-img{max-height:65vh}
   #detailContent .detail-info-col{grid-column:2}
-  #detailContent .detail-related-full{margin-top:24px}
+  #detailContent .detail-related-full{margin-top:24px;max-width:calc(100% - 480px)}
 }
 .tag{background:var(--s2);border:1px solid var(--b);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;color:var(--m)}
 .seller-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
@@ -1870,7 +1870,7 @@ async function showDetail(id) {
     '</div>' +
     (imgs.length>1?
     '<div id="thumbRow" style="display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px">'+
-    imgs.map(function(url,i){ return '<img src="'+url+'" onclick="slideImg('+i+')" id="thumb'+i+'" style="width:64px;height:64px;flex-shrink:0;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid '+(i===0?'var(--a)':'transparent')+';opacity:'+(i===0?'1':'0.7')+'">'; }).join('')+
+    imgs.map(function(url,i){ return '<img src="'+url+'" onclick="slideImg('+i+')" onmouseenter="slideImg('+i+')" id="thumb'+i+'" style="width:64px;height:64px;flex-shrink:0;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid '+(i===0?'var(--a)':'transparent')+';opacity:'+(i===0?'1':'0.7')+'">'; }).join('')+
     '</div>':'') :
     '<div class="detail-img">'+(EMOJIS[l.category]||'📦')+'</div>';
   document.getElementById('detailContent').innerHTML =
