@@ -792,8 +792,9 @@ select.form-input{cursor:pointer}
       </div>
 
       <div id="catTier4" style="margin-bottom:12px;display:none">
-        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:6px">🚗 МОДЕЛЬ</div>
-        <div id="catTier4Grid" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:8px">🚗 МОДЕЛЬ</div>
+        <input class="form-input" id="tier4Search" placeholder="Модель хайх..." oninput="filterTier4Search(this.value)" style="margin-bottom:8px;font-size:13px">
+        <div id="catTier4Grid" style="background:#1a1a2e;border-radius:12px;padding:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:280px;overflow-y:auto"></div>
       </div>
 
       <!-- ФОРМ ТАЛБАРУУД -->
@@ -1557,22 +1558,34 @@ function selectTier3(item, el) {
   window._catSub3 = '';
   var tier4 = document.getElementById('catTier4');
   var models = CAR_MODELS[item];
+  document.getElementById('tier4Search').value = '';
   if (!models || !models.length) {
     tier4.style.display = 'none';
     document.getElementById('catTier4Grid').innerHTML = '';
     return;
   }
   document.getElementById('catTier4Grid').innerHTML = models.map(function(m) {
-    return '<div class="tier3-pill" onclick="selectTier4(\''+m.replace(/'/g,"\\'")+'\',this)">🚗 '+m+'</div>';
+    return '<div class="flow-v-grid" data-model="'+m.toLowerCase()+'" onclick="selectTier4(\''+m.replace(/'/g,"\\'")+'\',this)">'+
+      '<span style="font-size:18px">🚗</span>'+
+      '<span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.8);text-align:center;line-height:1.2">'+m+'</span>'+
+      '</div>';
   }).join('');
   tier4.style.display = 'block';
   tier4.style.animation = 'slideIn 0.25s ease';
 }
 
 function selectTier4(model, el) {
-  document.querySelectorAll('#catTier4Grid .tier3-pill').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('#catTier4Grid .flow-v-grid').forEach(function(p){ p.classList.remove('active'); });
   el.classList.add('active');
   window._catSub3 = model;
+}
+
+function filterTier4Search(query) {
+  var q = query.toLowerCase().trim();
+  document.querySelectorAll('#catTier4Grid .flow-v-grid').forEach(function(el) {
+    var model = el.getAttribute('data-model') || '';
+    el.style.display = !q || model.indexOf(q) > -1 ? 'flex' : 'none';
+  });
 }
 
 function updateFilterProvinceFields() {
