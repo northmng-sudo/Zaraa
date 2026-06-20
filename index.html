@@ -386,7 +386,10 @@ select.form-input{cursor:pointer}
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохирно</label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterVerified" onchange="doSearch()"> ✅ Баталгаажсан</label>
       </div>
-      <button class="btn btn-ghost" style="width:100%" onclick="clearFilter()">Цэвэрлэх</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn btn-ghost" onclick="clearFilter()">Цэвэрлэх</button>
+        <button class="btn btn-primary" onclick="applyAndScrollToResults()">🔍 Хайх</button>
+      </div>
     </div>
   </div>
 
@@ -1626,6 +1629,14 @@ function updateFilterProvinceFields() {
     document.getElementById('filterSum').value = '';
   }
   doSearch();
+}
+
+function applyAndScrollToResults() {
+  var panel = document.getElementById('filterPanel');
+  panel.style.display = 'none';
+  doSearch();
+  var grid = document.getElementById('listingsGrid');
+  if (grid) grid.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function toggleFilter() {
