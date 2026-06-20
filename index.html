@@ -162,12 +162,13 @@ select.form-input{cursor:pointer}
 .detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 #detailContent{max-width:600px;margin:0 auto}
 @media (min-width:900px){
-  #detailContent{max-width:1400px;display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:40px;align-items:start;margin:0 auto;padding:0 24px}
-  #detailContent .detail-media-col{grid-column:1;position:sticky;top:70px;max-height:75vh}
-  #detailContent .detail-media-col #imgSlider{max-height:75vh}
-  #detailContent .detail-media-col .detail-img{max-height:75vh}
+  #detailContent{max-width:1400px;margin:0 auto;padding:0 24px}
+  #detailContent .detail-two-col{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:40px;align-items:start}
+  #detailContent .detail-media-col{grid-column:1;position:sticky;top:70px;max-width:520px;max-height:60vh}
+  #detailContent .detail-media-col #imgSlider{max-height:60vh}
+  #detailContent .detail-media-col .detail-img{max-height:60vh}
   #detailContent .detail-info-col{grid-column:2}
-  #detailContent .detail-related-full{grid-column:1/-1}
+  #detailContent .detail-related-full{margin-top:24px}
 }
 .tag{background:var(--s2);border:1px solid var(--b);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;color:var(--m)}
 .seller-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
@@ -1873,6 +1874,7 @@ async function showDetail(id) {
     '</div>':'') :
     '<div class="detail-img">'+(EMOJIS[l.category]||'📦')+'</div>';
   document.getElementById('detailContent').innerHTML =
+    '<div class="detail-two-col">'+
     '<div class="detail-media-col">'+
     imgHtml+
     (l.video_url?'<div style="margin-top:12px;border-radius:10px;overflow:hidden;background:#000;position:relative;display:flex;align-items:center;justify-content:center;min-height:200px">'+
@@ -1919,6 +1921,7 @@ async function showDetail(id) {
     '</div>':'')+
     (l.location?'<div id="mapBox" style="margin-top:16px;border-radius:12px;overflow:hidden;height:200px"><iframe width="100%" height="200" frameborder="0" src="https://maps.google.com/maps?q='+encodeURIComponent((l.location||'Улаанбаатар')+', Улаанбаатар, Монгол')+'&output=embed&z=14" style="border:none"></iframe></div>':'')+'<div style="margin-top:16px" id="reviewSection"></div>'+
     (CU&&l.user_id===CU.id?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><button class="btn btn-ghost btn-full" style="color:#e53e3e;border-color:#e53e3e" onclick="deleteListing(\''+l.id+'\')">🗑️ Устгах</button><button class="btn btn-ghost btn-full" onclick="editListing(\''+l.id+'\')">✏️ Засах</button></div>':'')+
+    '</div>'+
     '</div>'+
     '</div>'+
     '<div id="relatedSection" class="detail-related-full" style="margin-top:24px"></div>';
