@@ -2077,25 +2077,37 @@ var KHOROO = {
 };
 
 var CAR_MODELS = {
-  'Toyota': ['Prius','Prius C','Prius α','Land Cruiser 100','Land Cruiser 200','Land Cruiser Prado','Camry','Corolla','RAV4','Highlander','Sienna','Avalon','Alphard','Vellfire','Noah','Voxy','Estima','Ipsum','Vitz','Probox','Succeed','Hiace','Crown','Mark X','Sienta','Harrier','C-HR','86','Tacoma','Tundra','Fortuner','Hilux','Бусад'],
-  'Lexus': ['LX570','LX600','RX350','RX450h','NX300','GX460','ES350','IS250','LS500','UX200','Бусад'],
-  'Nissan': ['X-Trail','Patrol','Qashqai','Murano','Teana','Sunny','Tiida','Note','March','Serena','Elgrand','Juke','Navara','Pathfinder','Skyline','Fuga','Cube','AD','Wingroad','Бусад'],
-  'Hyundai': ['Santa Fe','Tucson','Sonata','Elantra','Accent','Starex','Porter','Grand Starex','Avante','Getz','Solaris','Creta','Палисад','Бусад'],
-  'Kia': ['Sportage','Sorento','Rio','K5','Carnival','Soul','Ceed','Mohave','Bongo','Морнинг','Бусад'],
-  'Honda': ['CR-V','Fit','Civic','Accord','Stepwgn','Odyssey','Vezel','Freed','Insight','Pilot','HR-V','Inspire','Бусад'],
+  'Toyota': ['Prius 10','Prius 11','Prius 20','Prius 21','Prius 30','Prius 31','Prius 40','Prius 41','Prius 50','Prius 60','Prius C','Prius α','Prius PHV','Land Cruiser 70','Land Cruiser 76','Land Cruiser 78','Land Cruiser 79','Land Cruiser 80','Land Cruiser 90','Land Cruiser 95','Land Cruiser 100','Land Cruiser 105','Land Cruiser 200','Land Cruiser 300','Land Cruiser Prado 90','Land Cruiser Prado 120','Land Cruiser Prado 150','Land Cruiser Prado 250','Camry 30','Camry 40','Camry 50','Camry 55','Camry 70','Corolla 110','Corolla 120','Corolla 140','Corolla 150','Corolla 160','Corolla 170','Corolla Axio','Corolla Fielder','Corolla Spacio','Corolla Rumion','RAV4 20','RAV4 30','RAV4 40','RAV4 50','Highlander','Sienna','Avalon','Alphard 10','Alphard 20','Alphard 30','Vellfire 20','Vellfire 30','Noah 60','Noah 70','Noah 80','Noah 90','Voxy 60','Voxy 70','Voxy 80','Voxy 90','Estima 10','Estima 20','Estima 30','Estima 40','Estima 50','Ipsum','Vitz 10','Vitz 90','Vitz 130','Probox','Succeed','Hiace 100','Hiace 200','Hiace 300','Crown 130','Crown 140','Crown 150','Crown 170','Crown 180','Crown 200','Crown 210','Mark X 120','Mark X 130','Sienta','Harrier 10','Harrier 60','Harrier 80','C-HR','86','Tacoma','Tundra','Fortuner','Hilux','Wish','Allion','Premio','Belta','Aqua','Passo','Yaris','Land Cruiser 70 Pickup','FJ Cruiser','Sequoia','4Runner','Бусад'],
+  'Lexus': ['LX450','LX470','LX570','LX600','RX300','RX330','RX350','RX400h','RX450h','RX500h','NX200','NX300','NX350','NX450h','GX460','GX470','GX550','ES300','ES330','ES350','IS250','IS300','IS350','LS400','LS460','LS500','UX200','UX250h','CT200h','Бусад'],
+  'Nissan': ['X-Trail T30','X-Trail T31','X-Trail T32','Patrol Y60','Patrol Y61','Patrol Y62','Qashqai','Murano Z50','Murano Z51','Murano Z52','Teana J31','Teana J32','Teana L33','Sunny','Tiida','Note','March','Cube','Serena C24','Serena C25','Serena C26','Serena C27','Elgrand E50','Elgrand E51','Elgrand E52','Juke','Navara','Pathfinder','Skyline','Fuga','AD','Wingroad','Бусад'],
+  'Hyundai': ['Santa Fe CM','Santa Fe DM','Santa Fe TM','Tucson','Sonata','Elantra','Accent','Starex','Grand Starex','H-1','Porter','Avante','Getz','Solaris','Creta','Palisade','Бусад'],
+  'Kia': ['Sportage','Sorento','Rio','K5','Carnival','Soul','Ceed','Mohave','Bongo','Morning','Бусад'],
+  'Honda': ['CR-V RD1','CR-V RD5','CR-V RE','CR-V RM','Fit GD','Fit GE','Fit GK','Civic','Accord','Stepwgn','Odyssey','Vezel','Freed','Insight','Pilot','HR-V','Inspire','Бусад'],
   'Mercedes-Benz': ['E-class','S-class','C-class','GLE','GLS','G-class','GLC','ML','Sprinter','Vito','Бусад'],
   'BMW': ['X5','X3','X6','5 Series','3 Series','7 Series','X1','X7','M3','M5','Бусад'],
   'Subaru': ['Forester','Outback','Legacy','Impreza','XV','Levorg','Tribeca','Бусад'],
   'Mitsubishi': ['Pajero','Outlander','Delica','RVR','Montero','L200','ASX','Lancer','Бусад'],
   'Mazda': ['CX-5','CX-9','Mazda3','Mazda6','CX-3','Demio','MPV','Bongo','Бусад'],
   'Ford': ['Explorer','F-150','Ranger','Focus','Escape','Edge','Transit','Бусад'],
-  'Volkswagen': ['Tiguan','Touareg','Passat','Golf','Jetta','Polo','Multivan','Busад'],
+  'Volkswagen': ['Tiguan','Touareg','Passat','Golf','Jetta','Polo','Multivan','Бусад'],
   'Audi': ['Q7','Q5','A6','A4','Q3','A8','Бусад'],
   'Chevrolet': ['Tahoe','Captiva','Cruze','Aveo','Damas','Spark','Бусад'],
   'Land Rover': ['Range Rover','Discovery','Defender','Range Rover Sport','Бусад'],
   'Porsche': ['Cayenne','Macan','Panamera','911','Бусад'],
   'Suzuki': ['Escudo','Jimny','Vitara','Swift','Бусад'],
-  'Peugeot': ['3008','5008','308','2008','Бусад']
+  'Peugeot': ['3008','5008','308','2008','Бусад'],
+  'Daihatsu': ['Terios','Mira','Move','Tanto','Hijet','Бусад'],
+  'Isuzu': ['Elf','Bighorn','D-Max','Trooper','Бусад'],
+  'Mini': ['Cooper','Countryman','Clubman','Бусад'],
+  'UAZ': ['Patriot','Hunter','Bukhanka','Бусад'],
+  'Lada': ['Niva','Granta','Vesta','Priora','Бусад'],
+  'Škoda': ['Octavia','Kodiaq','Superb','Yeti','Бусад'],
+  'Acura': ['MDX','RDX','TL','TSX','Бусад'],
+  'Infiniti': ['QX56','QX60','QX80','FX35','G35','Бусад'],
+  'Daewoo': ['Matiz','Nexia','Lacetti','Бусад'],
+  'GMC': ['Yukon','Sierra','Acadia','Бусад'],
+  'Jeep': ['Wrangler','Grand Cherokee','Cherokee','Compass','Бусад'],
+  'Cadillac': ['Escalade','SRX','CTS','Бусад']
 };
 
 var AIMAG_SUMS = {
