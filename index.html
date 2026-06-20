@@ -162,11 +162,12 @@ select.form-input{cursor:pointer}
 .detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 #detailContent{max-width:600px;margin:0 auto}
 @media (min-width:900px){
-  #detailContent{max-width:1100px;display:grid;grid-template-columns:minmax(0,600px) 420px;gap:32px;align-items:start;margin:0 auto}
-  #detailContent .detail-media-col{grid-column:1;position:sticky;top:70px;max-width:600px;max-height:75vh}
+  #detailContent{max-width:1400px;display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:40px;align-items:start;margin:0 auto;padding:0 24px}
+  #detailContent .detail-media-col{grid-column:1;position:sticky;top:70px;max-height:75vh}
   #detailContent .detail-media-col #imgSlider{max-height:75vh}
   #detailContent .detail-media-col .detail-img{max-height:75vh}
   #detailContent .detail-info-col{grid-column:2}
+  #detailContent .detail-related-full{grid-column:1/-1}
 }
 .tag{background:var(--s2);border:1px solid var(--b);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;color:var(--m)}
 .seller-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
@@ -1858,17 +1859,18 @@ async function showDetail(id) {
   if (!l) return;
   var imgs = l.images&&l.images.length ? l.images : null;
   var imgHtml = imgs ?
-    '<div style="position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--surface2)" id="imgSlider">'+
+    '<div style="position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--surface2);border-radius:10px" id="imgSlider">'+
     '<div style="display:flex;transition:transform 0.3s;height:100%" id="imgSliderInner">'+
     imgs.map(function(url){ return '<img src="'+url+'" style="min-width:100%;height:100%;object-fit:cover">'; }).join('')+
     '</div>'+
     (imgs.length>1?
-    '<div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px" id="imgDots">'+
-    imgs.map(function(_,i){ return '<div onclick="slideImg('+i+')" style="width:6px;height:6px;border-radius:50%;background:'+(i===0?'white':'rgba(255,255,255,0.5)')+';cursor:pointer" id="dot'+i+'"></div>'; }).join('')+
-    '</div>'+
     '<button onclick="slideImg(-1,true)" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer">‹</button>'+
     '<button onclick="slideImg(1,true)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer">›</button>':'')+
-    '</div>' :
+    '</div>' +
+    (imgs.length>1?
+    '<div id="thumbRow" style="display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px">'+
+    imgs.map(function(url,i){ return '<img src="'+url+'" onclick="slideImg('+i+')" id="thumb'+i+'" style="width:64px;height:64px;flex-shrink:0;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid '+(i===0?'var(--a)':'transparent')+';opacity:'+(i===0?'1':'0.7')+'">'; }).join('')+
+    '</div>':'') :
     '<div class="detail-img">'+(EMOJIS[l.category]||'📦')+'</div>';
   document.getElementById('detailContent').innerHTML =
     '<div class="detail-media-col">'+
@@ -1916,10 +1918,10 @@ async function showDetail(id) {
     (l.has_delivery?'<button class="btn btn-primary btn-full" onclick="openDelivery(\''+l.id+'\')">🚚 Хүргэлт захиалах</button>':'<button class="btn btn-ghost btn-full" onclick="enableDelivery(\''+l.id+'\')">🚚 Хүргэлт нэмэх</button>')+
     '</div>':'')+
     (l.location?'<div id="mapBox" style="margin-top:16px;border-radius:12px;overflow:hidden;height:200px"><iframe width="100%" height="200" frameborder="0" src="https://maps.google.com/maps?q='+encodeURIComponent((l.location||'Улаанбаатар')+', Улаанбаатар, Монгол')+'&output=embed&z=14" style="border:none"></iframe></div>':'')+'<div style="margin-top:16px" id="reviewSection"></div>'+
-    '<div id="relatedSection" style="margin-top:16px"></div>'+
     (CU&&l.user_id===CU.id?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><button class="btn btn-ghost btn-full" style="color:#e53e3e;border-color:#e53e3e" onclick="deleteListing(\''+l.id+'\')">🗑️ Устгах</button><button class="btn btn-ghost btn-full" onclick="editListing(\''+l.id+'\')">✏️ Засах</button></div>':'')+
     '</div>'+
-    '</div>';
+    '</div>'+
+    '<div id="relatedSection" class="detail-related-full" style="margin-top:24px"></div>';
   window._slideIdx = 0;
   window._slideTotal = imgs ? imgs.length : 0;
   window._currentListingId = l.id;
@@ -1936,8 +1938,11 @@ function slideImg(n, isRelative) {
   var inner = document.getElementById('imgSliderInner');
   if (inner) inner.style.transform = 'translateX(-'+window._slideIdx*100+'%)';
   for (var i=0; i<total; i++) {
-    var dot = document.getElementById('dot'+i);
-    if (dot) dot.style.background = i===window._slideIdx ? 'white' : 'rgba(255,255,255,0.5)';
+    var thumb = document.getElementById('thumb'+i);
+    if (thumb) {
+      thumb.style.border = i===window._slideIdx ? '2px solid var(--a)' : '2px solid transparent';
+      thumb.style.opacity = i===window._slideIdx ? '1' : '0.7';
+    }
   }
 }
 
