@@ -713,6 +713,7 @@ select.form-input{cursor:pointer}
             <option>Өвөрхангай</option><option>Өмнөговь</option><option>Сүхбаатар</option>
             <option>Сэлэнгэ</option><option>Төв</option><option>Увс</option>
             <option>Ховд</option><option>Хөвсгөл</option><option>Хэнтий</option>
+            <option value="БНХАУ - Эрээн">🇨🇳 БНХАУ - Эрээн</option>
           </select>
           <div id="shopUbFields" style="display:flex;gap:8px">
             <select class="form-input" id="shopDistrict" onchange="updateShopKhoroo()" style="flex:1">
@@ -729,6 +730,9 @@ select.form-input{cursor:pointer}
             <select class="form-input" id="shopSum">
               <option value="">Сум сонгох</option>
             </select>
+          </div>
+          <div id="shopEreenFields" style="display:none">
+            <input class="form-input" id="shopEreenMarket" placeholder="Зах/Маркетийн нэр (жишээ: Дунд зах, Жинхуа)">
           </div>
         </div>
         <div class="form-group"><label class="form-label">Дэлгэрэнгүй хаяг</label><input class="form-input" type="text" id="shopAddress" placeholder="Гудамж, байр, давхар..."></div>
@@ -872,6 +876,12 @@ select.form-input{cursor:pointer}
               <input type="checkbox" id="postNegotiable"> Тохирно
             </label>
           </div>
+        </div>
+
+        <div class="form-group" id="postYuanGroup" style="display:none">
+          <label class="form-label">¥ Юань үнэ (эх үнэ)</label>
+          <input class="form-input" type="number" id="postPriceYuan" placeholder="0" oninput="syncYuanToTugrik()">
+          <div style="font-size:11px;color:var(--m);margin-top:4px">Шилжилт ханш: ¥1 ≈ 500₮ (ойролцоогоор)</div>
         </div>
 
         <div class="form-group">
@@ -1925,7 +1935,7 @@ function renderListings(arr) {
         '<div style="position:absolute;top:0;left:0;right:0;background:linear-gradient(90deg,#FF8C00,#FFD700);color:white;font-size:12px;font-weight:800;padding:6px 10px;text-align:center;letter-spacing:1px">⭐ ОНЦЛОХ ЗАР ⭐</div>'+
         '</div>'+
         '<div style="padding:10px">'+
-        '<div style="color:#E62B05;font-size:18px;font-weight:800;margin-bottom:4px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
+        '<div style="color:#E62B05;font-size:18px;font-weight:800;margin-bottom:4px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price_yuan?' <span style="font-size:13px;color:var(--m);font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
         '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;line-height:1.3">'+l.title+'</div>'+
         (l.description?'<div style="font-size:11px;color:#888;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3">'+l.description+'</div>':'')+
         (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-bottom:4px">🏪 '+(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
@@ -1983,7 +1993,7 @@ function renderListings(arr) {
       'onclick="if(!event.target.closest(\'[data-imgs]\'))showDetail(\''+l.id+'\')">'+
       '<div class="card-inner">'+imgHtml+
       '<div style="padding:6px 8px 8px;background:white">'+
-      '<div style="color:#111;font-size:15px;font-weight:800">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
+      '<div style="color:#111;font-size:15px;font-weight:800">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price_yuan?' <span style="font-size:12px;color:#999;font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
       '<div class="card-title" style="margin-top:4px">'+l.title+'</div>'+
       (l.description?'<div style="font-size:11px;color:#888;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3">'+l.description+'</div>':'')+
       (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🏪 '+(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
@@ -2041,7 +2051,7 @@ async function showDetail(id) {
     '<div class="detail-info-col">'+
     '<div class="detail-body">'+
     '<div class="detail-title">'+l.title+'</div>'+
-    '<div class="detail-price">₮'+Number(l.price).toLocaleString()+'</div>'+
+    '<div class="detail-price">₮'+Number(l.price).toLocaleString()+(l.price_yuan?' <span style="font-size:15px;color:var(--m);font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+'</div>'+
     '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'<span style="font-size:11px;color:#999;margin-left:4px">🕐 '+timeAgo(l.created_at)+'</span></div>'+
     '<div class="detail-desc">'+(l.description||'Тайлбар байхгүй')+'</div>'+
     (l.extra_data && Object.keys(l.extra_data).length ?
@@ -3224,6 +3234,7 @@ async function editListing(id) {
   document.getElementById('postTitle').value = l.title||'';
   document.getElementById('postDesc').value = l.description||'';
   document.getElementById('postPrice').value = l.price||'';
+  if (document.getElementById('postPriceYuan')) document.getElementById('postPriceYuan').value = l.price_yuan||'';
   document.getElementById('postNegotiable').checked = l.is_negotiable||false;
   document.getElementById('postDelivery').checked = l.has_delivery||false;
   if (l.location) {
@@ -3343,12 +3354,19 @@ function updateShopRegProvince() {
   var province = document.getElementById('shopProvince').value;
   var ubFields = document.getElementById('shopUbFields');
   var aimagFields = document.getElementById('shopAimagFields');
+  var ereenFields = document.getElementById('shopEreenFields');
   if (province === 'Улаанбаатар') {
     ubFields.style.display = 'flex';
     aimagFields.style.display = 'none';
+    ereenFields.style.display = 'none';
+  } else if (province === 'БНХАУ - Эрээн') {
+    ubFields.style.display = 'none';
+    aimagFields.style.display = 'none';
+    ereenFields.style.display = 'block';
   } else {
     ubFields.style.display = 'none';
     aimagFields.style.display = 'block';
+    ereenFields.style.display = 'none';
     var sums = AIMAG_SUMS[province] || [];
     var sumSelect = document.getElementById('shopSum');
     sumSelect.innerHTML = '<option value="">Сум сонгох</option>' + sums.map(function(s){ return '<option>'+s+'</option>'; }).join('');
@@ -3403,10 +3421,14 @@ async function register() {
     var shopName = document.getElementById('shopName').value;
     var shopCategory = document.getElementById('shopCategory').value;
     var province = document.getElementById('shopProvince').value;
-    var shopDistrict, shopKhoroo;
+    var shopDistrict, shopKhoroo, isEreen = false;
     if (province === 'Улаанбаатар') {
       shopDistrict = document.getElementById('shopDistrict').value;
       shopKhoroo = document.getElementById('shopKhoroo').value;
+    } else if (province === 'БНХАУ - Эрээн') {
+      shopDistrict = province;
+      shopKhoroo = document.getElementById('shopEreenMarket').value;
+      isEreen = true;
     } else {
       shopDistrict = province;
       shopKhoroo = document.getElementById('shopSum').value;
@@ -3418,6 +3440,7 @@ async function register() {
       shop_category: shopCategory,
       shop_district: shopDistrict,
       shop_khoroo: shopKhoroo,
+      shop_is_ereen: isEreen,
       shop_address: document.getElementById('shopAddress').value,
       shop_hours_open: document.getElementById('shopOpen').value,
       shop_hours_close: document.getElementById('shopClose').value,
@@ -3614,10 +3637,19 @@ async function uploadVideo(file) {
   return pub.data.publicUrl;
 }
 
+function syncYuanToTugrik() {
+  var yuan = document.getElementById('postPriceYuan').value;
+  if (yuan) {
+    var estimated = Math.round(Number(yuan) * 500 / 1000) * 1000; // ойролцоо ханш, 1000-р тоймлоно
+    document.getElementById('postPrice').value = estimated;
+  }
+}
+
 async function postListing() {
   var title = document.getElementById('postTitle').value;
   var desc = document.getElementById('postDesc').value;
   var price = document.getElementById('postPrice').value;
+  var priceYuan = document.getElementById('postPriceYuan') ? document.getElementById('postPriceYuan').value : '';
   var negotiable = document.getElementById('postNegotiable').checked;
   var province = document.getElementById('postProvince').value;
   var district = document.getElementById('postDistrict').value;
@@ -3656,6 +3688,7 @@ async function postListing() {
   var data = {
     title: title, description: desc,
     price: price ? Number(price) : null,
+    price_yuan: priceYuan ? Number(priceYuan) : null,
     location: loc, category: cat, has_delivery: hasD,
     extra_data: Object.keys(extra).length ? extra : null,
     is_negotiable: negotiable
@@ -3737,6 +3770,7 @@ async function loadProfile() {
   var ls = await sb.from('listings').select('*').eq('user_id',CU.id);
   var ds = await sb.from('deliveries').select('*, listings(title)').eq('buyer_id',CU.id);
   var user = u.data; if (!user) return;
+  window._myProfile = user;
   document.getElementById('profileContent').innerHTML =
     '<div class="profile-header"><div class="profile-avatar">'+(user.name||'?')[0].toUpperCase()+'</div>'+
     '<div class="profile-name">'+(user.name||'Хэрэглэгч')+'</div><div class="profile-email">'+user.email+'</div></div>'+
@@ -4543,6 +4577,10 @@ function openModal(id) {
   var m = document.getElementById(id);
   m.classList.add('open');
   m.style.display = 'flex';
+  if (id === 'postModal') {
+    var yuanGroup = document.getElementById('postYuanGroup');
+    if (yuanGroup) yuanGroup.style.display = (window._myProfile && window._myProfile.shop_is_ereen) ? 'block' : 'none';
+  }
 }
 function closeModal(id) {
   var m = document.getElementById(id);
