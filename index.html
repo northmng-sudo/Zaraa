@@ -850,6 +850,7 @@ select.form-input{cursor:pointer}
             <option>Өвөрхангай</option><option>Өмнөговь</option><option>Сүхбаатар</option>
             <option>Сэлэнгэ</option><option>Төв</option><option>Увс</option>
             <option>Ховд</option><option>Хөвсгөл</option><option>Хэнтий</option>
+            <option value="БНХАУ - Эрээн">🇨🇳 БНХАУ - Эрээн</option>
           </select>
           <div id="ubLocationFields" style="display:flex;gap:8px">
             <select class="form-input" id="postDistrict" onchange="updateKhoroo()" style="flex:1">
@@ -2275,6 +2276,9 @@ function updateProvinceFields() {
   var aimagFields = document.getElementById('aimagLocationFields');
   if (province === 'Улаанбаатар') {
     ubFields.style.display = 'flex';
+    aimagFields.style.display = 'none';
+  } else if (province === 'БНХАУ - Эрээн') {
+    ubFields.style.display = 'none';
     aimagFields.style.display = 'none';
   } else {
     ubFields.style.display = 'none';
