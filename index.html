@@ -309,7 +309,11 @@ select.form-input{cursor:pointer}
     <div style="position:relative">
       <button onclick="scrollPillRow('modelCatRow',-200)" style="position:absolute;left:0;top:0;bottom:0;width:28px;background:linear-gradient(90deg,#f0f0f0,rgba(240,240,240,0.7));border:none;cursor:pointer;z-index:2;font-size:14px;color:#666">◀</button>
       <div id="modelCatRow" style="background:#f0f0f0;border-bottom:1px solid #e5e5e5;padding:8px 36px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;white-space:nowrap"></div>
+      <button onclick="toggleModelSearch()" style="position:absolute;right:28px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;z-index:2;font-size:15px;color:#666">🔍</button>
       <button onclick="scrollPillRow('modelCatRow',200)" style="position:absolute;right:0;top:0;bottom:0;width:28px;background:linear-gradient(270deg,#f0f0f0,rgba(240,240,240,0.7));border:none;cursor:pointer;z-index:2;font-size:14px;color:#666">▶</button>
+    </div>
+    <div id="modelSearchWrap" style="display:none;background:#f0f0f0;padding:8px 12px;border-bottom:1px solid #e5e5e5">
+      <input id="modelSearchInput" placeholder="Модель хайх... (жишээ: Prius, Land Cruiser)" oninput="filterModelSearch(this.value)" style="width:100%;border:1px solid #ddd;border-radius:50px;padding:8px 14px;font-size:13px;outline:none">
     </div>
   </div>
 
@@ -1638,6 +1642,7 @@ function clearFilter() {
   if (document.getElementById('modelCatRowWrap')) {
     document.getElementById('modelCatRowWrap').style.display = 'none';
     document.getElementById('modelCatRow').innerHTML = '';
+    document.getElementById('modelSearchWrap').style.display = 'none';
   }
   if (document.getElementById('searchWrap')) {
     document.getElementById('searchWrap').style.top = document.getElementById('subCatRowWrap').style.display === 'block' ? '97px' : '50px';
@@ -2475,7 +2480,10 @@ function renderModelCatRow(brand) {
   var row = document.getElementById('modelCatRow');
   var wrap = document.getElementById('modelCatRowWrap');
   var searchWrap = document.getElementById('searchWrap');
+  var modelSearchWrap = document.getElementById('modelSearchWrap');
   window._subCat3 = '';
+  modelSearchWrap.style.display = 'none';
+  document.getElementById('modelSearchInput').value = '';
   var models = brand ? CAR_MODELS[brand] : null;
   if (!brand || !models || !models.length) {
     wrap.style.display = 'none';
@@ -2484,10 +2492,30 @@ function renderModelCatRow(brand) {
     return;
   }
   row.innerHTML = models.map(function(m) {
-    return '<span class="subcat-pill" onclick="filterModelCat(\''+m.replace(/'/g,"\\'")+'\')" data-modelcat="'+m.replace(/"/g,'&quot;')+'">🚗 '+m+'</span>';
+    return '<span class="subcat-pill" onclick="filterModelCat(\''+m.replace(/'/g,"\\'")+'\')" data-modelcat="'+m.replace(/"/g,'&quot;')+'" data-model="'+m.toLowerCase()+'">🚗 '+m+'</span>';
   }).join('');
   wrap.style.display = 'block';
   if (searchWrap) searchWrap.style.top = '191px';
+}
+
+function toggleModelSearch() {
+  var w = document.getElementById('modelSearchWrap');
+  var searchWrap = document.getElementById('searchWrap');
+  w.style.display = w.style.display === 'none' ? 'block' : 'none';
+  if (w.style.display === 'block') {
+    document.getElementById('modelSearchInput').focus();
+    if (searchWrap) searchWrap.style.top = '233px';
+  } else {
+    if (searchWrap) searchWrap.style.top = '191px';
+  }
+}
+
+function filterModelSearch(query) {
+  var q = query.toLowerCase().trim();
+  document.querySelectorAll('#modelCatRow .subcat-pill').forEach(function(el) {
+    var model = el.getAttribute('data-model') || '';
+    el.style.display = !q || model.indexOf(q) > -1 ? 'inline-flex' : 'none';
+  });
 }
 
 function filterModelCat(m) {
