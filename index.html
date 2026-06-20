@@ -1050,7 +1050,7 @@ var CAT_SUBS = {
     'Түрээслүүлнэ': ['Орон сууц','Монгол гэр','Хашаа байшин','Газар','Оффис','Граф контейнер','Худалдаа үйлчилгээний талбай','Үйлдвэр/агуулах','Бусад']
   },
   'Авто': {
-    'Автомашин зарна': ['Acura','Audi','Baic','Baojun','BAW','Bentley','Bestune','BMW','BYD','Cadillac','Changan','Chery','Chevrolet','Chrysler','Citroën','Daewoo','Daihatsu','Dayun','Dodge','Dongfeng','Fiat','Ford','Foton','GAC','Geely','GMC','GWM Tank','Haval','Honda','Huawei','Hummer','Hyundai','Infiniti','Isuzu','Jetour','Jaguar','Jeep','Kaiyi','Kenbo','Kia','Lada','Land Rover','Lamborghini','Lexus','Leapmotor','Lincoln','Li Auto','Lynk & Co','Mazda','Mercedes-Benz','MG','MINI','Mitsubishi','Neta','Nissan','Opel','Peugeot','Porsche','Renault','Rolls Royce','Saab','Samsung','SsangYong','Škoda','Subaru','Suzuki','Tesla','Toyota','UAZ','Volkswagen','Volvo','Wuling','Zotye','Бусад'],
+    'Автомашин зарна': ['Toyota','Lexus','Nissan','Hyundai','Kia','Honda','Mercedes-Benz','BMW','Subaru','Mitsubishi','Mazda','Ford','Volkswagen','Audi','Chevrolet','Land Rover','Porsche','Suzuki','Peugeot','Acura','Baic','Baojun','BAW','Bentley','Bestune','BYD','Cadillac','Changan','Chery','Chrysler','Citroën','Daewoo','Daihatsu','Dayun','Dodge','Dongfeng','Fiat','Foton','GAC','Geely','GMC','GWM Tank','Haval','Huawei','Hummer','Infiniti','Isuzu','Jetour','Jaguar','Jeep','Kaiyi','Kenbo','Lada','Lamborghini','Leapmotor','Lincoln','Li Auto','Lynk & Co','MG','MINI','Neta','Opel','Renault','Rolls Royce','Saab','Samsung','SsangYong','Škoda','Tesla','UAZ','Volvo','Wuling','Zotye','Бусад'],
     'Ачааны машин, автобус, хүнд механизм': ['Ачааны машин','Автобус','Хүнд механизм'],
     'Авто түрээслүүлнэ': null,
     'Мотоцикл, мопед, суррон': ['Мотоцикл','Мопед, Суррон','Скүүтэр','Бусад'],
@@ -1858,29 +1858,41 @@ async function showDetail(id) {
   var r = await sb.from('listings').select('*, users(name,rating,phone,is_verified,is_shop,shop_name,shop_is_verified)').eq('id',id).single();
   var l = r.data;
   if (!l) return;
-  var imgs = l.images&&l.images.length ? l.images : null;
-  var imgHtml = imgs ?
-    '<div style="position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--surface2);border-radius:10px" id="imgSlider">'+
+  var imgs = l.images&&l.images.length ? l.images : [];
+  var mediaItems = imgs.map(function(u){ return {type:'image', url:u}; });
+  if (l.video_url) mediaItems.push({type:'video', url:l.video_url});
+  window._mediaItems = mediaItems;
+  var imgHtml = mediaItems.length ?
+    '<div style="position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:#000;border-radius:10px" id="imgSlider">'+
     '<div style="display:flex;transition:transform 0.3s;height:100%" id="imgSliderInner">'+
-    imgs.map(function(url){ return '<img src="'+url+'" style="min-width:100%;height:100%;object-fit:cover">'; }).join('')+
+    mediaItems.map(function(m){
+      if (m.type === 'video') {
+        return '<div style="min-width:100%;height:100%;position:relative;display:flex;align-items:center;justify-content:center;background:#000">'+
+          '<video src="'+m.url+'" muted loop playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;filter:blur(25px) brightness(0.6);transform:scale(1.1);z-index:1"></video>'+
+          '<video src="'+m.url+'" controls playsinline style="position:relative;max-width:100%;max-height:100%;z-index:2" id="mainVideo"></video>'+
+          '</div>';
+      }
+      return '<img src="'+m.url+'" style="min-width:100%;height:100%;object-fit:cover">';
+    }).join('')+
     '</div>'+
-    (imgs.length>1?
-    '<button onclick="slideImg(-1,true)" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer">‹</button>'+
-    '<button onclick="slideImg(1,true)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer">›</button>':'')+
+    (mediaItems.length>1?
+    '<button onclick="slideImg(-1,true)" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;z-index:3">‹</button>'+
+    '<button onclick="slideImg(1,true)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;z-index:3">›</button>':'')+
     '</div>' +
-    (imgs.length>1?
+    (mediaItems.length>1?
     '<div id="thumbRow" style="display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px">'+
-    imgs.map(function(url,i){ return '<img src="'+url+'" onclick="slideImg('+i+')" onmouseenter="slideImg('+i+')" id="thumb'+i+'" style="width:64px;height:64px;flex-shrink:0;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid '+(i===0?'var(--a)':'transparent')+';opacity:'+(i===0?'1':'0.7')+'">'; }).join('')+
+    mediaItems.map(function(m,i){
+      var thumbContent = m.type === 'video' ?
+        '<div style="width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;color:white;font-size:20px">▶</div>' :
+        '<img src="'+m.url+'" style="width:100%;height:100%;object-fit:cover">';
+      return '<div onclick="slideImg('+i+')" onmouseenter="slideImg('+i+')" id="thumb'+i+'" style="width:64px;height:64px;flex-shrink:0;border-radius:8px;cursor:pointer;border:2px solid '+(i===0?'var(--a)':'transparent')+';opacity:'+(i===0?'1':'0.7')+';overflow:hidden">'+thumbContent+'</div>';
+    }).join('')+
     '</div>':'') :
     '<div class="detail-img">'+(EMOJIS[l.category]||'📦')+'</div>';
   document.getElementById('detailContent').innerHTML =
     '<div class="detail-two-col">'+
     '<div class="detail-media-col">'+
     imgHtml+
-    (l.video_url?'<div style="margin-top:12px;border-radius:10px;overflow:hidden;background:#000;position:relative;display:flex;align-items:center;justify-content:center;min-height:200px">'+
-      '<video src="'+l.video_url+'" muted loop autoplay playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;filter:blur(25px) brightness(0.6);transform:scale(1.1);z-index:1"></video>'+
-      '<video src="'+l.video_url+'" controls playsinline style="position:relative;max-width:100%;max-height:70vh;display:block;z-index:2"></video>'+
-      '</div>':'')+
     '</div>'+
     '<div class="detail-info-col">'+
     '<div class="detail-body">'+
@@ -1926,7 +1938,7 @@ async function showDetail(id) {
     '</div>'+
     '<div id="relatedSection" class="detail-related-full" style="margin-top:24px"></div>';
   window._slideIdx = 0;
-  window._slideTotal = imgs ? imgs.length : 0;
+  window._slideTotal = mediaItems.length;
   window._currentListingId = l.id;
   window._currentSellerId = l.user_id;
   loadReviews(l.id);
@@ -1945,6 +1957,16 @@ function slideImg(n, isRelative) {
     if (thumb) {
       thumb.style.border = i===window._slideIdx ? '2px solid var(--a)' : '2px solid transparent';
       thumb.style.opacity = i===window._slideIdx ? '1' : '0.7';
+    }
+  }
+  // Видео slide руу орвол тоглуул, гарвал зогсоо
+  var mainVideo = document.getElementById('mainVideo');
+  if (mainVideo) {
+    var items = window._mediaItems || [];
+    if (items[window._slideIdx] && items[window._slideIdx].type === 'video') {
+      mainVideo.play().catch(function(){});
+    } else {
+      mainVideo.pause();
     }
   }
 }
