@@ -304,6 +304,15 @@ select.form-input{cursor:pointer}
     </div>
   </div>
 
+  <!-- MODEL ROW (4th level) -->
+  <div style="position:sticky;top:144px;z-index:91;display:none" id="modelCatRowWrap">
+    <div style="position:relative">
+      <button onclick="scrollPillRow('modelCatRow',-200)" style="position:absolute;left:0;top:0;bottom:0;width:28px;background:linear-gradient(90deg,#f0f0f0,rgba(240,240,240,0.7));border:none;cursor:pointer;z-index:2;font-size:14px;color:#666">◀</button>
+      <div id="modelCatRow" style="background:#f0f0f0;border-bottom:1px solid #e5e5e5;padding:8px 36px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;white-space:nowrap"></div>
+      <button onclick="scrollPillRow('modelCatRow',200)" style="position:absolute;right:0;top:0;bottom:0;width:28px;background:linear-gradient(270deg,#f0f0f0,rgba(240,240,240,0.7));border:none;cursor:pointer;z-index:2;font-size:14px;color:#666">▶</button>
+    </div>
+  </div>
+
   <!-- SEARCH STICKY -->
   <div id="searchWrap" style="position:sticky;top:50px;z-index:90;background:#f5f5f5;padding:20px 16px 12px 320px">
     <div style="position:relative;min-height:210px">
@@ -961,7 +970,7 @@ document.getElementById('catList').addEventListener('click', function(e) {
 });
 
 // Mouse wheel-р хэвтээ scroll хийх боломж нэмэх (компьютер дээр)
-['subCatRow', 'typeCatRow'].forEach(function(id) {
+['subCatRow', 'typeCatRow', 'modelCatRow'].forEach(function(id) {
   var el = document.getElementById(id);
   if (el) {
     el.addEventListener('wheel', function(e) {
@@ -1575,10 +1584,15 @@ function clearFilter() {
   if (document.getElementById('filterVerified')) document.getElementById('filterVerified').checked = false;
   window._subCat = '';
   window._subCat2 = '';
+  window._subCat3 = '';
   document.querySelectorAll('.subcat-pill').forEach(function(p){ p.classList.remove('active'); });
   if (document.getElementById('typeCatRowWrap')) {
     document.getElementById('typeCatRowWrap').style.display = 'none';
     document.getElementById('typeCatRow').innerHTML = '';
+  }
+  if (document.getElementById('modelCatRowWrap')) {
+    document.getElementById('modelCatRowWrap').style.display = 'none';
+    document.getElementById('modelCatRow').innerHTML = '';
   }
   if (document.getElementById('searchWrap')) {
     document.getElementById('searchWrap').style.top = document.getElementById('subCatRowWrap').style.display === 'block' ? '97px' : '50px';
@@ -1616,6 +1630,13 @@ function doSearch() {
     if (extra._subcat2 && extra._subcat2.toLowerCase() === t) return true;
     return (l.title||'').toLowerCase().indexOf(t) > -1 ||
            (l.description||'').toLowerCase().indexOf(t) > -1;
+  });
+  if (window._subCat3) arr = arr.filter(function(l){
+    var m = window._subCat3.toLowerCase();
+    var extra = l.extra_data || {};
+    if (extra._subcat3 && extra._subcat3.toLowerCase() === m) return true;
+    return (l.title||'').toLowerCase().indexOf(m) > -1 ||
+           (l.description||'').toLowerCase().indexOf(m) > -1;
   });
   if (q) arr = arr.filter(function(l){ return (l.title||'').toLowerCase().indexOf(q) > -1 || (l.description||'').toLowerCase().indexOf(q) > -1; });
   if (minP) arr = arr.filter(function(l){ return l.price >= minP; });
@@ -2055,6 +2076,28 @@ var KHOROO = {
   'Чингэлтэй': 12, 'Сонгинохайрхан': 32, 'Налайх': 5, 'Багануур': 5, 'Багахангай': 3
 };
 
+var CAR_MODELS = {
+  'Toyota': ['Prius','Prius C','Prius α','Land Cruiser 100','Land Cruiser 200','Land Cruiser Prado','Camry','Corolla','RAV4','Highlander','Sienna','Avalon','Alphard','Vellfire','Noah','Voxy','Estima','Ipsum','Vitz','Probox','Succeed','Hiace','Crown','Mark X','Sienta','Harrier','C-HR','86','Tacoma','Tundra','Fortuner','Hilux','Бусад'],
+  'Lexus': ['LX570','LX600','RX350','RX450h','NX300','GX460','ES350','IS250','LS500','UX200','Бусад'],
+  'Nissan': ['X-Trail','Patrol','Qashqai','Murano','Teana','Sunny','Tiida','Note','March','Serena','Elgrand','Juke','Navara','Pathfinder','Skyline','Fuga','Cube','AD','Wingroad','Бусад'],
+  'Hyundai': ['Santa Fe','Tucson','Sonata','Elantra','Accent','Starex','Porter','Grand Starex','Avante','Getz','Solaris','Creta','Палисад','Бусад'],
+  'Kia': ['Sportage','Sorento','Rio','K5','Carnival','Soul','Ceed','Mohave','Bongo','Морнинг','Бусад'],
+  'Honda': ['CR-V','Fit','Civic','Accord','Stepwgn','Odyssey','Vezel','Freed','Insight','Pilot','HR-V','Inspire','Бусад'],
+  'Mercedes-Benz': ['E-class','S-class','C-class','GLE','GLS','G-class','GLC','ML','Sprinter','Vito','Бусад'],
+  'BMW': ['X5','X3','X6','5 Series','3 Series','7 Series','X1','X7','M3','M5','Бусад'],
+  'Subaru': ['Forester','Outback','Legacy','Impreza','XV','Levorg','Tribeca','Бусад'],
+  'Mitsubishi': ['Pajero','Outlander','Delica','RVR','Montero','L200','ASX','Lancer','Бусад'],
+  'Mazda': ['CX-5','CX-9','Mazda3','Mazda6','CX-3','Demio','MPV','Bongo','Бусад'],
+  'Ford': ['Explorer','F-150','Ranger','Focus','Escape','Edge','Transit','Бусад'],
+  'Volkswagen': ['Tiguan','Touareg','Passat','Golf','Jetta','Polo','Multivan','Busад'],
+  'Audi': ['Q7','Q5','A6','A4','Q3','A8','Бусад'],
+  'Chevrolet': ['Tahoe','Captiva','Cruze','Aveo','Damas','Spark','Бусад'],
+  'Land Rover': ['Range Rover','Discovery','Defender','Range Rover Sport','Бусад'],
+  'Porsche': ['Cayenne','Macan','Panamera','911','Бусад'],
+  'Suzuki': ['Escudo','Jimny','Vitara','Swift','Бусад'],
+  'Peugeot': ['3008','5008','308','2008','Бусад']
+};
+
 var AIMAG_SUMS = {
   'Архангай': ['Цэцэрлэг','Эрдэнэбулган','Батцэнгэл','Булган','Жаргалант','Их тамир','Кашаат','Намивай','Олзвой','Өгийнуур','Өлзийт','Тариат','Төвшрүүлэх','Хайрхан','Хангай','Хашаат','Хотонт','Цахир','Цэнхэр','Чулуут','Эрдэнэмандал'],
   'Баян-Өлгий': ['Өлгий','Алтай','Алтанцөгц','Баяннуур','Булган','Буянт','Дэлүүн','Сагсай','Толбо','Улаанхус','Цагааннуур','Цэнгэл'],
@@ -2293,11 +2336,16 @@ function renderSubCatRow(cat) {
   var wrap = document.getElementById('subCatRowWrap');
   var typeRow = document.getElementById('typeCatRow');
   var typeWrap = document.getElementById('typeCatRowWrap');
+  var modelRow = document.getElementById('modelCatRow');
+  var modelWrap = document.getElementById('modelCatRowWrap');
   var searchWrap = document.getElementById('searchWrap');
   var subs = CAT_SUBS[cat];
   typeWrap.style.display = 'none';
   typeRow.innerHTML = '';
+  modelWrap.style.display = 'none';
+  modelRow.innerHTML = '';
   window._subCat2 = '';
+  window._subCat3 = '';
   if (!cat || !subs) {
     wrap.style.display = 'none';
     row.innerHTML = '';
@@ -2331,9 +2379,14 @@ function filterSubCat(sub) {
 function renderTypeCatRow(cat, sub) {
   var row = document.getElementById('typeCatRow');
   var wrap = document.getElementById('typeCatRowWrap');
+  var modelWrap = document.getElementById('modelCatRowWrap');
+  var modelRow = document.getElementById('modelCatRow');
   var searchWrap = document.getElementById('searchWrap');
   var subs = CAT_SUBS[cat];
   var types = sub && subs ? subs[sub] : null;
+  modelWrap.style.display = 'none';
+  modelRow.innerHTML = '';
+  window._subCat3 = '';
   if (!sub || !types || !types.length) {
     wrap.style.display = 'none';
     row.innerHTML = '';
@@ -2356,6 +2409,38 @@ function filterTypeCat(t) {
   }
   document.querySelectorAll('#typeCatRow .subcat-pill').forEach(function(p) {
     p.classList.toggle('active', p.getAttribute('data-typecat') === window._subCat2);
+  });
+  renderModelCatRow(window._subCat2);
+  doSearch();
+}
+
+function renderModelCatRow(brand) {
+  var row = document.getElementById('modelCatRow');
+  var wrap = document.getElementById('modelCatRowWrap');
+  var searchWrap = document.getElementById('searchWrap');
+  window._subCat3 = '';
+  var models = brand ? CAR_MODELS[brand] : null;
+  if (!brand || !models || !models.length) {
+    wrap.style.display = 'none';
+    row.innerHTML = '';
+    if (searchWrap) searchWrap.style.top = '144px';
+    return;
+  }
+  row.innerHTML = models.map(function(m) {
+    return '<span class="subcat-pill" onclick="filterModelCat(\''+m.replace(/'/g,"\\'")+'\')" data-modelcat="'+m.replace(/"/g,'&quot;')+'">🚗 '+m+'</span>';
+  }).join('');
+  wrap.style.display = 'block';
+  if (searchWrap) searchWrap.style.top = '191px';
+}
+
+function filterModelCat(m) {
+  if (window._subCat3 === m) {
+    window._subCat3 = '';
+  } else {
+    window._subCat3 = m;
+  }
+  document.querySelectorAll('#modelCatRow .subcat-pill').forEach(function(p) {
+    p.classList.toggle('active', p.getAttribute('data-modelcat') === window._subCat3);
   });
   doSearch();
 }
