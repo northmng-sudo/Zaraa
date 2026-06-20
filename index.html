@@ -368,6 +368,19 @@ select.form-input{cursor:pointer}
         </select>
       </div>
       <div id="catFilters"></div>
+      <div id="filterCarBrandWrap" style="margin-bottom:12px;display:none">
+        <label class="form-label">Марк</label>
+        <select class="form-input" id="filterCarBrand" onchange="updateFilterCarModel()">
+          <option value="">Бүгд</option>
+        </select>
+      </div>
+      <div id="filterCarModelWrap" style="margin-bottom:12px;display:none">
+        <label class="form-label">Модель</label>
+        <input class="form-input" id="filterCarModelSearch" placeholder="Модель хайх..." oninput="filterCarModelOptions(this.value)" style="margin-bottom:6px">
+        <select class="form-input" id="filterCarModel" onchange="window._subCat3=this.value;doSearch()" size="6" style="height:auto">
+          <option value="">Бүгд</option>
+        </select>
+      </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterDelivery" onchange="doSearch()"> 🚚 Хүргэлттэй</label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохирно</label>
@@ -1618,6 +1631,52 @@ function updateFilterProvinceFields() {
 function toggleFilter() {
   var panel = document.getElementById('filterPanel');
   panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  updateFilterCarBrandVisibility();
+}
+
+function updateFilterCarBrandVisibility() {
+  var brandWrap = document.getElementById('filterCarBrandWrap');
+  var modelWrap = document.getElementById('filterCarModelWrap');
+  var brandSelect = document.getElementById('filterCarBrand');
+  // Авто ангилал ба "Автомашин зарна" дэд ангилал-д л харагдана
+  if (CC === 'Авто') {
+    var brands = Object.keys(CAR_MODELS);
+    brandSelect.innerHTML = '<option value="">Бүгд</option>' + brands.map(function(b){ return '<option>'+b+'</option>'; }).join('');
+    brandWrap.style.display = 'block';
+  } else {
+    brandWrap.style.display = 'none';
+    modelWrap.style.display = 'none';
+  }
+}
+
+function updateFilterCarModel() {
+  var brand = document.getElementById('filterCarBrand').value;
+  var modelWrap = document.getElementById('filterCarModelWrap');
+  var modelSelect = document.getElementById('filterCarModel');
+  document.getElementById('filterCarModelSearch').value = '';
+  var models = brand ? CAR_MODELS[brand] : null;
+  if (!models || !models.length) {
+    modelWrap.style.display = 'none';
+    modelSelect.innerHTML = '<option value="">Бүгд</option>';
+    window._subCat2 = brand || '';
+    window._subCat3 = '';
+    doSearch();
+    return;
+  }
+  modelSelect.innerHTML = '<option value="">Бүгд</option>' + models.map(function(m){ return '<option>'+m+'</option>'; }).join('');
+  modelWrap.style.display = 'block';
+  window._subCat2 = brand;
+  window._subCat3 = '';
+  doSearch();
+}
+
+function filterCarModelOptions(query) {
+  var q = query.toLowerCase().trim();
+  var select = document.getElementById('filterCarModel');
+  Array.from(select.options).forEach(function(opt) {
+    if (!opt.value) return; // "Бүгд" сонголтыг үргэлж харуул
+    opt.style.display = !q || opt.text.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
 }
 
 function clearFilter() {
@@ -1631,6 +1690,9 @@ function clearFilter() {
   document.getElementById('filterDelivery').checked = false;
   document.getElementById('filterNegotiable').checked = false;
   if (document.getElementById('filterVerified')) document.getElementById('filterVerified').checked = false;
+  if (document.getElementById('filterCarBrand')) document.getElementById('filterCarBrand').value = '';
+  if (document.getElementById('filterCarModel')) document.getElementById('filterCarModel').innerHTML = '<option value="">Бүгд</option>';
+  if (document.getElementById('filterCarModelWrap')) document.getElementById('filterCarModelWrap').style.display = 'none';
   window._subCat = '';
   window._subCat2 = '';
   window._subCat3 = '';
