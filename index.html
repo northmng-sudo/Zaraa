@@ -1887,7 +1887,7 @@ async function showDetail(id) {
           '</div>';
       }).join('')+
       '</div>' : '')+
-    (l.video_url?'<div style="margin-bottom:16px"><video src="'+l.video_url+'" controls style="width:100%;border-radius:10px;max-height:220px;background:#333"></video></div>':'')+
+    (l.video_url?'<div style="margin-bottom:16px"><video src="'+l.video_url+'" controls style="width:100%;border-radius:10px;max-height:400px;background:#000;display:block;object-fit:contain" playsinline></video></div>':'')+
     '<div class="seller-card"><div class="seller-avatar">'+((l.users&&l.users.is_shop&&l.users.shop_name?l.users.shop_name:l.users&&l.users.name?l.users.name:'?')[0].toUpperCase())+'</div>'+
     '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.is_shop?'🏪 '+(l.users.shop_name||'Дэлгүүр'):(l.users&&l.users.name?l.users.name:'Хэрэглэгч'))+(l.users&&(l.users.is_verified||l.users.shop_is_verified)?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+'</div>'+
     '<div class="seller-rating">⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+' • Найдвартай</div></div></div>'+
