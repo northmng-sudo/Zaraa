@@ -2274,6 +2274,8 @@ function updateProvinceFields() {
   var province = document.getElementById('postProvince').value;
   var ubFields = document.getElementById('ubLocationFields');
   var aimagFields = document.getElementById('aimagLocationFields');
+  var yuanGroup = document.getElementById('postYuanGroup');
+  if (yuanGroup) yuanGroup.style.display = (province === 'БНХАУ - Эрээн') ? 'block' : 'none';
   if (province === 'Улаанбаатар') {
     ubFields.style.display = 'flex';
     aimagFields.style.display = 'none';
@@ -4583,10 +4585,6 @@ function openModal(id) {
   var m = document.getElementById(id);
   m.classList.add('open');
   m.style.display = 'flex';
-  if (id === 'postModal') {
-    var yuanGroup = document.getElementById('postYuanGroup');
-    if (yuanGroup) yuanGroup.style.display = (window._myProfile && window._myProfile.shop_is_ereen) ? 'block' : 'none';
-  }
 }
 function closeModal(id) {
   var m = document.getElementById(id);
