@@ -993,6 +993,16 @@ const SURL = 'https://xtxdktakcpscpdjdcalf.supabase.co';
 const SKEY = 'sb_publishable_LLuvIl44tpDQhPamDiV9Ww_i_ry2kiW';
 const sb = supabase.createClient(SURL, SKEY);
 
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 var CU = null;
 var AL = [];
 var CC = '';
@@ -1961,9 +1971,9 @@ function renderListings(arr) {
         '</div>'+
         '<div style="padding:10px">'+
         '<div style="color:#E62B05;font-size:18px;font-weight:800;margin-bottom:4px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price_yuan?' <span style="font-size:13px;color:var(--m);font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
-        '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;line-height:1.3">'+l.title+'</div>'+
-        (l.description?'<div style="font-size:11px;color:#888;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3">'+l.description+'</div>':'')+
-        (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-bottom:4px">🏪 '+(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
+        '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;line-height:1.3">'+escapeHtml(l.title)+'</div>'+
+        (l.description?'<div style="font-size:11px;color:#888;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3">'+escapeHtml(l.description)+'</div>':'')+
+        (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-bottom:4px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
         '<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:11px;color:#999">📍 '+(l.location||'УБ')+'</div><div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div></div>'+
         '</div></div></div>';
     });
@@ -2019,9 +2029,9 @@ function renderListings(arr) {
       '<div class="card-inner">'+imgHtml+
       '<div style="padding:6px 8px 8px;background:white">'+
       '<div style="color:#111;font-size:15px;font-weight:800">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price_yuan?' <span style="font-size:12px;color:#999;font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
-      '<div class="card-title" style="margin-top:4px">'+l.title+'</div>'+
-      (l.description?'<div style="font-size:11px;color:#888;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3">'+l.description+'</div>':'')+
-      (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🏪 '+(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
+      '<div class="card-title" style="margin-top:4px">'+escapeHtml(l.title)+'</div>'+
+      (l.description?'<div style="font-size:11px;color:#888;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3">'+escapeHtml(l.description)+'</div>':'')+
+      (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
       '<div style="display:flex;justify-content:space-between;margin-top:3px">'+
       '<div style="font-size:10px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
       '<div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div>'+
@@ -2075,10 +2085,10 @@ async function showDetail(id) {
     '</div>'+
     '<div class="detail-info-col">'+
     '<div class="detail-body">'+
-    '<div class="detail-title">'+l.title+'</div>'+
+    '<div class="detail-title">'+escapeHtml(l.title)+'</div>'+
     '<div class="detail-price">₮'+Number(l.price).toLocaleString()+(l.price_yuan?' <span style="font-size:15px;color:var(--m);font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+'</div>'+
     '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'<span style="font-size:11px;color:#999;margin-left:4px">🕐 '+timeAgo(l.created_at)+'</span></div>'+
-    '<div class="detail-desc">'+(l.description||'Тайлбар байхгүй')+'</div>'+
+    '<div class="detail-desc">'+escapeHtml(l.description||'Тайлбар байхгүй')+'</div>'+
     (l.extra_data && Object.keys(l.extra_data).length ?
       '<div style="background:var(--s2);border-radius:10px;padding:14px;margin-bottom:16px">'+
       '<div style="font-weight:700;font-size:13px;margin-bottom:10px">📋 Дэлгэрэнгүй мэдээлэл</div>'+
@@ -2099,7 +2109,7 @@ async function showDetail(id) {
       }).join('')+
       '</div>' : '')+
     '<div class="seller-card"><div class="seller-avatar">'+((l.users&&l.users.is_shop&&l.users.shop_name?l.users.shop_name:l.users&&l.users.name?l.users.name:'?')[0].toUpperCase())+'</div>'+
-    '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.is_shop?'🏪 '+(l.users.shop_name||'Дэлгүүр'):(l.users&&l.users.name?l.users.name:'Хэрэглэгч'))+(l.users&&(l.users.is_verified||l.users.shop_is_verified)?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+'</div>'+
+    '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.is_shop?'🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр'):escapeHtml(l.users&&l.users.name?l.users.name:'Хэрэглэгч'))+(l.users&&(l.users.is_verified||l.users.shop_is_verified)?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+'</div>'+
     '<div class="seller-rating">⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+' • Найдвартай</div></div></div>'+
     '<div class="action-btns">'+
     '<a href="tel:'+(l.users&&l.users.phone?l.users.phone:'')+'" style="text-decoration:none"><button class="btn btn-ghost btn-full" style="width:100%">📞 Холбоо барих</button></a>'+
@@ -2176,7 +2186,7 @@ async function loadRelatedListings(category, currentId) {
         (l.is_featured?'<div style="position:absolute;top:4px;left:4px;background:#FFD700;color:#333;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px">⭐ Онцлох</div>':'')+
         '</div>'+
         '<div style="padding:6px">'+
-        '<div style="font-size:11px;color:#333;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+l.title+'</div>'+
+        '<div style="font-size:11px;color:#333;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+escapeHtml(l.title)+'</div>'+
         '</div></div>';
     }).join('')+
     '</div>';
@@ -2713,7 +2723,7 @@ async function loadChat(listingId, sellerId) {
     } else if (m.message_type === 'audio' && m.audio_url) {
       bubbleContent = '<audio src="'+m.audio_url+'" controls onclick="event.stopPropagation()" style="width:200px;height:36px"></audio>';
     } else {
-      bubbleContent = '<div>'+(m.content||'')+'</div>';
+      bubbleContent = '<div>'+escapeHtml(m.content||'')+'</div>';
     }
     var longPressAttrs = isMine ? ' oncontextmenu="event.preventDefault();confirmDeleteMessage(\''+m.id+'\')" ontouchstart="chatLongPressStart(\''+m.id+'\')" ontouchend="chatLongPressEnd()" ontouchmove="chatLongPressEnd()"' : '';
     return '<div style="display:flex;justify-content:'+(isMine?'flex-end':'flex-start')+'">'+
@@ -2878,15 +2888,18 @@ async function notifyChatPartner(text) {
 }
 
 async function sendMessage() {
+  if (window._sendingMessage) return;
   var input = document.getElementById('chatInput');
   var content = input.value.trim();
   if (!content) return;
+  window._sendingMessage = true;
   var r = await sb.from('messages').insert({
     listing_id: window._chatListingId,
     sender_id: CU.id,
     receiver_id: window._chatSellerId,
     content: content
   });
+  window._sendingMessage = false;
   if (!r.error) {
     input.value = '';
     loadChat(window._chatListingId, window._chatSellerId);
@@ -2931,8 +2944,8 @@ async function loadAdmin() {
     pendingBox.innerHTML = pd.length ? pd.map(function(l) {
       return '<div style="background:var(--s);border:2px solid #FFD700;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">'+
         '<div style="flex:1">'+
-        '<div style="font-weight:600;font-size:13px">'+l.title+'</div>'+
-        '<div style="font-size:11px;color:var(--m)">'+(l.users&&l.users.name||'?')+' • '+l.category+' • ₮'+Number(l.price).toLocaleString()+'</div>'+
+        '<div style="font-weight:600;font-size:13px">'+escapeHtml(l.title)+'</div>'+
+        '<div style="font-size:11px;color:var(--m)">'+escapeHtml(l.users&&l.users.name||'?')+' • '+escapeHtml(l.category)+' • ₮'+Number(l.price).toLocaleString()+'</div>'+
         '</div>'+
         '<button onclick="approveListing(\''+l.id+'\')" style="background:#00C96B;color:white;border:none;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">✓ Зөвшөөрөх</button>'+
         '<button onclick="adminDeleteListing(\''+l.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
@@ -2962,8 +2975,8 @@ async function loadAdmin() {
   document.getElementById('adminListings').innerHTML = (ls.data||[]).map(function(l) {
     return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">'+
       '<div style="flex:1">'+
-      '<div style="font-weight:600;font-size:13px">'+l.title+'</div>'+
-      '<div style="font-size:11px;color:var(--m)">'+(l.users&&l.users.name||'?')+' • '+l.category+' • ₮'+Number(l.price).toLocaleString()+'</div>'+
+      '<div style="font-weight:600;font-size:13px">'+escapeHtml(l.title)+'</div>'+
+      '<div style="font-size:11px;color:var(--m)">'+escapeHtml(l.users&&l.users.name||'?')+' • '+escapeHtml(l.category)+' • ₮'+Number(l.price).toLocaleString()+'</div>'+
       '</div>'+
       '<div style="display:flex;gap:6px">'+
       '<button onclick="toggleFeatured(\''+l.id+'\','+l.is_featured+')" style="background:'+(l.is_featured?'#FFD700':'var(--s2)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer" title="Онцлох">'+
@@ -2978,11 +2991,11 @@ async function loadAdmin() {
     return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px">'+
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
       '<div style="flex:1">'+
-      '<div style="font-weight:600;font-size:13px">'+u.name+
+      '<div style="font-weight:600;font-size:13px">'+escapeHtml(u.name)+
       (u.is_courier?' <span style="background:#FF5C00;color:white;border-radius:4px;padding:1px 6px;font-size:10px">🚚 Хүргэгч</span>':' <span style="background:#5C8BFF;color:white;border-radius:4px;padding:1px 6px;font-size:10px">🛍️ Хэрэглэгч</span>')+
       (u.is_admin?' <span style="background:#333;color:white;border-radius:4px;padding:1px 6px;font-size:10px">🛡️ Admin</span>':'')+
       '</div>'+
-      '<div style="font-size:11px;color:var(--m)">'+u.email+(u.phone?' • '+u.phone:'')+'</div>'+
+      '<div style="font-size:11px;color:var(--m)">'+escapeHtml(u.email)+(u.phone?' • '+escapeHtml(u.phone):'')+'</div>'+
       // Регистрийн дугаар
       '<div style="font-size:12px;margin-top:4px;display:flex;align-items:center;gap:6px">'+
       '<span style="color:var(--m)">🪪 Регистр:</span> '+
@@ -3684,6 +3697,17 @@ function syncYuanToTugrik() {
 }
 
 async function postListing() {
+  if (!CU) { openAuth('login'); showToast('Эхлээд нэвтэрнэ үү', true); return; }
+  if (window._postingListing) return;
+  window._postingListing = true;
+  try {
+    await postListingInner();
+  } finally {
+    window._postingListing = false;
+  }
+}
+
+async function postListingInner() {
   var title = document.getElementById('postTitle').value;
   var desc = document.getElementById('postDesc').value;
   var price = document.getElementById('postPrice').value;
@@ -3826,7 +3850,7 @@ async function loadProfile() {
   if (ls.data&&ls.data.length) {
     document.getElementById('myListings').innerHTML = '<div class="grid">'+ls.data.map(function(l){
       return '<div class="card" onclick="showDetail(\''+l.id+'\')"><div class="card-img">'+(EMOJIS[l.category]||'📦')+(l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+'</div>'+
-        '<div class="card-body"><div class="card-title">'+l.title+'</div><div class="card-price">₮'+Number(l.price).toLocaleString()+'</div></div></div>';
+        '<div class="card-body"><div class="card-title">'+escapeHtml(l.title)+'</div><div class="card-price">₮'+Number(l.price).toLocaleString()+'</div></div></div>';
     }).join('')+'</div>';
   }
   if (ds.data&&ds.data.length) {
@@ -4130,7 +4154,7 @@ async function loadMyChats() {
       '<div style="font-weight:700;font-size:14px;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">'+(m.listings&&m.listings.title||'Зар')+'</div>'+
       '<div style="font-size:11px;color:#999;flex-shrink:0">'+time+'</div>'+
       '</div>'+
-      '<div style="font-size:13px;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(isMe?'Та: ':'')+m.content+'</div>'+
+      '<div style="font-size:13px;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(isMe?'Та: ':'')+escapeHtml(m.content)+'</div>'+
       '</div>'+
       '<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">'+
       '<button onclick="hideChat(\''+m.listing_id+'\')" style="background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:2px;line-height:1" title="Нуух">×</button>'+
@@ -4336,7 +4360,7 @@ async function showShopDetail(shopId) {
     (listings.length?'<div class="grid" style="padding:0">'+listings.map(function(l) {
       return '<div class="card" onclick="showDetail(\''+l.id+'\')"><div class="card-img">'+(l.images&&l.images[0]?'<img src="'+l.images[0]+'">':(EMOJIS[l.category]||'📦'))+'</div>'+
         '<div style="padding:6px 8px"><div style="font-size:13px;font-weight:700">₮'+Number(l.price||0).toLocaleString()+'</div>'+
-        '<div class="card-title">'+l.title+'</div></div></div>';
+        '<div class="card-title">'+escapeHtml(l.title)+'</div></div></div>';
     }).join('')+'</div>':'<div class="empty"><p>Одоогоор бараа байхгүй</p></div>')+
     '</div>';
 }
@@ -4385,7 +4409,7 @@ async function loadShopManage() {
         '<div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+
         (l.images&&l.images[0]?'<img src="'+l.images[0]+'" style="width:100%;height:100%;object-fit:cover">':'📦')+'</div>'+
         '<div style="flex:1;min-width:0" onclick="showDetail(\''+l.id+'\')">'+
-        '<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+l.title+'</div>'+
+        '<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtml(l.title)+'</div>'+
         '<div style="font-size:12px;color:#999">₮'+Number(l.price||0).toLocaleString()+' • '+statusLabel+'</div>'+
         '</div>'+
         '<button onclick="editListing(\''+l.id+'\')" style="background:none;border:none;font-size:16px;cursor:pointer;padding:6px">✏️</button>'+
