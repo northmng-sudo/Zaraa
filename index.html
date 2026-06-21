@@ -2245,19 +2245,28 @@ async function showDetail(id) {
     (l.extra_data && Object.keys(l.extra_data).length ?
       '<div style="background:var(--s2);border-radius:10px;padding:14px;margin-bottom:16px">'+
       '<div style="font-weight:700;font-size:13px;margin-bottom:10px">📋 Дэлгэрэнгүй мэдээлэл</div>'+
-      Object.entries(l.extra_data).map(function(e) {
-        if (!e[1]) return '';
+      Object.entries(l.extra_data).filter(function(e) {
+        // Дотоод системийн талбарууд (_subcat, _subcat2, _subcat3) хэрэглэгчид харагдахгүй
+        return e[0].indexOf('_') !== 0 && e[1];
+      }).map(function(e) {
         var labels = {
-          brand:'Марк', year_min:'Он', year_max:'Он дээд', mileage:'Гүйлт',
+          brand:'Марк', model:'Модель', year:'Он', year_min:'Он', year_max:'Он дээд', mileage:'Гүйлт',
           color:'Өнгө', rooms:'Өрөө', floor_min:'Давхар', floor_max:'Давхар дээд',
           area_min:'Талбай', area_max:'Талбай дээд', condition:'Нөхцөл',
           size:'Хэмжээ', gender:'Хэн', material:'Материал', type:'Төрөл',
-          schedule:'Цагийн хуваарь', salary_min:'Цалин', salary_max:'Цалин дээд',
-          age:'Нас', floor:'Давхар', area:'Талбай', rooms_count:'Өрөө'
+          schedule:'Цагийн хуваарь', salary:'Цалин', salary_min:'Цалин', salary_max:'Цалин дээд',
+          age:'Нас', floor:'Давхар', area:'Талбай', rooms_count:'Өрөө',
+          engine:'Хөдөлгүүр', transmission:'Хурдны хайрцаг', drive:'Хөтлөгч',
+          fuel:'Шатахуун төрөл', body_type:'Биеийн төрөл', wheel:'Хүрд байрлал',
+          warranty:'Баталгаа', breed:'Үүлдэр', weight:'Жин', height:'Өндөр',
+          os:'Үйлдлийн систем', ram:'RAM', storage:'Санах ой', screen:'Дэлгэц',
+          experience:'Туршлага', education:'Боловсрол'
         };
+        var key = e[0];
+        var label = labels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
         return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--b);font-size:13px">'+
-          '<span style="color:var(--m)">'+(labels[e[0]]||e[0])+'</span>'+
-          '<span style="font-weight:600">'+e[1]+'</span>'+
+          '<span style="color:var(--m)">'+escapeHtml(label)+'</span>'+
+          '<span style="font-weight:600">'+escapeHtml(e[1])+'</span>'+
           '</div>';
       }).join('')+
       '</div>' : '')+
@@ -3197,6 +3206,14 @@ async function toggleFeatured(id, current) {
   until.setDate(until.getDate() + days);
   await sb.from('listings').update({is_featured:true, featured_until:until.toISOString()}).eq('id',id);
   showToast('Онцлох болгогдлоо! '+days+' хоног');
+  var listing = await sb.from('listings').select('user_id').eq('id', id).single();
+  if (listing.data) {
+    await sb.from('notifications').insert({
+      user_id: listing.data.user_id,
+      title: '🌟 Таны зар Онцлох болгогдлоо!',
+      body: days+' хоногийн турш онцлогдоно'
+    });
+  }
   loadAdmin(); loadListings();
 }
 
@@ -4343,6 +4360,10 @@ async function sendNotifToUser(userId, title, body) {
 
 function startBuyerTracking() {
   if (!CU) return;
+  if (window._buyerChannel) {
+    sb.removeChannel(window._buyerChannel);
+    window._buyerChannel = null;
+  }
   window._buyerChannel = sb.channel('buyer_'+CU.id)
     .on('postgres_changes', {
       event: 'UPDATE',
