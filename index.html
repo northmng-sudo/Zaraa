@@ -3194,7 +3194,7 @@ async function loadAdmin() {
 
 async function toggleFeatured(id, current) {
   if (current) {
-    await sb.from('listings').update({is_featured:false, featured_until:null}).eq('id',id);
+    await sb.from('listings').update({is_featured:false, featured_until:null, featured_status:'none'}).eq('id',id);
     showToast('Онцлох болиулагдлаа');
     loadAdmin(); loadListings();
     return;
@@ -3204,7 +3204,7 @@ async function toggleFeatured(id, current) {
   days = parseInt(days) || 7;
   var until = new Date();
   until.setDate(until.getDate() + days);
-  await sb.from('listings').update({is_featured:true, featured_until:until.toISOString()}).eq('id',id);
+  await sb.from('listings').update({is_featured:true, featured_until:until.toISOString(), featured_status:'active'}).eq('id',id);
   showToast('Онцлох болгогдлоо! '+days+' хоног');
   var listing = await sb.from('listings').select('user_id').eq('id', id).single();
   if (listing.data) {
