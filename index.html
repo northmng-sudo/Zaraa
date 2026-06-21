@@ -205,6 +205,11 @@ select.form-input{cursor:pointer}
 </head>
 <body>
 <div class="toast" id="toast"></div>
+<div id="postLoadingOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;flex-direction:column;color:white">
+  <div class="spinner" style="width:48px;height:48px;border-width:4px;margin-bottom:16px"></div>
+  <div id="postLoadingText" style="font-size:16px;font-weight:700">Зар байршуулж байна...</div>
+  <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:6px">Энэ цонхыг хаахгүй байхыг хүсье</div>
+</div>
 <nav>
   <div onclick="showPage('home')" style="cursor:pointer">
     <svg width="160" height="40" viewBox="0 0 360 68" role="img">
@@ -4080,11 +4085,14 @@ async function postListingInner() {
   if (window._catSub) extra._subcat = window._catSub;
   if (window._catSub2) extra._subcat2 = window._catSub2;
   if (window._catSub3) extra._subcat3 = window._catSub3;
-  showToast('🖼️ Зураг байршуулж байна...', false, 60000);
+  var overlay = document.getElementById('postLoadingOverlay');
+  var overlayText = document.getElementById('postLoadingText');
+  overlay.style.display = 'flex';
+  overlayText.textContent = '🖼️ Зураг байршуулж байна...';
   var imgUrls = imgFiles.length ? await uploadImages(imgFiles) : [];
-  if (vidFile) showToast('🎥 Бичлэг байршуулж байна...', false, 60000);
+  if (vidFile) overlayText.textContent = '🎥 Бичлэг байршуулж байна...';
   var vidUrl = vidFile ? await uploadVideo(vidFile) : null;
-  showToast('📋 Зар илгээж байна...', false, 60000);
+  overlayText.textContent = '📋 Зар илгээж байна...';
   var data = {
     title: title, description: desc,
     price: price ? Number(price) : null,
@@ -4108,7 +4116,8 @@ async function postListingInner() {
     data.user_id = CU.id; data.is_active = true; data.status = 'pending';
     r = await sb.from('listings').insert(data);
   }
-  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  if (r.error) { overlay.style.display = 'none'; showToast('Алдаа: '+r.error.message, true); return; }
+  overlay.style.display = 'none';
   closeModal('postModal');
   document.getElementById('postModal').removeAttribute('data-edit-id');
   document.getElementById('postTitle').value='';
@@ -4391,6 +4400,11 @@ async function loadNotifications() {
 
 async function markRead(id) {
   await sb.from('notifications').update({is_read:true}).eq('id', id);
+  loadNotifications();
+}
+
+async function deleteNotif(id) {
+  await sb.from('notifications').delete().eq('id', id);
   loadNotifications();
 }
 
