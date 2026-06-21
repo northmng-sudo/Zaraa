@@ -2089,9 +2089,40 @@ function renderListings(arr) {
     grid.innerHTML = '<div class="empty" style="grid-column:span 2"><div class="empty-icon">📭</div><p>Зар олдсонгүй</p></div>';
     return;
   }
-  var featured = arr.filter(function(l){ return l.is_featured; });
-  var normal = arr.filter(function(l){ return !l.is_featured; });
+  var vip = arr.filter(function(l){ return l.vip_status === 'active'; });
+  var featured = arr.filter(function(l){ return l.is_featured && l.vip_status !== 'active'; });
+  var normal = arr.filter(function(l){ return !l.is_featured && l.vip_status !== 'active'; });
   var html = '';
+
+  if (vip.length) {
+    html += '<div style="grid-column:1/-1;background:linear-gradient(135deg,#1a1a2e,#2d2d44);margin:-14px -14px 8px;padding:10px 14px 14px">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<span style="font-size:15px;font-weight:900;background:linear-gradient(90deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent">👑 ВИП ЗАРУУД</span>'+
+      '<span style="font-size:11px;color:#333;background:#FFD700;border-radius:10px;padding:2px 8px;font-weight:700">'+vip.length+' зар</span>'+
+      '<div style="flex:1;height:2px;background:linear-gradient(90deg,#FFD700,transparent);border-radius:2px"></div>'+
+      '</div>';
+    html += '<div style="position:relative">'+
+      '<div id="vipSlider" style="display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px">';
+    vip.forEach(function(l) {
+      html += '<div class="card card-featured" onclick="showDetail(\''+l.id+'\')" style="position:relative;min-width:320px;max-width:320px;scroll-snap-align:start;flex-shrink:0;border:3px solid #FFD700!important">'+
+        '<div class="featured-shimmer"></div>'+
+        '<div class="card-inner" style="border-color:#FFD700">'+
+        '<div class="card-img" style="aspect-ratio:4/3" '+(l.video_url?'onmouseenter="cardVideoPlay(this,\''+l.video_url+'\')" onmouseleave="cardVideoStop(this)" ':'')+'>'+
+        (l.images&&l.images[0]?'<img src="'+l.images[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+        (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
+        (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
+        '<div style="position:absolute;top:0;left:0;right:0;background:linear-gradient(90deg,#FFD700,#FFA500);color:#1a1a2e;font-size:12px;font-weight:900;padding:6px 10px;text-align:center;letter-spacing:1px">👑 ВИП ЗАР 👑</div>'+
+        '</div>'+
+        '<div style="padding:10px">'+
+        '<div style="color:#E62B05;font-size:18px;font-weight:800;margin-bottom:4px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price_yuan?' <span style="font-size:13px;color:var(--m);font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
+        '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;line-height:1.3">'+escapeHtml(l.title)+'</div>'+
+        (l.description?'<div style="font-size:11px;color:#888;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3">'+escapeHtml(l.description)+'</div>':'')+
+        (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-bottom:4px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
+        '<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:11px;color:#999">📍 '+(l.location||'УБ')+'</div><div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div></div>'+
+        '</div></div></div>';
+    });
+    html += '</div></div></div>';
+  }
 
   if (featured.length) {
     html += '<div style="grid-column:1/-1;background:white;margin:-14px -14px 8px;padding:10px 14px 14px">';
@@ -2129,6 +2160,8 @@ function renderListings(arr) {
       html += '</div>';
     }
     html += '</div></div>';
+  }
+  if (vip.length || featured.length) {
     html += '<div style="grid-column:1/-1;font-size:13px;font-weight:600;padding:4px 0 8px;color:#666">Шинэ зарууд</div>';
   }
 
