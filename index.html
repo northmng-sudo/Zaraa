@@ -562,6 +562,11 @@ select.form-input{cursor:pointer}
   <div class="section"><div id="myListings"><div class="empty"><div class="empty-icon">📋</div><p>Зар байхгүй<br><br><button class="btn btn-primary" onclick="showPostModal()">+ Зар байршуулах</button></p></div></div></div>
 </div>
 
+<div class="page" id="page-favorites">
+  <div style="padding:20px 16px 10px"><div class="section-title">❤️ Хадгалсан зарууд</div></div>
+  <div class="grid" id="favoritesGrid"><div class="loading"><div class="spinner"></div></div></div>
+</div>
+
 <!-- ADMIN PAGE -->
 <div class="page" id="page-notifications">
   <div style="padding:20px 16px 10px;display:flex;align-items:center;justify-content:space-between">
@@ -1005,6 +1010,7 @@ function escapeHtml(str) {
 
 var CU = null;
 var AL = [];
+var FAVORITES = new Set();
 var CC = '';
 var EMOJIS = {'Авто':'🚗','Үл хөдлөх':'🏠','Ажлын байр':'💼','Гар утас':'📱','Компьютер':'💻','Цахилгаан бараа':'🔌','Хувцас':'👗','Гутал':'👟','Эрүүл мэнд, гоо сайхан, хүнс':'💄','Гэр ахуйн бараа':'🪑','Барилгын төхөөрөмж, материал, түлш':'🏗️','Амралт, спорт, хобби':'⚽','Хүүхдийн бараа':'🧸','Эрүүл мэнд':'💊','Хоол хүнс':'🍎','Мал амьтан, ургамал':'🐾','Ном':'📚','Үйлчилгээ':'🔧','Техник':'📱','Бусад':'📦'};
 
@@ -1828,6 +1834,7 @@ async function init() {
     startGlobalNotifications();
     loadNotifications(); 
     loadUnreadChatBadge();
+    await loadFavorites();
   }
   loadListings();
   loadStats();
@@ -1933,6 +1940,34 @@ var LISTINGS_PAGE_SIZE = 60;
 var listingsOffset = 0;
 var listingsHasMore = true;
 
+async function loadFavorites() {
+  if (!CU) { FAVORITES = new Set(); return; }
+  var r = await sb.from('favorites').select('listing_id').eq('user_id', CU.id);
+  FAVORITES = new Set((r.data || []).map(function(f){ return f.listing_id; }));
+}
+
+async function toggleFavorite(listingId, btn) {
+  if (!CU) { openAuth('login'); showToast('Эхлээд нэвтэрнэ үү', true); return; }
+  var isFav = FAVORITES.has(listingId);
+  if (isFav) {
+    var r = await sb.from('favorites').delete().eq('user_id', CU.id).eq('listing_id', listingId);
+    if (!r.error) {
+      FAVORITES.delete(listingId);
+      showToast('Хадгалснаас хасагдлаа');
+    }
+  } else {
+    var r = await sb.from('favorites').insert({user_id: CU.id, listing_id: listingId});
+    if (!r.error) {
+      FAVORITES.add(listingId);
+      showToast('❤️ Хадгалагдлаа');
+    }
+  }
+  // Бүх ижил listing-н heart товчнуудыг шинэчилнэ (нэг зар нэг хуудсанд хэд хэдэн удаа харагдаж болзошгүй)
+  document.querySelectorAll('.fav-btn[data-listing-id="'+listingId+'"]').forEach(function(b) {
+    b.textContent = FAVORITES.has(listingId) ? '❤️' : '🤍';
+  });
+}
+
 async function loadListings() {
   var grid = document.getElementById('listingsGrid');
   grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
@@ -2030,6 +2065,7 @@ function renderListings(arr) {
         return '<img src="'+url+'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.2s;opacity:'+(i===0?'1':'0')+';pointer-events:none">';
       }).join('')+
       (l.has_delivery?'<div class="delivery-badge" style="pointer-events:none;z-index:3">Хүргэнэ</div>':'')+
+      '<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this)" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button>'+
       '</div>'+
       '<div class="card-arrows" style="opacity:0;transition:opacity 0.2s;position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:0 4px;z-index:5">'+
       '<button onclick="cardPrev(event,this.closest(\'[data-imgs]\'))" style="background:rgba(0,0,0,0.5);color:white;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">‹</button>'+
@@ -2042,6 +2078,7 @@ function renderListings(arr) {
       (imgs?'<img src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
+      '<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this)" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button>'+
       '</div>';
     html += '<div class="card" style="position:relative" '+
       'onmouseenter="showCardPopup(event,this,\''+l.id+'\')" '+
@@ -2114,7 +2151,7 @@ async function showDetail(id) {
     '</div>'+
     '<div class="detail-info-col">'+
     '<div class="detail-body">'+
-    '<div class="detail-title">'+escapeHtml(l.title)+'</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div class="detail-title">'+escapeHtml(l.title)+'</div><button class="fav-btn" data-listing-id="'+l.id+'" onclick="toggleFavorite(\''+l.id+'\',this)" style="background:var(--s2);border:1px solid var(--b);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button></div>'+
     '<div class="detail-price">₮'+Number(l.price).toLocaleString()+(l.price_yuan?' <span style="font-size:15px;color:var(--m);font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+'</div>'+
     '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'<span style="font-size:11px;color:#999;margin-left:4px">🕐 '+timeAgo(l.created_at)+'</span></div>'+
     '<div class="detail-desc">'+escapeHtml(l.description||'Тайлбар байхгүй')+'</div>'+
@@ -3869,6 +3906,7 @@ async function loadProfile() {
     '<div class="stat"><div class="stat-num">'+(ds.data?ds.data.length:0)+'</div><div class="stat-label">Захиалга</div></div>'+
     '<div class="stat"><div class="stat-num">⭐ '+(user.rating||5.0)+'</div><div class="stat-label">Үнэлгээ</div></div></div>'+
     '<div class="menu-item" onclick="showPage(\'listings\')"><div class="menu-left"><div class="menu-icon">📋</div>Миний зарууд</div></div>'+
+    '<div class="menu-item" onclick="showPage(\'favorites\')"><div class="menu-left"><div class="menu-icon">❤️</div>Хадгалсан зарууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'chats\')"><div class="menu-left"><div class="menu-icon">💬</div>Миний чатууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'deliveries\')"><div class="menu-left"><div class="menu-icon">📦</div>Миний захиалгууд</div></div>'+
     '<div class="menu-item" onclick="editProfile()"><div class="menu-left"><div class="menu-icon">✏️</div>Профайл засах</div></div>'+
@@ -4228,6 +4266,41 @@ function openChatFromList(listingId, otherId) {
 }
 
 
+async function loadFavoritesPage() {
+  var grid = document.getElementById('favoritesGrid');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  if (!CU) { grid.innerHTML = '<div class="empty" style="grid-column:span 2"><div class="empty-icon">❤️</div><p>Эхлээд нэвтэрнэ үү</p></div>'; return; }
+  var favIds = Array.from(FAVORITES);
+  if (!favIds.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:span 2"><div class="empty-icon">💔</div><p>Хадгалсан зар байхгүй<br><br>Зар дээрх 🤍 товчийг дарж хадгалаарай</p></div>';
+    return;
+  }
+  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified)').in('id', favIds);
+  if (r.error || !r.data || !r.data.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:span 2"><div class="empty-icon">💔</div><p>Хадгалсан зар олдсонгүй</p></div>';
+    return;
+  }
+  renderFavoritesGrid(r.data);
+}
+
+function renderFavoritesGrid(arr) {
+  var grid = document.getElementById('favoritesGrid');
+  grid.innerHTML = arr.map(function(l) {
+    var imgs = l.images && l.images.length ? l.images : null;
+    return '<div class="card" style="position:relative" onclick="showDetail(\''+l.id+'\')">'+
+      '<div class="card-inner">'+
+      '<div class="card-img">'+
+      (imgs?'<img src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+      '<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this);loadFavoritesPage()" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">❤️</button>'+
+      '</div>'+
+      '<div style="padding:6px 8px 8px;background:white">'+
+      '<div style="color:#111;font-size:15px;font-weight:800">₮'+Number(l.price||0).toLocaleString()+'</div>'+
+      '<div class="card-title" style="margin-top:4px">'+escapeHtml(l.title)+'</div>'+
+      '<div style="font-size:10px;color:#999;margin-top:3px">📍 '+(l.location||'УБ')+'</div>'+
+      '</div></div></div>';
+  }).join('');
+}
+
 function showPage(name) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('page-'+name).classList.add('active');
@@ -4242,6 +4315,7 @@ function showPage(name) {
   if (name === 'notifications') loadNotifications();
   if (name === 'shops') loadShops();
   if (name === 'shopManage') loadShopManage();
+  if (name === 'favorites') loadFavoritesPage();
 }
 
 var SHOPS_CACHE = [];
