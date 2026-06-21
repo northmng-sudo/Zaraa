@@ -1929,15 +1929,36 @@ async function loadStats() {
   if (el2) el2.textContent = r2.count||0;
 }
 
+var LISTINGS_PAGE_SIZE = 60;
+var listingsOffset = 0;
+var listingsHasMore = true;
+
 async function loadListings() {
   var grid = document.getElementById('listingsGrid');
   grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
   await sb.rpc('check_featured_expiry');
-  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false});
+  listingsOffset = 0;
+  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false}).range(0, LISTINGS_PAGE_SIZE-1);
   if (r.error) { grid.innerHTML = '<div class="empty"><div class="empty-icon">😕</div><p>Алдаа гарлаа</p></div>'; return; }
   AL = r.data || [];
   AL.sort(function(a, b) { return (b.is_featured?1:0) - (a.is_featured?1:0); });
+  listingsHasMore = (r.data || []).length === LISTINGS_PAGE_SIZE;
+  listingsOffset = LISTINGS_PAGE_SIZE;
   applyFilter();
+}
+
+async function loadMoreListings() {
+  if (!listingsHasMore) return;
+  var btn = document.getElementById('loadMoreBtn');
+  if (btn) btn.textContent = 'Ачааллаж байна...';
+  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false}).range(listingsOffset, listingsOffset+LISTINGS_PAGE_SIZE-1);
+  if (!r.error && r.data) {
+    AL = AL.concat(r.data);
+    listingsHasMore = r.data.length === LISTINGS_PAGE_SIZE;
+    listingsOffset += LISTINGS_PAGE_SIZE;
+    applyFilter();
+  }
+  if (btn) btn.textContent = 'Илүү ачаалах';
 }
 
 function renderListings(arr) {
@@ -2040,6 +2061,14 @@ function renderListings(arr) {
   });
 
   grid.innerHTML = html;
+
+  // "Илүү ачаалах" товч — зөвхөн шүүлтүүргүй vед, ачаалах боломжтой бол
+  var noFilterActive = !CC && !window._subCat && !window._subCat2 && !window._subCat3 &&
+    !document.getElementById('searchInput').value &&
+    !document.getElementById('filterMinPrice').value && !document.getElementById('filterMaxPrice').value;
+  if (noFilterActive && listingsHasMore) {
+    grid.insertAdjacentHTML('beforeend', '<div style="grid-column:1/-1;text-align:center;padding:16px"><button id="loadMoreBtn" class="btn btn-ghost" onclick="loadMoreListings()">Илүү ачаалах</button></div>');
+  }
 }
 
 async function showDetail(id) {
