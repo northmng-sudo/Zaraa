@@ -3151,8 +3151,10 @@ async function loadAdmin() {
       '<div style="font-size:11px;color:var(--m)">'+escapeHtml(l.users&&l.users.name||'?')+' • '+escapeHtml(l.category)+' • ₮'+Number(l.price).toLocaleString()+'</div>'+
       '</div>'+
       '<div style="display:flex;gap:6px">'+
+      '<button onclick="toggleVip(\''+l.id+'\','+(l.vip_status==='active')+')" style="background:'+(l.vip_status==='active'?'linear-gradient(135deg,#FFD700,#FFA500)':'var(--s2)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer" title="ВИП">'+
+      (l.vip_status==='active'?('⭐ ВИП '+(l.vip_expires_at?new Date(l.vip_expires_at).toLocaleDateString('mn-MN',{month:'2-digit',day:'2-digit'})+'хүртэл':'')):'☆ ВИП')+'</button>'+
       '<button onclick="toggleFeatured(\''+l.id+'\','+l.is_featured+')" style="background:'+(l.is_featured?'#FFD700':'var(--s2)')+';border:1px solid var(--b);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer" title="Онцлох">'+
-      (l.is_featured?('⭐ '+(l.featured_until?new Date(l.featured_until).toLocaleDateString('mn-MN',{month:'2-digit',day:'2-digit'})+'хүртэл':'Онцлох')):'☆ Онцлох')+'</button>'+
+      (l.is_featured?('🌟 '+(l.featured_until?new Date(l.featured_until).toLocaleDateString('mn-MN',{month:'2-digit',day:'2-digit'})+'хүртэл':'Онцлох')):'☆ Онцлох')+'</button>'+
       '<button onclick="adminDeleteListing(\''+l.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
       '</div></div>';
   }).join('');
@@ -3190,6 +3192,31 @@ async function loadAdmin() {
       '<button onclick="adminDeleteUser(\''+u.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
       '</div></div>';
   }).join('');
+}
+
+async function toggleVip(id, current) {
+  if (current) {
+    await sb.from('listings').update({vip_status:'none', vip_expires_at:null, is_featured:false}).eq('id',id);
+    showToast('ВИП цуцлагдлаа');
+    loadAdmin(); loadListings();
+    return;
+  }
+  var days = prompt('Хэдэн хоног ВИП болгох вэ? (7, 30, 90)', '7');
+  if (!days) return;
+  days = parseInt(days) || 7;
+  var until = new Date();
+  until.setDate(until.getDate() + days);
+  await sb.from('listings').update({vip_status:'active', vip_expires_at:until.toISOString(), vip_duration_days:days, is_featured:true}).eq('id',id);
+  showToast('ВИП болгогдлоо! '+days+' хоног');
+  var listing = await sb.from('listings').select('user_id').eq('id', id).single();
+  if (listing.data) {
+    await sb.from('notifications').insert({
+      user_id: listing.data.user_id,
+      title: '⭐ Таны зар ВИП болгогдлоо!',
+      body: days+' хоногийн турш ВИП статустай байна'
+    });
+  }
+  loadAdmin(); loadListings();
 }
 
 async function toggleFeatured(id, current) {
