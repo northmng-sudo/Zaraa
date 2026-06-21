@@ -2271,7 +2271,7 @@ async function showDetail(id) {
   var r = await sb.from('listings').select('*, users(name,rating,phone,is_verified,is_shop,shop_name,shop_is_verified)').eq('id',id).single();
   var l = r.data;
   if (!l) return;
-  sb.rpc('increment_view_count', {listing_id: id}); // Үзсэн тоо нэмэгдүүлэх (async, хариу хүлээхгүй)
+  sb.rpc('increment_view_count', {p_listing_id: id}); // Үзсэн тоо нэмэгдүүлэх (async, хариу хүлээхгүй)
   var imgs = l.images&&l.images.length ? l.images : [];
   var mediaItems = imgs.map(function(u){ return {type:'image', url:u}; });
   if (l.video_url) mediaItems.push({type:'video', url:l.video_url});
