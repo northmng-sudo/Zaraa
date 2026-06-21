@@ -97,7 +97,12 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
   #searchWrap{padding:12px 16px!important}
   #searchWrap > div{min-height:auto!important;position:static!important}
   #searchInner{width:100%!important;height:auto!important;padding:10px 8px 10px 14px!important}
-  #catTier1{grid-template-columns:repeat(4,1fr)!important}
+  #catTier1{grid-template-columns:repeat(3,1fr)!important}
+  #catTier1 .flow-h .fh-text{white-space:normal!important;font-size:10px!important;line-height:1.2!important;text-align:center}
+  #catTier1 .flow-h{padding:6px 4px!important}
+  #catTier1 .flow-h .fh-icon{font-size:18px!important}
+  /* iOS Safari автомат zoom-ийн эсрэг — бvх текст input 16px-ээс багагvй байх ёстой */
+  input[type="text"],input[type="number"],input[type="email"],input[type="password"],input[type="search"],input[type="tel"],textarea,select{font-size:16px!important}
 }
 @media(min-width:768px){
   #adSideWrap{display:flex!important}
@@ -134,7 +139,7 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .modal-title{font-size:18px;font-weight:800;margin-bottom:20px;letter-spacing:-0.3px}
 .form-group{margin-bottom:16px}
 .form-label{font-size:12px;font-weight:600;color:var(--m);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.5px}
-.form-input{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px 14px;color:var(--t);font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color 0.2s}
+.form-input{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px 14px;color:var(--t);font-size:16px;outline:none;font-family:'Inter',sans-serif;transition:border-color 0.2s}
 .form-input:focus{border-color:var(--a)}
 .form-input::placeholder{color:var(--m)}
 textarea.form-input{resize:vertical;min-height:80px}
@@ -313,7 +318,7 @@ select.form-input{cursor:pointer}
       <button onclick="scrollPillRow('modelCatRow',200)" style="position:absolute;right:0;top:0;bottom:0;width:28px;background:linear-gradient(270deg,#f0f0f0,rgba(240,240,240,0.7));border:none;cursor:pointer;z-index:2;font-size:14px;color:#666">▶</button>
     </div>
     <div id="modelSearchWrap" style="display:none;background:#f0f0f0;padding:8px 12px;border-bottom:1px solid #e5e5e5">
-      <input id="modelSearchInput" placeholder="Модель хайх... (жишээ: Prius, Land Cruiser)" oninput="filterModelSearch(this.value)" style="width:100%;border:1px solid #ddd;border-radius:50px;padding:8px 14px;font-size:13px;outline:none">
+      <input id="modelSearchInput" placeholder="Модель хайх... (жишээ: Prius, Land Cruiser)" oninput="filterModelSearch(this.value)" style="width:100%;border:1px solid #ddd;border-radius:50px;padding:8px 14px;font-size:16px;outline:none">
     </div>
   </div>
 
@@ -322,7 +327,7 @@ select.form-input{cursor:pointer}
     <div style="position:relative;min-height:210px">
       <div id="searchInner" style="width:760px;height:100px;background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.12);border:2px solid #FF8C00;display:flex;align-items:center;overflow:hidden;padding:10px 8px 10px 14px;gap:6px">
         <svg style="flex-shrink:0;color:#999" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:14px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
+        <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:16px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
         <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px 8px;color:#999;font-size:13px;border-radius:8px;flex-shrink:0">⚙️</button>
         <button onclick="doSearch()" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
       </div>
@@ -1812,6 +1817,7 @@ async function init() {
     await loadProfile(); 
     startGlobalNotifications();
     loadNotifications(); 
+    loadUnreadChatBadge();
   }
   loadListings();
   loadStats();
@@ -1859,6 +1865,18 @@ function sendNotification(title, body) {
 function clearChatBadge() {
   var badge = document.getElementById('chatBadge');
   if (badge) { badge.textContent = '0'; badge.style.display = 'none'; }
+  localStorage.setItem('zaraa_chat_last_seen', new Date().toISOString());
+}
+
+async function loadUnreadChatBadge() {
+  var lastSeen = localStorage.getItem('zaraa_chat_last_seen') || '1970-01-01T00:00:00Z';
+  var r = await sb.from('messages').select('id', {count:'exact', head:true})
+    .eq('receiver_id', CU.id)
+    .gt('created_at', lastSeen);
+  if (!r.error && r.count > 0) {
+    var badge = document.getElementById('chatBadge');
+    if (badge) { badge.textContent = r.count; badge.style.display = 'flex'; }
+  }
 }
 
 function startGlobalNotifications() {
@@ -1882,6 +1900,10 @@ function startGlobalNotifications() {
       sendNotification(n.title, n.body);
       showToast(n.title);
       loadNotifications();
+      if (n.title && n.title.indexOf('Шинэ мессеж') > -1) {
+        var badge = document.getElementById('chatBadge');
+        if (badge) { var c=(parseInt(badge.textContent)||0)+1; badge.textContent=c; badge.style.display='flex'; }
+      }
     })
     .subscribe();
 }
@@ -2770,7 +2792,13 @@ async function startVoiceRecording(e) {
     return;
   }
   _voiceChunks = [];
-  _voiceRecorder = new MediaRecorder(_voiceStream);
+  var mimeType = '';
+  var candidates = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
+  for (var i=0; i<candidates.length; i++) {
+    if (MediaRecorder.isTypeSupported(candidates[i])) { mimeType = candidates[i]; break; }
+  }
+  _voiceRecorder = mimeType ? new MediaRecorder(_voiceStream, {mimeType: mimeType}) : new MediaRecorder(_voiceStream);
+  window._voiceMimeType = mimeType || 'audio/webm';
   _voiceRecorder.ondataavailable = function(e) { if (e.data.size > 0) _voiceChunks.push(e.data); };
   _voiceRecorder.start();
   _voiceStartTime = Date.now();
@@ -2800,7 +2828,7 @@ function stopVoiceRecording(e) {
     try {
       if (_voiceStream) { _voiceStream.getTracks().forEach(function(t){t.stop();}); _voiceStream = null; }
       if (duration < 800) { showToast('Хэт богино дуу хоолой', true); return; } // ignore accidental taps
-      var blob = new Blob(_voiceChunks, {type:'audio/webm'});
+      var blob = new Blob(_voiceChunks, {type: window._voiceMimeType || 'audio/webm'});
       await sendChatAudio(blob);
     } catch(err) {
       console.error('Voice send error:', err);
@@ -2818,8 +2846,10 @@ function stopVoiceRecording(e) {
 async function sendChatAudio(blob) {
   try {
     showToast('Дуу мессеж илгээж байна...');
-    var path = CU.id+'/voice_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.webm';
-    var up = await sb.storage.from('listings').upload(path, blob, {cacheControl:'3600', upsert:true, contentType:'audio/webm'});
+    var mimeType = blob.type || 'audio/webm';
+    var ext = mimeType.indexOf('mp4') > -1 ? 'mp4' : (mimeType.indexOf('ogg') > -1 ? 'ogg' : 'webm');
+    var path = CU.id+'/voice_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.'+ext;
+    var up = await sb.storage.from('listings').upload(path, blob, {cacheControl:'3600', upsert:true, contentType:mimeType});
     if (up.error) { showToast('Дуу илгээхэд алдаа гарлаа: '+up.error.message, true); return; }
     var url = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
     var r = await sb.from('messages').insert({
