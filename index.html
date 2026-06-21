@@ -57,6 +57,8 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .cat{flex-shrink:0;white-space:nowrap;background:none;border:none;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:color 0.2s;color:#666;position:relative;z-index:1;border-radius:50px}
 .cat.active{color:white}
 .subcat-pill{display:inline-flex;align-items:center;gap:4px;background:#f5f5f5;border:1px solid #eee;border-radius:50px;padding:6px 12px;margin-right:6px;font-size:12px;font-weight:600;color:#555;cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.quick-reply-pill{display:inline-flex;align-items:center;background:#fff5f0;border:1px solid #FFD0B8;border-radius:50px;padding:6px 12px;margin-right:6px;margin-bottom:8px;font-size:12px;font-weight:600;color:#E62B05;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s}
+.quick-reply-pill:active{background:#FFE0D0}
 .subcat-pill.active{background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border-color:transparent}
 .cat:hover,.cat.active{color:#E62B05;border-bottom-color:#E62B05;font-weight:600}
 .stack-img-wrap{position:relative;aspect-ratio:1;overflow:visible!important;margin:8px}
@@ -401,6 +403,7 @@ select.form-input{cursor:pointer}
         <button class="btn btn-ghost" onclick="clearFilter()">Цэвэрлэх</button>
         <button class="btn btn-primary" onclick="applyAndScrollToResults()">🔍 Хайх</button>
       </div>
+      <button class="btn btn-ghost btn-full" style="margin-top:8px;color:#E62B05;border-color:#E62B05" onclick="saveCurrentSearch()">🔔 Энэ хайлтыг хадгалах</button>
     </div>
   </div>
 
@@ -570,6 +573,11 @@ select.form-input{cursor:pointer}
 <div class="page" id="page-favorites">
   <div style="padding:20px 16px 10px"><div class="section-title">❤️ Хадгалсан зарууд</div></div>
   <div class="grid" id="favoritesGrid"><div class="loading"><div class="spinner"></div></div></div>
+</div>
+
+<div class="page" id="page-savedSearches">
+  <div style="padding:20px 16px 10px"><div class="section-title">🔔 Хадгалсан хайлтууд</div></div>
+  <div class="section"><div id="savedSearchesList"><div class="loading"><div class="spinner"></div></div></div></div>
 </div>
 
 <!-- ADMIN PAGE -->
@@ -955,6 +963,14 @@ select.form-input{cursor:pointer}
     </div>
     <!-- Messages -->
     <div id="chatMessages" style="flex:1;overflow-y:auto;background:#f5f5f5;padding:12px;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain"></div>
+    <!-- Quick replies -->
+    <div id="quickReplyRow" style="display:flex;gap:6px;padding:8px 12px 0;overflow-x:auto;scrollbar-width:none;background:white;flex-shrink:0">
+      <span class="quick-reply-pill" onclick="sendQuickReply('Энэ зар хараахан байгаа юу?')">Хараахан байгаа юу?</span>
+      <span class="quick-reply-pill" onclick="sendQuickReply('Үнэ тохирох уу?')">Үнэ тохирох уу?</span>
+      <span class="quick-reply-pill" onclick="sendQuickReply('Хаана байршилтай вэ?')">Хаана байршилтай?</span>
+      <span class="quick-reply-pill" onclick="sendQuickReply('Хүргэлт хийх боломжтой юу?')">Хүргэлт хийх үү?</span>
+      <span class="quick-reply-pill" onclick="sendQuickReply('Баярлалаа!')">Баярлалаа!</span>
+    </div>
     <!-- Input -->
     <div style="padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));background:white;border-top:1px solid #f0f0f0;display:flex;gap:6px;align-items:center;flex-shrink:0">
       <input type="file" id="chatImageInput" accept="image/*" style="display:none" onchange="sendChatImage(this)">
@@ -1750,6 +1766,23 @@ function updateFilterProvinceFields() {
   doSearch();
 }
 
+async function saveCurrentSearch() {
+  if (!CU) { openAuth('login'); showToast('Эхлээд нэвтэрнэ үү', true); return; }
+  var q = document.getElementById('searchInput').value;
+  var minP = document.getElementById('filterMinPrice').value;
+  var maxP = document.getElementById('filterMaxPrice').value;
+  if (!q && !CC) { showToast('Хайлтын утга эсвэл ангилал сонгоно уу', true); return; }
+  var r = await sb.from('saved_searches').insert({
+    user_id: CU.id,
+    query: q || null,
+    category: CC || null,
+    min_price: minP ? Number(minP) : null,
+    max_price: maxP ? Number(maxP) : null
+  });
+  if (r.error) { showToast('Алдаа гарлаа: '+r.error.message, true); return; }
+  showToast('🔔 Хайлт хадгалагдлаа! Шинэ зар орж ирэхэд мэдэгдэнэ');
+}
+
 function applyAndScrollToResults() {
   var panel = document.getElementById('filterPanel');
   panel.style.display = 'none';
@@ -2238,6 +2271,7 @@ async function showDetail(id) {
   var r = await sb.from('listings').select('*, users(name,rating,phone,is_verified,is_shop,shop_name,shop_is_verified)').eq('id',id).single();
   var l = r.data;
   if (!l) return;
+  sb.rpc('increment_view_count', {listing_id: id}); // Үзсэн тоо нэмэгдүүлэх (async, хариу хүлээхгүй)
   var imgs = l.images&&l.images.length ? l.images : [];
   var mediaItems = imgs.map(function(u){ return {type:'image', url:u}; });
   if (l.video_url) mediaItems.push({type:'video', url:l.video_url});
@@ -2278,7 +2312,7 @@ async function showDetail(id) {
     '<div class="detail-body">'+
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div class="detail-title">'+escapeHtml(l.title)+'</div><button class="fav-btn" data-listing-id="'+l.id+'" onclick="toggleFavorite(\''+l.id+'\',this)" style="background:var(--s2);border:1px solid var(--b);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button></div>'+
     '<div class="detail-price">₮'+Number(l.price).toLocaleString()+(l.price_yuan?' <span style="font-size:15px;color:var(--m);font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+'</div>'+
-    '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'<span style="font-size:11px;color:#999;margin-left:4px">🕐 '+timeAgo(l.created_at)+'</span></div>'+
+    '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'<span style="font-size:11px;color:#999;margin-left:4px">🕐 '+timeAgo(l.created_at)+'</span><span style="font-size:11px;color:#999;margin-left:4px">👁️ '+(l.view_count||0)+' үзсэн</span></div>'+
     '<div class="detail-desc">'+escapeHtml(l.description||'Тайлбар байхгүй')+'</div>'+
     (l.extra_data && Object.keys(l.extra_data).length ?
       '<div style="background:var(--s2);border-radius:10px;padding:14px;margin-bottom:16px">'+
@@ -3095,6 +3129,11 @@ async function notifyChatPartner(text) {
   });
 }
 
+function sendQuickReply(text) {
+  document.getElementById('chatInput').value = text;
+  sendMessage();
+}
+
 async function sendMessage() {
   if (window._sendingMessage) return;
   var input = document.getElementById('chatInput');
@@ -3523,7 +3562,7 @@ async function rejectFeaturedOrder(orderId, listingId) {
 }
 
 async function approveListing(id) {
-  var listing = await sb.from('listings').select('user_id, title').eq('id', id).single();
+  var listing = await sb.from('listings').select('user_id, title, category, price').eq('id', id).single();
   await sb.from('listings').update({status:'active'}).eq('id', id);
   if (listing.data) {
     await sb.from('notifications').insert({
@@ -3532,9 +3571,33 @@ async function approveListing(id) {
       body: '"'+listing.data.title+'" зар амжилттай нийтлэгдлээ. Одоо хүн бүр харах боломжтой!',
       listing_id: id
     });
+    // Хадгалсан хайлттай тохирох хэрэглэгчдэд мэдэгдэл
+    await notifySavedSearchMatches(listing.data, id);
   }
   showToast('Зар зөвшөөрөгдлөө! ✅');
   loadAdmin(); loadListings();
+}
+
+async function notifySavedSearchMatches(listing, listingId) {
+  var r = await sb.from('saved_searches').select('*');
+  var searches = r.data || [];
+  var title = (listing.title || '').toLowerCase();
+  for (var i = 0; i < searches.length; i++) {
+    var s = searches[i];
+    if (s.user_id === listing.user_id) continue; // Өөртөө мэдэгдэл явуулахгүй
+    var matchQuery = !s.query || title.indexOf(s.query.toLowerCase()) > -1;
+    var matchCategory = !s.category || s.category === listing.category;
+    var matchMinPrice = !s.min_price || (listing.price && listing.price >= s.min_price);
+    var matchMaxPrice = !s.max_price || (listing.price && listing.price <= s.max_price);
+    if (matchQuery && matchCategory && matchMinPrice && matchMaxPrice) {
+      await sb.from('notifications').insert({
+        user_id: s.user_id,
+        title: '🔔 Хадгалсан хайлттай таарсан зар!',
+        body: '"'+listing.title+'" зар таны хайлттай таарч байна',
+        listing_id: listingId
+      });
+    }
+  }
 }
 
 async function dismissReport(id) {
@@ -4302,6 +4365,7 @@ async function loadProfile() {
     '<div class="stat"><div class="stat-num">⭐ '+(user.rating||5.0)+'</div><div class="stat-label">Үнэлгээ</div></div></div>'+
     '<div class="menu-item" onclick="showPage(\'listings\')"><div class="menu-left"><div class="menu-icon">📋</div>Миний зарууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'favorites\')"><div class="menu-left"><div class="menu-icon">❤️</div>Хадгалсан зарууд</div></div>'+
+    '<div class="menu-item" onclick="showPage(\'savedSearches\')"><div class="menu-left"><div class="menu-icon">🔔</div>Хадгалсан хайлтууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'chats\')"><div class="menu-left"><div class="menu-icon">💬</div>Миний чатууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'deliveries\')"><div class="menu-left"><div class="menu-icon">📦</div>Миний захиалгууд</div></div>'+
     '<div class="menu-item" onclick="editProfile()"><div class="menu-left"><div class="menu-icon">✏️</div>Профайл засах</div></div>'+
@@ -4670,6 +4734,37 @@ function openChatFromList(listingId, otherId) {
 }
 
 
+async function loadSavedSearchesPage() {
+  var box = document.getElementById('savedSearchesList');
+  if (!CU) { box.innerHTML = '<div class="empty"><div class="empty-icon">🔔</div><p>Эхлээд нэвтэрнэ үү</p></div>'; return; }
+  var r = await sb.from('saved_searches').select('*').eq('user_id', CU.id).order('created_at', {ascending:false});
+  var searches = r.data || [];
+  if (!searches.length) {
+    box.innerHTML = '<div class="empty"><div class="empty-icon">🔔</div><p>Хадгалсан хайлт байхгүй<br><br>Шүүлтүүр хэсэгт "Энэ хайлтыг хадгалах" товчийг ашиглаарай</p></div>';
+    return;
+  }
+  box.innerHTML = searches.map(function(s) {
+    var parts = [];
+    if (s.query) parts.push('"'+escapeHtml(s.query)+'"');
+    if (s.category) parts.push(escapeHtml(s.category));
+    if (s.min_price) parts.push('₮'+Number(s.min_price).toLocaleString()+'-ээс дээш');
+    if (s.max_price) parts.push('₮'+Number(s.max_price).toLocaleString()+'-аас бага');
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">'+
+      '<div style="flex:1">'+
+      '<div style="font-weight:600;font-size:13px">'+(parts.join(' • ')||'Бүх зар')+'</div>'+
+      '<div style="font-size:11px;color:var(--m);margin-top:2px">'+timeAgo(s.created_at)+' хадгалсан</div>'+
+      '</div>'+
+      '<button onclick="deleteSavedSearch(\''+s.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:6px 10px;font-size:12px;cursor:pointer">🗑️</button>'+
+      '</div>';
+  }).join('');
+}
+
+async function deleteSavedSearch(id) {
+  await sb.from('saved_searches').delete().eq('id', id);
+  showToast('Хайлт устгагдлаа');
+  loadSavedSearchesPage();
+}
+
 async function loadFavoritesPage() {
   var grid = document.getElementById('favoritesGrid');
   grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
@@ -4720,6 +4815,7 @@ function showPage(name) {
   if (name === 'shops') loadShops();
   if (name === 'shopManage') loadShopManage();
   if (name === 'favorites') loadFavoritesPage();
+  if (name === 'savedSearches') loadSavedSearchesPage();
 }
 
 var SHOPS_CACHE = [];
