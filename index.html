@@ -599,6 +599,10 @@ select.form-input{cursor:pointer}
       <button onclick="addBanner()" class="btn btn-primary btn-full">Баннер нэмэх</button>
     </div>
 
+    <div style="font-weight:700;margin:16px 0 12px">⭐ ВИП захиалгууд</div>
+    <div id="adminVipOrders"><div style="color:var(--m);font-size:13px">Захиалга байхгүй</div></div>
+    <div style="font-weight:700;margin:16px 0 12px">🌟 Онцлох захиалгууд</div>
+    <div id="adminFeaturedOrders"><div style="color:var(--m);font-size:13px">Захиалга байхгүй</div></div>
     <div style="font-weight:700;margin:16px 0 12px">⏳ Хүлээгдэж буй зарууд</div>
     <div id="adminPending"><div style="color:var(--m);font-size:13px">Байхгүй ✅</div></div>
     <div style="font-weight:700;margin:16px 0 12px">🚩 Мэдээллүүд</div>
@@ -990,6 +994,82 @@ select.form-input{cursor:pointer}
     <div class="form-group"><label class="form-label">Нэмэлт тайлбар</label><textarea class="form-input" id="deliveryNote" placeholder="Бараа ямар байдалтай, хэрхэн савлагдсан гэх мэт..."></textarea></div>
     <div class="form-group"><label class="form-label">Хүргэлтийн үнэ (₮)</label><input class="form-input" type="number" id="deliveryFee" placeholder="0 = хүргэгч тохирно"></div>
     <button class="btn btn-primary btn-full" onclick="orderDelivery()">Захиалах</button>
+  </div>
+</div>
+
+<!-- VIP ORDER MODAL -->
+<div class="modal-overlay" id="vipModal">
+  <div class="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal('vipModal')">×</button>
+    <div class="modal-title">⭐ ВИП зар болгох</div>
+    <input type="hidden" id="vipListingId">
+    <p style="font-size:13px;color:var(--m);margin-bottom:16px">ВИП зар хайлтын үр дүнгийн дээд хэсэгт, өнгөтэй хүрээгээр онцолж харагдана</p>
+
+    <div class="form-group">
+      <label class="form-label">Хугацаа сонгох</label>
+      <select class="form-input" id="vipDuration" onchange="updateVipPrice()">
+        <option value="7">7 хоног — 80,000₮</option>
+        <option value="30">30 хоног — 250,000₮</option>
+        <option value="90">90 хоног — 400,000₮</option>
+      </select>
+    </div>
+
+    <div style="background:var(--s2);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px">💳 Шилжүүлэх дансны мэдээлэл</div>
+      <div style="font-size:13px;line-height:1.6">
+        <b>Банк:</b> Хаан банк<br>
+        <b>Дансны дугаар:</b> 5025726380<br>
+        <b>Эзэмшигч:</b> Энхболд Тэмүжин<br>
+        <b>Дүн:</b> <span id="vipPriceDisplay" style="color:var(--a);font-weight:800">80,000₮</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">📷 Гүйлгээний нотолгоо (screenshot)</label>
+      <input type="file" id="vipProofFile" accept="image/*" onchange="previewVipProof(this)">
+      <div id="vipProofPreview" style="margin-top:8px"></div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="submitVipOrder()">Захиалга илгээх</button>
+    <p style="font-size:11px;color:var(--m);margin-top:10px;text-align:center">Захиалга илгээсний дараа админ шалгаад 24 цагийн дотор баталгаажуулна</p>
+  </div>
+</div>
+
+<!-- FEATURED ORDER MODAL -->
+<div class="modal-overlay" id="featuredModal">
+  <div class="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal('featuredModal')">×</button>
+    <div class="modal-title">🌟 Онцлох зар болгох</div>
+    <input type="hidden" id="featuredListingId">
+    <p style="font-size:13px;color:var(--m);margin-bottom:16px">Онцлох зар нүүр хуудасны дээд хэсэгт онцолж харагдана (ВИП зарны дараа)</p>
+
+    <div class="form-group">
+      <label class="form-label">Хугацаа сонгох</label>
+      <select class="form-input" id="featuredDuration" onchange="updateFeaturedPrice()">
+        <option value="7">7 хоног — 30,000₮</option>
+        <option value="30">30 хоног — 100,000₮</option>
+        <option value="90">90 хоног — 180,000₮</option>
+      </select>
+    </div>
+
+    <div style="background:var(--s2);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px">💳 Шилжүүлэх дансны мэдээлэл</div>
+      <div style="font-size:13px;line-height:1.6">
+        <b>Банк:</b> Хаан банк<br>
+        <b>Дансны дугаар:</b> 5025726380<br>
+        <b>Эзэмшигч:</b> Энхболд Тэмүжин<br>
+        <b>Дүн:</b> <span id="featuredPriceDisplay" style="color:var(--a);font-weight:800">30,000₮</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">📷 Гүйлгээний нотолгоо (screenshot)</label>
+      <input type="file" id="featuredProofFile" accept="image/*" onchange="previewFeaturedProof(this)">
+      <div id="featuredProofPreview" style="margin-top:8px"></div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="submitFeaturedOrder()">Захиалга илгээх</button>
+    <p style="font-size:11px;color:var(--m);margin-top:10px;text-align:center">Захиалга илгээсний дараа админ шалгаад 24 цагийн дотор баталгаажуулна</p>
   </div>
 </div>
 
@@ -1976,7 +2056,14 @@ async function loadListings() {
   var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false}).range(0, LISTINGS_PAGE_SIZE-1);
   if (r.error) { grid.innerHTML = '<div class="empty"><div class="empty-icon">😕</div><p>Алдаа гарлаа</p></div>'; return; }
   AL = r.data || [];
-  AL.sort(function(a, b) { return (b.is_featured?1:0) - (a.is_featured?1:0); });
+  AL.sort(function(a, b) {
+    var aVip = a.vip_status === 'active' ? 1 : 0;
+    var bVip = b.vip_status === 'active' ? 1 : 0;
+    if (aVip !== bVip) return bVip - aVip;
+    var aFeat = (a.featured_status === 'active' || a.is_featured) ? 1 : 0;
+    var bFeat = (b.featured_status === 'active' || b.is_featured) ? 1 : 0;
+    return bFeat - aFeat;
+  });
   listingsHasMore = (r.data || []).length === LISTINGS_PAGE_SIZE;
   listingsOffset = LISTINGS_PAGE_SIZE;
   applyFilter();
@@ -2185,6 +2272,14 @@ async function showDetail(id) {
     (CU&&l.user_id===CU.id?
     '<div style="margin-top:10px">'+
     (l.has_delivery?'<button class="btn btn-primary btn-full" onclick="openDelivery(\''+l.id+'\')">🚚 Хүргэлт захиалах</button>':'<button class="btn btn-ghost btn-full" onclick="enableDelivery(\''+l.id+'\')">🚚 Хүргэлт нэмэх</button>')+
+    (l.vip_status==='active'?'<div style="margin-top:8px;background:linear-gradient(135deg,#FFD700,#FFA500);color:#333;border-radius:10px;padding:10px;text-align:center;font-weight:700;font-size:13px">⭐ ВИП зар ('+(l.vip_expires_at?new Date(l.vip_expires_at).toLocaleDateString('mn-MN'):'')+' хүртэл)</div>':
+      (l.vip_status==='pending_payment'?'<button class="btn btn-ghost btn-full" style="margin-top:8px;color:#FFA500;border-color:#FFA500" disabled>⏳ ВИП хүсэлт хүлээгдэж байна</button>':
+      '<button class="btn btn-full" style="margin-top:8px;background:linear-gradient(135deg,#FFD700,#FFA500);color:#333;font-weight:700;border:none" onclick="openVipOrder(\''+l.id+'\')">⭐ ВИП зар болгох</button>'))+
+    (l.vip_status!=='active'?(
+      l.featured_status==='active'?'<div style="margin-top:8px;background:linear-gradient(135deg,#FF8C00,#FFB347);color:white;border-radius:10px;padding:10px;text-align:center;font-weight:700;font-size:13px">🌟 Онцлох зар</div>':
+      (l.featured_status==='pending_payment'?'<button class="btn btn-ghost btn-full" style="margin-top:8px;color:#FF8C00;border-color:#FF8C00" disabled>⏳ Онцлох хүсэлт хүлээгдэж байна</button>':
+      '<button class="btn btn-full" style="margin-top:8px;background:linear-gradient(135deg,#FF8C00,#FFB347);color:white;font-weight:700;border:none" onclick="openFeaturedOrder(\''+l.id+'\')">🌟 Онцлох зар болгох</button>')
+    ):'')+
     '</div>':'')+
     (l.location?'<div id="mapBox" style="margin-top:16px;border-radius:12px;overflow:hidden;height:200px"><iframe width="100%" height="200" frameborder="0" src="https://maps.google.com/maps?q='+encodeURIComponent((l.location||'Улаанбаатар')+', Улаанбаатар, Монгол')+'&output=embed&z=14" style="border:none"></iframe></div>':'')+'<div style="margin-top:16px" id="reviewSection"></div>'+
     (CU&&l.user_id===CU.id?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><button class="btn btn-ghost btn-full" style="color:#e53e3e;border-color:#e53e3e" onclick="deleteListing(\''+l.id+'\')">🗑️ Устгах</button><button class="btn btn-ghost btn-full" onclick="editListing(\''+l.id+'\')">✏️ Засах</button></div>':'')+
@@ -3001,6 +3096,8 @@ async function loadAdmin() {
 
   loadAdminAds();
   loadAdminBanners();
+  loadAdminVipOrders();
+  loadAdminFeaturedOrders();
 
   // Pending listings
   var pending = await sb.from('listings').select('*, users(name)').eq('status','pending').order('created_at',{ascending:false});
@@ -3243,6 +3340,104 @@ async function toggleVerified(id, current) {
 async function toggleAdmin(id, current) {
   await sb.from('users').update({is_admin: !current}).eq('id', id);
   loadAdmin();
+}
+
+async function loadAdminVipOrders() {
+  var box = document.getElementById('adminVipOrders');
+  if (!box) return;
+  var r = await sb.from('vip_orders').select('*, listings(title)').eq('status','pending').order('created_at',{ascending:false});
+  var orders = r.data || [];
+  box.innerHTML = orders.length ? orders.map(function(o) {
+    return '<div style="background:var(--s);border:2px solid #FFD700;border-radius:10px;padding:12px;margin-bottom:8px">'+
+      '<div style="font-weight:600;font-size:13px">'+escapeHtml(o.listings&&o.listings.title||'Зар олдсонгүй')+'</div>'+
+      '<div style="font-size:11px;color:var(--m);margin-bottom:8px">'+o.duration_days+' хоног • ₮'+Number(o.price).toLocaleString()+' • '+timeAgo(o.created_at)+'</div>'+
+      (o.payment_proof_url?'<img src="'+o.payment_proof_url+'" onclick="window.open(\''+o.payment_proof_url+'\',\'_blank\')" style="max-width:200px;border-radius:8px;cursor:pointer;margin-bottom:8px;display:block">':'')+
+      '<div style="display:flex;gap:8px">'+
+      '<button onclick="approveVipOrder(\''+o.id+'\',\''+o.listing_id+'\','+o.duration_days+')" style="flex:1;background:#00C96B;color:white;border:none;border-radius:6px;padding:8px;font-size:12px;cursor:pointer">✓ Зөвшөөрөх</button>'+
+      '<button onclick="rejectVipOrder(\''+o.id+'\',\''+o.listing_id+'\')" style="flex:1;background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:8px;font-size:12px;cursor:pointer">✕ Татгалзах</button>'+
+      '</div>'+
+      '</div>';
+  }).join('') : '<div style="color:var(--m);font-size:13px">Захиалга байхгүй</div>';
+}
+
+async function approveVipOrder(orderId, listingId, durationDays) {
+  var expiresAt = new Date(Date.now() + durationDays*24*60*60*1000).toISOString();
+  await sb.from('vip_orders').update({status:'approved', approved_at: new Date().toISOString(), approved_by: CU.id}).eq('id', orderId);
+  await sb.from('listings').update({vip_status:'active', vip_expires_at: expiresAt, vip_duration_days: durationDays, is_featured: true}).eq('id', listingId);
+  var order = await sb.from('vip_orders').select('user_id').eq('id', orderId).single();
+  if (order.data) {
+    await sb.from('notifications').insert({
+      user_id: order.data.user_id,
+      title: '⭐ ВИП зар баталгаажлаа!',
+      body: 'Таны зар одоо ВИП статустай, '+durationDays+' хоногийн турш онцлогдоно'
+    });
+  }
+  showToast('✅ ВИП захиалга баталгаажлаа');
+  loadAdminVipOrders();
+}
+
+async function rejectVipOrder(orderId, listingId) {
+  await sb.from('vip_orders').update({status:'rejected'}).eq('id', orderId);
+  await sb.from('listings').update({vip_status:'none'}).eq('id', listingId);
+  var order = await sb.from('vip_orders').select('user_id').eq('id', orderId).single();
+  if (order.data) {
+    await sb.from('notifications').insert({
+      user_id: order.data.user_id,
+      title: '❌ ВИП захиалга цуцлагдлаа',
+      body: 'Гүйлгээний мэдээллийг шалгаад дахин оролдоно уу'
+    });
+  }
+  showToast('Захиалга цуцлагдлаа');
+  loadAdminVipOrders();
+}
+
+async function loadAdminFeaturedOrders() {
+  var box = document.getElementById('adminFeaturedOrders');
+  if (!box) return;
+  var r = await sb.from('featured_orders').select('*, listings(title)').eq('status','pending').order('created_at',{ascending:false});
+  var orders = r.data || [];
+  box.innerHTML = orders.length ? orders.map(function(o) {
+    return '<div style="background:var(--s);border:2px solid #FF8C00;border-radius:10px;padding:12px;margin-bottom:8px">'+
+      '<div style="font-weight:600;font-size:13px">'+escapeHtml(o.listings&&o.listings.title||'Зар олдсонгүй')+'</div>'+
+      '<div style="font-size:11px;color:var(--m);margin-bottom:8px">'+o.duration_days+' хоног • ₮'+Number(o.price).toLocaleString()+' • '+timeAgo(o.created_at)+'</div>'+
+      (o.payment_proof_url?'<img src="'+o.payment_proof_url+'" onclick="window.open(\''+o.payment_proof_url+'\',\'_blank\')" style="max-width:200px;border-radius:8px;cursor:pointer;margin-bottom:8px;display:block">':'')+
+      '<div style="display:flex;gap:8px">'+
+      '<button onclick="approveFeaturedOrder(\''+o.id+'\',\''+o.listing_id+'\','+o.duration_days+')" style="flex:1;background:#00C96B;color:white;border:none;border-radius:6px;padding:8px;font-size:12px;cursor:pointer">✓ Зөвшөөрөх</button>'+
+      '<button onclick="rejectFeaturedOrder(\''+o.id+'\',\''+o.listing_id+'\')" style="flex:1;background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:8px;font-size:12px;cursor:pointer">✕ Татгалзах</button>'+
+      '</div>'+
+      '</div>';
+  }).join('') : '<div style="color:var(--m);font-size:13px">Захиалга байхгүй</div>';
+}
+
+async function approveFeaturedOrder(orderId, listingId, durationDays) {
+  var until = new Date(Date.now() + durationDays*24*60*60*1000).toISOString();
+  await sb.from('featured_orders').update({status:'approved', approved_at: new Date().toISOString(), approved_by: CU.id}).eq('id', orderId);
+  await sb.from('listings').update({featured_status:'active', is_featured: true, featured_until: until}).eq('id', listingId);
+  var order = await sb.from('featured_orders').select('user_id').eq('id', orderId).single();
+  if (order.data) {
+    await sb.from('notifications').insert({
+      user_id: order.data.user_id,
+      title: '🌟 Онцлох зар баталгаажлаа!',
+      body: 'Таны зар одоо Онцлох статустай, '+durationDays+' хоногийн турш онцлогдоно'
+    });
+  }
+  showToast('✅ Онцлох захиалга баталгаажлаа');
+  loadAdminFeaturedOrders();
+}
+
+async function rejectFeaturedOrder(orderId, listingId) {
+  await sb.from('featured_orders').update({status:'rejected'}).eq('id', orderId);
+  await sb.from('listings').update({featured_status:'none'}).eq('id', listingId);
+  var order = await sb.from('featured_orders').select('user_id').eq('id', orderId).single();
+  if (order.data) {
+    await sb.from('notifications').insert({
+      user_id: order.data.user_id,
+      title: '❌ Онцлох захиалга цуцлагдлаа',
+      body: 'Гүйлгээний мэдээллийг шалгаад дахин оролдоно уу'
+    });
+  }
+  showToast('Захиалга цуцлагдлаа');
+  loadAdminFeaturedOrders();
 }
 
 async function approveListing(id) {
@@ -3861,6 +4056,120 @@ async function postListingInner() {
     editId || null
   );
   loadListings(); loadStats();
+}
+
+var VIP_PRICES = {7: 80000, 30: 250000, 90: 400000};
+var vipProofUrl = null;
+
+function openVipOrder(id) {
+  if (!CU) { openAuth('login'); return; }
+  document.getElementById('vipListingId').value = id;
+  document.getElementById('vipDuration').value = '7';
+  document.getElementById('vipProofPreview').innerHTML = '';
+  vipProofUrl = null;
+  updateVipPrice();
+  openModal('vipModal');
+}
+
+function updateVipPrice() {
+  var duration = document.getElementById('vipDuration').value;
+  var price = VIP_PRICES[duration];
+  document.getElementById('vipPriceDisplay').textContent = price.toLocaleString()+'₮';
+}
+
+function previewVipProof(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var preview = document.getElementById('vipProofPreview');
+  preview.innerHTML = '<div style="font-size:12px;color:var(--m)">Зураг бэлэн байна: '+file.name+'</div>';
+}
+
+async function submitVipOrder() {
+  if (!CU) { openAuth('login'); return; }
+  var listingId = document.getElementById('vipListingId').value;
+  var duration = Number(document.getElementById('vipDuration').value);
+  var price = VIP_PRICES[duration];
+  var proofFile = document.getElementById('vipProofFile').files[0];
+  if (!proofFile) { showToast('Гүйлгээний нотолгоо оруулна уу', true); return; }
+
+  showToast('Илгээж байна...');
+  var ext = proofFile.name.split('.').pop();
+  var path = CU.id+'/vip_proof_'+Date.now()+'.'+ext;
+  var up = await sb.storage.from('listings').upload(path, proofFile, {cacheControl:'3600', upsert:true});
+  if (up.error) { showToast('Зураг илгээхэд алдаа гарлаа', true); return; }
+  var proofUrl = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
+
+  var r = await sb.from('vip_orders').insert({
+    listing_id: listingId,
+    user_id: CU.id,
+    duration_days: duration,
+    price: price,
+    payment_proof_url: proofUrl,
+    status: 'pending'
+  });
+  if (r.error) { showToast('Алдаа гарлаа: '+r.error.message, true); return; }
+
+  await sb.from('listings').update({vip_status: 'pending_payment'}).eq('id', listingId);
+
+  closeModal('vipModal');
+  showToast('✅ Захиалга илгээгдлээ! Админ шалгаад баталгаажуулна');
+  await notifyAdmins('⭐ Шинэ ВИП захиалга', 'Хэрэглэгч ВИП зар захиалга илгээлээ, шалгаж баталгаажуулна уу');
+}
+
+var FEATURED_PRICES = {7: 30000, 30: 100000, 90: 180000};
+
+function openFeaturedOrder(id) {
+  if (!CU) { openAuth('login'); return; }
+  document.getElementById('featuredListingId').value = id;
+  document.getElementById('featuredDuration').value = '7';
+  document.getElementById('featuredProofPreview').innerHTML = '';
+  updateFeaturedPrice();
+  openModal('featuredModal');
+}
+
+function updateFeaturedPrice() {
+  var duration = document.getElementById('featuredDuration').value;
+  var price = FEATURED_PRICES[duration];
+  document.getElementById('featuredPriceDisplay').textContent = price.toLocaleString()+'₮';
+}
+
+function previewFeaturedProof(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var preview = document.getElementById('featuredProofPreview');
+  preview.innerHTML = '<div style="font-size:12px;color:var(--m)">Зураг бэлэн байна: '+file.name+'</div>';
+}
+
+async function submitFeaturedOrder() {
+  if (!CU) { openAuth('login'); return; }
+  var listingId = document.getElementById('featuredListingId').value;
+  var duration = Number(document.getElementById('featuredDuration').value);
+  var price = FEATURED_PRICES[duration];
+  var proofFile = document.getElementById('featuredProofFile').files[0];
+  if (!proofFile) { showToast('Гүйлгээний нотолгоо оруулна уу', true); return; }
+
+  showToast('Илгээж байна...');
+  var ext = proofFile.name.split('.').pop();
+  var path = CU.id+'/featured_proof_'+Date.now()+'.'+ext;
+  var up = await sb.storage.from('listings').upload(path, proofFile, {cacheControl:'3600', upsert:true});
+  if (up.error) { showToast('Зураг илгээхэд алдаа гарлаа', true); return; }
+  var proofUrl = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
+
+  var r = await sb.from('featured_orders').insert({
+    listing_id: listingId,
+    user_id: CU.id,
+    duration_days: duration,
+    price: price,
+    payment_proof_url: proofUrl,
+    status: 'pending'
+  });
+  if (r.error) { showToast('Алдаа гарлаа: '+r.error.message, true); return; }
+
+  await sb.from('listings').update({featured_status: 'pending_payment'}).eq('id', listingId);
+
+  closeModal('featuredModal');
+  showToast('✅ Захиалга илгээгдлээ! Админ шалгаад баталгаажуулна');
+  await notifyAdmins('🌟 Шинэ Онцлох зар захиалга', 'Хэрэглэгч Онцлох зар захиалга илгээлээ, шалгаж баталгаажуулна уу');
 }
 
 function openDelivery(id) {
