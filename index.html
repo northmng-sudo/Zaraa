@@ -2380,7 +2380,7 @@ async function showDetail(id) {
     '</div>'+
     '<div class="detail-info-col">'+
     '<div class="detail-body">'+
-    '<div id="detailAdSpace" style="width:100%;max-width:400px;height:210px;border-radius:14px;overflow:hidden;background:#111;margin-bottom:16px"></div>'+
+    '<div id="detailAdSpace" style="width:100%;max-width:400px;height:210px;border-radius:14px;overflow:hidden;background:#111;margin-bottom:16px;position:sticky;top:70px;z-index:10"></div>'+
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div class="detail-title">'+escapeHtml(l.title)+'</div><button class="fav-btn" data-listing-id="'+l.id+'" onclick="toggleFavorite(\''+l.id+'\',this)" style="background:var(--s2);border:1px solid var(--b);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button></div>'+
     '<div class="detail-price">₮'+Number(l.price).toLocaleString()+(l.price_yuan?' <span style="font-size:15px;color:var(--m);font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+'</div>'+
     '<div class="detail-meta"><span class="tag">📍 '+(l.location||'УБ')+'</span><span class="tag">'+l.category+'</span>'+(l.has_delivery?'<span class="tag" style="color:var(--green);border-color:var(--green)">🚚 Хүргэлт боломжтой</span>':'')+'<span style="font-size:11px;color:#999;margin-left:4px">🕐 '+timeAgo(l.created_at)+'</span><span style="font-size:11px;color:#999;margin-left:4px">👁️ '+(l.view_count||0)+' үзсэн</span></div>'+
