@@ -95,6 +95,7 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 .featured-shimmer::after{content:'';position:absolute;top:0;left:0;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);animation:shimmer 2s infinite}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;background:#f0f0f0;border-top:1px solid #f0f0f0;padding:14px}
 .vip-feat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.vip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 #adSideWrap{display:none;flex-direction:column}
 @media(max-width:767px){
   #searchWrap{padding:12px 16px!important}
@@ -110,9 +111,9 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 @media(min-width:768px){
   #adSideWrap{display:flex!important}
 }
-@media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}.vip-feat-grid{grid-template-columns:repeat(3,1fr)!important}}
-@media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr);padding:0 80px}.vip-feat-grid{grid-template-columns:repeat(4,1fr)!important}}
-@media(min-width:1024px){.grid{grid-template-columns:repeat(6,1fr);padding:0 150px}.vip-feat-grid{grid-template-columns:repeat(6,1fr)!important}}
+@media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}.vip-feat-grid{grid-template-columns:repeat(3,1fr)!important}.vip-grid{grid-template-columns:repeat(3,1fr)!important}}
+@media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr);padding:0 80px}.vip-feat-grid{grid-template-columns:repeat(4,1fr)!important}.vip-grid{grid-template-columns:repeat(5,1fr)!important}}
+@media(min-width:1024px){.grid{grid-template-columns:repeat(6,1fr);padding:0 150px}.vip-feat-grid{grid-template-columns:repeat(6,1fr)!important}.vip-grid{grid-template-columns:repeat(5,1fr)!important}}
 .card{background:white;border:2px solid #ddd;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s,transform 0.2s;position:relative}
 .card-img img{transition:transform 0.3s ease}
 .card:hover .card-img img{transform:scale(1.08)}
@@ -2140,7 +2141,7 @@ function renderListings(arr) {
       '<span style="font-size:11px;color:#333;background:#FFD700;border-radius:10px;padding:2px 8px;font-weight:700">'+vip.length+' зар</span>'+
       '<div style="flex:1;height:2px;background:linear-gradient(90deg,#FFD700,transparent);border-radius:2px"></div>'+
       '</div>';
-    html += '<div id="vipSlider" class="vip-feat-grid">';
+    html += '<div id="vipSlider" class="vip-grid">';
     vip.forEach(function(l) {
       html += '<div class="card card-featured" onclick="showDetail(\''+l.id+'\')" style="position:relative;border:3px solid #FFD700!important">'+
         '<div class="featured-shimmer"></div>'+
