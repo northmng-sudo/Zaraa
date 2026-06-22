@@ -5389,10 +5389,17 @@ if (window.visualViewport) {
 var _qrLibLoaded = false;
 
 function loadQrLib(callback) {
-  if (_qrLibLoaded) { callback(); return; }
+  if (_qrLibLoaded || (typeof QRCode !== 'undefined')) { _qrLibLoaded = true; callback(); return; }
   var script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
-  script.onload = function() { _qrLibLoaded = true; callback(); };
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  script.onload = function() {
+    _qrLibLoaded = true;
+    callback();
+  };
+  script.onerror = function() {
+    console.error('QR library failed to load from cdnjs');
+    callback(); // callback дотор алдааг харуулна
+  };
   document.head.appendChild(script);
 }
 
@@ -5402,16 +5409,22 @@ function showQrCode() {
   container.innerHTML = '<div class="spinner"></div>';
   loadQrLib(function() {
     var siteUrl = window.location.origin + window.location.pathname;
-    container.innerHTML = '<canvas id="qrCanvas"></canvas>';
-    QRCode.toCanvas(document.getElementById('qrCanvas'), siteUrl, {width: 220, margin: 2}, function(err) {
-      if (err) container.innerHTML = '<p style="color:#e53e3e;font-size:13px">QR код үүсгэхэд алдаа гарлаа</p>';
+    if (typeof QRCode === 'undefined') {
+      container.innerHTML = '<p style="color:#e53e3e;font-size:13px">QR код library ачаалагдсангүй. Дахин оролдоно уу.</p>';
+      return;
+    }
+    container.innerHTML = '<div id="qrCanvas"></div>';
+    new QRCode(document.getElementById('qrCanvas'), {
+      text: siteUrl,
+      width: 220,
+      height: 220
     });
   });
 }
 
 function downloadQrCode() {
-  var canvas = document.getElementById('qrCanvas');
-  if (!canvas) return;
+  var canvas = document.querySelector('#qrCanvas canvas');
+  if (!canvas) { showToast('QR код олдсонгүй', true); return; }
   var link = document.createElement('a');
   link.download = 'zaraa-qr-code.png';
   link.href = canvas.toDataURL('image/png');
