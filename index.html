@@ -209,6 +209,15 @@ select.form-input{cursor:pointer}
 </head>
 <body>
 <div class="toast" id="toast"></div>
+<div id="pipAdWidget" style="display:none;position:fixed;bottom:90px;right:12px;width:140px;z-index:150;border-radius:10px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.3);background:#111">
+  <div style="position:relative;aspect-ratio:9/16">
+    <video id="pipAdVideo" muted playsinline autoplay onended="pipAdNext()" style="width:100%;height:100%;object-fit:cover"></video>
+    <img id="pipAdImage" style="width:100%;height:100%;object-fit:cover;display:none">
+    <div onclick="closePipAd()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:white;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;z-index:2">✕</div>
+    <div onclick="openPipAdLink()" style="position:absolute;top:0;left:0;right:0;bottom:0;cursor:pointer"></div>
+    <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,0.6);color:white;font-size:9px;padding:1px 5px;border-radius:4px">Реклам</div>
+  </div>
+</div>
 <div id="postLoadingOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;flex-direction:column;color:white">
   <div class="spinner" style="width:48px;height:48px;border-width:4px;margin-bottom:16px"></div>
   <div id="postLoadingText" style="font-size:16px;font-weight:700">Зар байршуулж байна...</div>
@@ -2034,6 +2043,7 @@ async function init() {
   loadListings();
   loadStats();
   startBannerSlider();
+  initPipAd();
   // Реклам нуусан байвал нуух
   if (localStorage.getItem('zaraa_ad_hidden') === '1') {
     var adEl = document.getElementById('adSpace');
@@ -3438,6 +3448,62 @@ function toggleAdSound(i) {
   if (!video) return;
   video.muted = !video.muted;
   if (btn) btn.textContent = video.muted ? '🔇' : '🔊';
+}
+
+var _pipAds = [];
+var _pipAdIdx = 0;
+var _pipAdClosed = false;
+
+async function initPipAd() {
+  if (_pipAdClosed || sessionStorage.getItem('zaraa_pip_ad_closed') === '1') return;
+  _pipAds = await loadAds();
+  if (!_pipAds.length) return;
+  showPipAd(0);
+  var widget = document.getElementById('pipAdWidget');
+  widget.style.display = 'block';
+}
+
+function showPipAd(idx) {
+  _pipAdIdx = idx;
+  var ad = _pipAds[idx];
+  if (!ad) return;
+  var video = document.getElementById('pipAdVideo');
+  var img = document.getElementById('pipAdImage');
+  if (ad.video_url) {
+    video.src = ad.video_url;
+    video.style.display = 'block';
+    img.style.display = 'none';
+    video.play().catch(function(){});
+  } else if (ad.image_url) {
+    img.src = ad.image_url;
+    img.style.display = 'block';
+    video.style.display = 'none';
+  }
+}
+
+function pipAdNext() {
+  if (!_pipAds.length) return;
+  if (_pipAds.length === 1) {
+    var video = document.getElementById('pipAdVideo');
+    video.currentTime = 0;
+    video.play().catch(function(){});
+    return;
+  }
+  showPipAd((_pipAdIdx + 1) % _pipAds.length);
+}
+
+function closePipAd() {
+  document.getElementById('pipAdWidget').style.display = 'none';
+  _pipAdClosed = true;
+  sessionStorage.setItem('zaraa_pip_ad_closed', '1');
+}
+
+function openPipAdLink() {
+  var ad = _pipAds[_pipAdIdx];
+  if (ad && ad.link_url) {
+    var url = ad.link_url.startsWith('http') ? ad.link_url : 'https://'+ad.link_url;
+    window.open(url, '_blank');
+  }
 }
 
 async function loadAds() {
