@@ -2514,6 +2514,22 @@ function buildCardImageHtml(l) {
     '</div>';
 }
 
+function buildVipCardHtml(l) {
+  return '<div class="card card-featured" onclick="if(!event.target.closest(\'[data-imgs]\'))showDetail(\''+l.id+'\')" style="position:relative;border:3px solid #FFD700!important">'+
+    '<div class="featured-shimmer"></div>'+
+    '<div class="card-inner" style="border-color:#FFD700;position:relative">'+
+    '<div style="position:absolute;top:0;left:0;right:0;background:linear-gradient(90deg,#FFD700,#FFA500);color:#1a1a2e;font-size:11px;font-weight:900;padding:5px 8px;text-align:center;letter-spacing:0.5px;z-index:6;pointer-events:none">👑 ВИП</div>'+
+    buildCardImageHtml(l)+
+    '<div style="padding:8px">'+
+    '<div style="color:#E62B05;font-size:15px;font-weight:800;margin-bottom:3px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.is_negotiable?' · Тохирно':'')+'</div>'+
+    '<div class="card-title" style="margin-top:2px">'+escapeHtml(l.title)+'</div>'+
+    (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
+    '<div style="display:flex;justify-content:space-between;margin-top:3px">'+
+    '<div style="font-size:10px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
+    '<div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div>'+
+    '</div></div></div></div>';
+}
+
 function renderListings(arr) {
   var grid = document.getElementById('listingsGrid');
   if (!arr || !arr.length) {
@@ -2526,6 +2542,30 @@ function renderListings(arr) {
   var html = '';
 
   if (vip.length) {
+    if (!CC) {
+      // Бvх ангилал харагдаж байгаа vед ВИП заруудыг ангилал бvрээр тусдаа бvлэг болгож харуулна
+      var vipByCat = {};
+      var vipCatOrder = [];
+      vip.forEach(function(l) {
+        if (!vipByCat[l.category]) { vipByCat[l.category] = []; vipCatOrder.push(l.category); }
+        vipByCat[l.category].push(l);
+      });
+      vipCatOrder.forEach(function(cat) {
+        var catVip = vipByCat[cat];
+        var icon = EMOJIS[cat] || '📦';
+        html += '<div style="grid-column:1/-1;background:linear-gradient(135deg,#1a1a2e,#2d2d44);margin:-14px -14px 8px;padding:10px 14px 14px">';
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+          '<span style="font-size:15px;font-weight:900;background:linear-gradient(90deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent">👑 '+icon+' '+escapeHtml(cat)+'-н ВИП зарууд</span>'+
+          '<span style="font-size:11px;color:#333;background:#FFD700;border-radius:10px;padding:2px 8px;font-weight:700">'+catVip.length+' зар</span>'+
+          '<div style="flex:1;height:2px;background:linear-gradient(90deg,#FFD700,transparent);border-radius:2px"></div>'+
+          '</div>';
+        html += '<div class="vip-grid">';
+        catVip.forEach(function(l) {
+          html += buildVipCardHtml(l);
+        });
+        html += '</div></div>';
+      });
+    } else {
     html += '<div style="grid-column:1/-1;background:linear-gradient(135deg,#1a1a2e,#2d2d44);margin:-14px -14px 8px;padding:10px 14px 14px">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
       '<span style="font-size:15px;font-weight:900;background:linear-gradient(90deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent">👑 ВИП ЗАРУУД</span>'+
@@ -2534,21 +2574,10 @@ function renderListings(arr) {
       '</div>';
     html += '<div id="vipSlider" class="vip-grid">';
     vip.forEach(function(l) {
-      html += '<div class="card card-featured" onclick="if(!event.target.closest(\'[data-imgs]\'))showDetail(\''+l.id+'\')" style="position:relative;border:3px solid #FFD700!important">'+
-        '<div class="featured-shimmer"></div>'+
-        '<div class="card-inner" style="border-color:#FFD700;position:relative">'+
-        '<div style="position:absolute;top:0;left:0;right:0;background:linear-gradient(90deg,#FFD700,#FFA500);color:#1a1a2e;font-size:11px;font-weight:900;padding:5px 8px;text-align:center;letter-spacing:0.5px;z-index:6;pointer-events:none">👑 ВИП</div>'+
-        buildCardImageHtml(l)+
-        '<div style="padding:8px">'+
-        '<div style="color:#E62B05;font-size:15px;font-weight:800;margin-bottom:3px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.is_negotiable?' · Тохирно':'')+'</div>'+
-        '<div class="card-title" style="margin-top:2px">'+escapeHtml(l.title)+'</div>'+
-        (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
-        '<div style="display:flex;justify-content:space-between;margin-top:3px">'+
-        '<div style="font-size:10px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
-        '<div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div>'+
-        '</div></div></div></div>';
+      html += buildVipCardHtml(l);
     });
     html += '</div></div>';
+    }
   }
 
   if (featured.length) {
