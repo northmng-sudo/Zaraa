@@ -2581,15 +2581,8 @@ function renderListings(arr) {
   }
 
   if (featured.length) {
-    html += '<div style="grid-column:1/-1;background:white;margin:-14px -14px 8px;padding:10px 14px 14px">';
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
-      '<span style="font-size:14px;font-weight:800;background:linear-gradient(90deg,#FF8C00,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent">⭐ Онцлох зарууд</span>'+
-      '<span style="font-size:11px;color:#999;background:#fff8e1;border:1px solid #FFD700;border-radius:10px;padding:2px 8px">'+featured.length+' зар</span>'+
-      '<div style="flex:1;height:2px;background:linear-gradient(90deg,#FFD700,transparent);border-radius:2px"></div>'+
-      '</div>';
-    html += '<div id="featuredSlider" class="vip-feat-grid">';
-    featured.forEach(function(l) {
-      html += '<div class="card card-featured" onclick="if(!event.target.closest(\'[data-imgs]\'))showDetail(\''+l.id+'\')" style="position:relative">'+
+    function buildFeaturedCardHtml(l) {
+      return '<div class="card card-featured" onclick="if(!event.target.closest(\'[data-imgs]\'))showDetail(\''+l.id+'\')" style="position:relative">'+
         '<div class="featured-shimmer"></div>'+
         '<div class="card-inner" style="border-color:#FFD700;position:relative">'+
         '<div style="position:absolute;top:0;left:0;right:0;background:linear-gradient(90deg,#FF8C00,#FFD700);color:white;font-size:11px;font-weight:800;padding:5px 8px;text-align:center;letter-spacing:0.5px;z-index:6;pointer-events:none">⭐ ОНЦЛОХ</div>'+
@@ -2602,8 +2595,43 @@ function renderListings(arr) {
         '<div style="font-size:10px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
         '<div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div>'+
         '</div></div></div></div>';
-    });
-    html += '</div></div>';
+    }
+    if (!CC) {
+      // Бүх ангилал харагдаж байгаа үед Онцлох заруудыг ангилал бүрээр тусдаа бүлэг болгож харуулна
+      var featByCat = {};
+      var featCatOrder = [];
+      featured.forEach(function(l) {
+        if (!featByCat[l.category]) { featByCat[l.category] = []; featCatOrder.push(l.category); }
+        featByCat[l.category].push(l);
+      });
+      featCatOrder.forEach(function(cat) {
+        var catFeat = featByCat[cat];
+        var icon = EMOJIS[cat] || '📦';
+        html += '<div style="grid-column:1/-1;background:white;margin:-14px -14px 8px;padding:10px 14px 14px">';
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+          '<span style="font-size:14px;font-weight:800;background:linear-gradient(90deg,#FF8C00,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent">⭐ '+icon+' '+escapeHtml(cat)+'-н онцлох зарууд</span>'+
+          '<span style="font-size:11px;color:#999;background:#fff8e1;border:1px solid #FFD700;border-radius:10px;padding:2px 8px">'+catFeat.length+' зар</span>'+
+          '<div style="flex:1;height:2px;background:linear-gradient(90deg,#FFD700,transparent);border-radius:2px"></div>'+
+          '</div>';
+        html += '<div class="vip-feat-grid">';
+        catFeat.forEach(function(l) {
+          html += buildFeaturedCardHtml(l);
+        });
+        html += '</div></div>';
+      });
+    } else {
+      html += '<div style="grid-column:1/-1;background:white;margin:-14px -14px 8px;padding:10px 14px 14px">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+        '<span style="font-size:14px;font-weight:800;background:linear-gradient(90deg,#FF8C00,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent">⭐ Онцлох зарууд</span>'+
+        '<span style="font-size:11px;color:#999;background:#fff8e1;border:1px solid #FFD700;border-radius:10px;padding:2px 8px">'+featured.length+' зар</span>'+
+        '<div style="flex:1;height:2px;background:linear-gradient(90deg,#FFD700,transparent);border-radius:2px"></div>'+
+        '</div>';
+      html += '<div id="featuredSlider" class="vip-feat-grid">';
+      featured.forEach(function(l) {
+        html += buildFeaturedCardHtml(l);
+      });
+      html += '</div></div>';
+    }
   }
   if (vip.length || featured.length) {
     html += '<div style="grid-column:1/-1;font-size:13px;font-weight:600;padding:4px 0 8px;color:#666">Шинэ зарууд</div>';
