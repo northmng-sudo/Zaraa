@@ -2694,8 +2694,12 @@ function slideImg(n, isRelative) {
     var items = window._mediaItems || [];
     if (items[window._slideIdx] && items[window._slideIdx].type === 'video') {
       mainVideo.play().catch(function(){});
+      // Зарын видео дуутай тоглож эхлэхэд реклам видеог түр зуур зогсоо
+      document.querySelectorAll('#detailAdSpace video').forEach(function(v){ v.pause(); });
     } else {
       mainVideo.pause();
+      // Зарын видеогоос гарвал реклам видеог дахин тоглуул
+      document.querySelectorAll('#detailAdSpace video').forEach(function(v){ v.play().catch(function(){}); });
     }
   }
 }
