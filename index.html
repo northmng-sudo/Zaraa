@@ -572,6 +572,9 @@ select.form-input{cursor:pointer}
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--m);cursor:pointer">
       <input type="checkbox" id="shopFilterDelivery" onchange="filterShops()"> 🚚 Зөвхөн хүргэлттэй
     </label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--m);cursor:pointer">
+      <input type="checkbox" id="shopFilterEreen" onchange="filterShops()"> 🇨🇳 Зөвхөн Эрээн дэлгүүр
+    </label>
   </div>
   <div id="shopsList" style="padding:14px"><div class="empty" style="padding-top:60px"><div class="empty-icon">🏪</div><p>Ачааллаж байна...</p></div></div>
 </div>
@@ -595,6 +598,14 @@ select.form-input{cursor:pointer}
 <div class="page" id="page-savedSearches">
   <div style="padding:20px 16px 10px"><div class="section-title">🔔 Хадгалсан хайлтууд</div></div>
   <div class="section"><div id="savedSearchesList"><div class="loading"><div class="spinner"></div></div></div></div>
+</div>
+
+<div class="page" id="page-recentlyViewed">
+  <div style="padding:20px 16px 10px;display:flex;justify-content:space-between;align-items:center">
+    <div class="section-title">🕐 Сүүлд үзсэн зарууд</div>
+    <button onclick="clearRecentlyViewed()" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer">🗑️ Цэвэрлэх</button>
+  </div>
+  <div class="grid" id="recentlyViewedGrid"><div class="loading"><div class="spinner"></div></div></div>
 </div>
 
 <!-- TERMS OF SERVICE PAGE -->
@@ -2448,7 +2459,7 @@ async function loadListings() {
   grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
   await sb.rpc('check_featured_expiry');
   listingsOffset = 0;
-  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false}).range(0, LISTINGS_PAGE_SIZE-1);
+  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified,shop_is_ereen)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false}).range(0, LISTINGS_PAGE_SIZE-1);
   if (r.error) { grid.innerHTML = '<div class="empty"><div class="empty-icon">😕</div><p>Алдаа гарлаа</p></div>'; return; }
   AL = r.data || [];
   AL.sort(function(a, b) {
@@ -2468,7 +2479,7 @@ async function loadMoreListings() {
   if (!listingsHasMore) return;
   var btn = document.getElementById('loadMoreBtn');
   if (btn) btn.textContent = 'Ачааллаж байна...';
-  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false}).range(listingsOffset, listingsOffset+LISTINGS_PAGE_SIZE-1);
+  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified,shop_is_ereen)').eq('is_active',true).eq('status','active').order('created_at',{ascending:false}).range(listingsOffset, listingsOffset+LISTINGS_PAGE_SIZE-1);
   if (!r.error && r.data) {
     AL = AL.concat(r.data);
     listingsHasMore = r.data.length === LISTINGS_PAGE_SIZE;
@@ -2523,7 +2534,7 @@ function buildVipCardHtml(l) {
     '<div style="padding:8px">'+
     '<div style="color:#E62B05;font-size:15px;font-weight:800;margin-bottom:3px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.is_negotiable?' · Тохирно':'')+'</div>'+
     '<div class="card-title" style="margin-top:2px">'+escapeHtml(l.title)+'</div>'+
-    (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
+    (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+(l.users.shop_is_ereen?' <span style="background:linear-gradient(135deg,#DE2910,#FFDE00);color:white;font-weight:700;padding:1px 5px;border-radius:6px;font-size:9px">🇨🇳 Эрээн</span>':'')+'</div>':'')+
     '<div style="display:flex;justify-content:space-between;margin-top:3px">'+
     '<div style="font-size:10px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
     '<div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div>'+
@@ -2590,7 +2601,7 @@ function renderListings(arr) {
         '<div style="padding:8px">'+
         '<div style="color:#E62B05;font-size:15px;font-weight:800;margin-bottom:3px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.is_negotiable?' · Тохирно':'')+'</div>'+
         '<div class="card-title" style="margin-top:2px">'+escapeHtml(l.title)+'</div>'+
-        (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
+        (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+(l.users.shop_is_ereen?' <span style="background:linear-gradient(135deg,#DE2910,#FFDE00);color:white;font-weight:700;padding:1px 5px;border-radius:6px;font-size:9px">🇨🇳 Эрээн</span>':'')+'</div>':'')+
         '<div style="display:flex;justify-content:space-between;margin-top:3px">'+
         '<div style="font-size:10px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
         '<div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div>'+
@@ -2681,7 +2692,7 @@ function renderListings(arr) {
       '<div style="color:#111;font-size:15px;font-weight:800">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.price_yuan?' <span style="font-size:12px;color:#999;font-weight:600">(¥'+Number(l.price_yuan).toLocaleString()+')</span>':'')+(l.price&&l.is_negotiable?' · ':'')+(l.is_negotiable?'Тохирно':'')+'</div>'+
       '<div class="card-title" style="margin-top:4px">'+escapeHtml(l.title)+'</div>'+
       (l.description?'<div style="font-size:11px;color:#888;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3">'+escapeHtml(l.description)+'</div>':'')+
-      (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+'</div>':'')+
+      (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+(l.users.shop_is_ereen?' 🇨🇳':'')+'</div>':'')+
       '<div style="display:flex;justify-content:space-between;margin-top:3px">'+
       '<div style="font-size:10px;color:#999">📍 '+(l.location||'УБ')+'</div>'+
       '<div style="font-size:10px;color:#bbb">'+timeAgo(l.created_at)+'</div>'+
@@ -2702,9 +2713,25 @@ function renderListings(arr) {
 
 async function showDetail(id) {
   showPage('detail');
-  var r = await sb.from('listings').select('*, users(name,rating,phone,is_verified,is_shop,shop_name,shop_is_verified,created_at)').eq('id',id).single();
+  var r = await sb.from('listings').select('*, users(name,rating,phone,is_verified,is_shop,shop_name,shop_is_verified,shop_is_ereen,created_at)').eq('id',id).single();
   var l = r.data;
   if (!l) return;
+  // Сүүлд үзсэн зарууд - localStorage-д хадгална
+  try {
+    var rv = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+    rv = rv.filter(function(x){ return x.id !== l.id; });
+    rv.unshift({
+      id: l.id,
+      title: l.title,
+      price: l.price,
+      image: l.images && l.images[0] ? l.images[0] : null,
+      location: l.location,
+      category: l.category,
+      viewed_at: Date.now()
+    });
+    if (rv.length > 30) rv = rv.slice(0, 30);
+    localStorage.setItem('recentlyViewed', JSON.stringify(rv));
+  } catch(e) {}
   l.view_count = (l.view_count || 0) + 1; // Дэлгэцэнд нэмэгдсэн тоог шууд харуулна
   sb.rpc('increment_view_count', {p_listing_id: id}); // Бодит тоог сервер дээр нэмэгдүүлнэ (async, хариу хүлээхгүй)
   var imgs = l.images&&l.images.length ? l.images : [];
@@ -2779,7 +2806,7 @@ async function showDetail(id) {
       }).join('')+
       '</div>' : '')+
     '<div class="seller-card"><div class="seller-avatar">'+((l.users&&l.users.is_shop&&l.users.shop_name?l.users.shop_name:l.users&&l.users.name?l.users.name:'?')[0].toUpperCase())+'</div>'+
-    '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.is_shop?'🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр'):escapeHtml(l.users&&l.users.name?l.users.name:'Хэрэглэгч'))+(l.users&&(l.users.is_verified||l.users.shop_is_verified)?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+'</div>'+
+    '<div class="seller-info"><div class="seller-name">'+(l.users&&l.users.is_shop?'🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр'):escapeHtml(l.users&&l.users.name?l.users.name:'Хэрэглэгч'))+(l.users&&(l.users.is_verified||l.users.shop_is_verified)?' <span style="background:#00C96B;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">✓ Баталгаажсан</span>':'')+(l.users&&l.users.shop_is_ereen?' <span style="background:linear-gradient(135deg,#DE2910,#FFDE00);color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">🇨🇳 Эрээн</span>':'')+'</div>'+
     '<div class="seller-rating">⭐ '+(l.users&&l.users.rating?l.users.rating:5.0)+(l.users&&l.users.created_at?' • '+getAccountAgeText(l.users.created_at):'')+'</div></div></div>'+
     (l.users&&!l.users.is_verified&&!l.users.shop_is_verified&&l.users.created_at&&isNewAccount(l.users.created_at)?
       '<div style="background:#FFF3E0;border:1px solid #FFB74D;border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:#E65100"><b>⚠️ Анхаар:</b> Энэ хэрэглэгч сүүлийн үед бүртгүүлсэн, бас баталгаажаагүй байна. Бэлэн мөнгө шилжүүлэхээс өмнө барааг биечлэн шалгахыг зөвлөж байна. <a href="javascript:void(0)" onclick="showPage(\'safety\')" style="color:#E65100;font-weight:700;text-decoration:underline">Дэлгэрэнгүй →</a></div>':'')+
@@ -4835,6 +4862,7 @@ async function loadProfile() {
     '<div class="stat"><div class="stat-num">⭐ '+(user.rating||5.0)+'</div><div class="stat-label">Үнэлгээ</div></div></div>'+
     '<div class="menu-item" onclick="showPage(\'listings\')"><div class="menu-left"><div class="menu-icon">📋</div>Миний зарууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'favorites\')"><div class="menu-left"><div class="menu-icon">❤️</div>Хадгалсан зарууд</div></div>'+
+    '<div class="menu-item" onclick="showRecentlyViewed()"><div class="menu-left"><div class="menu-icon">🕐</div>Сүүлд үзсэн зарууд</div></div>'+
     '<div class="menu-item" onclick="showPage(\'savedSearches\')"><div class="menu-left"><div class="menu-icon">🔔</div>Хадгалсан хайлтууд</div></div>'+
     '<div class="menu-item" onclick="showQrCode()"><div class="menu-left"><div class="menu-icon">📱</div>QR код хуваалцах</div></div>'+
     '<div class="menu-item" onclick="showPage(\'terms\')"><div class="menu-left"><div class="menu-icon">📋</div>Үйлчилгээний нөхцөл</div></div>'+
@@ -5248,7 +5276,7 @@ async function loadFavoritesPage() {
     grid.innerHTML = '<div class="empty" style="grid-column:span 2"><div class="empty-icon">💔</div><p>Хадгалсан зар байхгүй<br><br>Зар дээрх 🤍 товчийг дарж хадгалаарай</p></div>';
     return;
   }
-  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified)').in('id', favIds);
+  var r = await sb.from('listings').select('*, users(name,rating,is_verified,is_shop,shop_name,shop_is_verified,shop_is_ereen)').in('id', favIds);
   if (r.error || !r.data || !r.data.length) {
     grid.innerHTML = '<div class="empty" style="grid-column:span 2"><div class="empty-icon">💔</div><p>Хадгалсан зар олдсонгүй</p></div>';
     return;
@@ -5274,6 +5302,40 @@ function renderFavoritesGrid(arr) {
   }).join('');
 }
 
+function showRecentlyViewed() {
+  showPage('recentlyViewed');
+  renderRecentlyViewed();
+}
+
+function renderRecentlyViewed() {
+  var grid = document.getElementById('recentlyViewedGrid');
+  var rv = [];
+  try { rv = JSON.parse(localStorage.getItem('recentlyViewed') || '[]'); } catch(e) {}
+  if (!rv.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:span 2"><div class="empty-icon">🕐</div><p>Сүүлд үзсэн зар алга</p><p style="font-size:12px;color:#999;margin-top:8px">Зар үзэхэд энд хадгалагдана</p></div>';
+    return;
+  }
+  grid.innerHTML = rv.map(function(l) {
+    return '<div class="card" onclick="showDetail(\''+l.id+'\')">'+
+      '<div class="card-inner">'+
+      '<div class="card-img" style="background:#f5f5f5;display:flex;align-items:center;justify-content:center">'+
+      (l.image?'<img src="'+l.image+'" style="width:100%;height:100%;object-fit:cover">':'<div style="font-size:36px">📦</div>')+
+      '</div>'+
+      '<div style="padding:8px">'+
+      '<div style="color:#E62B05;font-size:15px;font-weight:800;margin-bottom:3px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+'</div>'+
+      '<div class="card-title">'+escapeHtml(l.title||'')+'</div>'+
+      '<div style="font-size:10px;color:#999;margin-top:3px">📍 '+(l.location||'УБ')+' · '+timeAgo(new Date(l.viewed_at).toISOString())+'</div>'+
+      '</div></div></div>';
+  }).join('');
+}
+
+function clearRecentlyViewed() {
+  if (!confirm('Сүүлд үзсэн заруудыг бүгдийг арилгах уу?')) return;
+  localStorage.removeItem('recentlyViewed');
+  renderRecentlyViewed();
+  showToast('Цэвэрлэлээ');
+}
+
 function showPage(name) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('page-'+name).classList.add('active');
@@ -5295,7 +5357,7 @@ function showPage(name) {
 var SHOPS_CACHE = [];
 
 async function loadShops() {
-  var r = await sb.from('users').select('id,name,shop_name,shop_category,shop_district,shop_khoroo,shop_address,shop_hours_open,shop_hours_close,shop_logo_url,shop_has_delivery,shop_is_verified,shop_rating,phone').eq('is_shop', true);
+  var r = await sb.from('users').select('id,name,shop_name,shop_category,shop_district,shop_khoroo,shop_address,shop_hours_open,shop_hours_close,shop_logo_url,shop_has_delivery,shop_is_verified,shop_rating,phone,shop_is_ereen').eq('is_shop', true);
   SHOPS_CACHE = r.data || [];
   await renderShops(SHOPS_CACHE);
 }
@@ -5330,12 +5392,14 @@ async function filterShops() {
   var sum = document.getElementById('shopFilterSum') ? document.getElementById('shopFilterSum').value : '';
   var category = document.getElementById('shopFilterCategory').value;
   var deliveryOnly = document.getElementById('shopFilterDelivery').checked;
+  var ereenOnly = document.getElementById('shopFilterEreen').checked;
   var filtered = SHOPS_CACHE.filter(function(s) {
     if (province === 'Улаанбаатар' && district && s.shop_district !== district) return false;
     if (province && province !== 'Улаанбаатар' && sum && s.shop_khoroo !== sum) return false;
     if (province && province !== 'Улаанбаатар' && !sum && s.shop_district !== province) return false;
     if (category && s.shop_category !== category) return false;
     if (deliveryOnly && !s.shop_has_delivery) return false;
+    if (ereenOnly && !s.shop_is_ereen) return false;
     return true;
   });
   await renderShops(filtered);
@@ -5392,8 +5456,9 @@ async function renderShops(shops) {
       (s.shop_logo_url?'<img src="'+s.shop_logo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px">':icon)+
       '</div>'+
       '<div style="flex:1;min-width:0">'+
-      '<div style="display:flex;align-items:center;gap:6px"><div style="font-weight:700;font-size:14px">'+(s.shop_name||s.name)+'</div>'+
-      (s.shop_is_verified?'<span style="color:#1a73e8;font-size:13px">✔️</span>':'')+'</div>'+
+      '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><div style="font-weight:700;font-size:14px">'+(s.shop_name||s.name)+'</div>'+
+      (s.shop_is_verified?'<span style="color:#1a73e8;font-size:13px">✔️</span>':'')+
+      (s.shop_is_ereen?'<span style="font-size:10px;background:linear-gradient(135deg,#DE2910,#FFDE00);color:white;font-weight:700;padding:2px 6px;border-radius:8px">🇨🇳 Эрээн</span>':'')+'</div>'+
       '<div style="font-size:12px;color:#999;margin-top:2px">📍 '+(s.shop_district||'')+(s.shop_khoroo?', '+s.shop_khoroo:'')+'</div>'+
       '<div style="display:flex;align-items:center;gap:8px;margin-top:4px">'+
       (isOpen!==null?'<span style="font-size:11px;color:'+(isOpen?'#00875a':'#e53e3e')+';font-weight:600">'+(isOpen?'🟢 Нээгдсэн':'🔴 Хаалттай')+'</span>':'')+
