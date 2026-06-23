@@ -2745,7 +2745,7 @@ async function showDetail(id) {
       if (m.type === 'video') {
         return '<div style="min-width:100%;height:100%;position:relative;display:flex;align-items:center;justify-content:center;background:#000">'+
           '<video src="'+m.url+'" muted loop playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;filter:blur(25px) brightness(0.6);transform:scale(1.1);z-index:1"></video>'+
-          '<video src="'+m.url+'" controls playsinline style="position:relative;max-width:100%;max-height:100%;z-index:2" id="mainVideo"></video>'+
+          '<video src="'+m.url+'" controls playsinline onplay="document.querySelectorAll(\'#adSpace video, #detailAdSpace video\').forEach(function(v){try{v.pause();}catch(e){}})" style="position:relative;max-width:100%;max-height:100%;z-index:2" id="mainVideo"></video>'+
           '</div>';
       }
       return '<img src="'+m.url+'" style="min-width:100%;height:100%;object-fit:cover">';
@@ -5337,12 +5337,30 @@ function clearRecentlyViewed() {
 }
 
 function showPage(name) {
+  // Page солих үед өмнөх page-н бүх видеог зогсооно (дуу давхар сонсогдохгүй байх)
+  try {
+    var currentPage = document.querySelector('.page.active');
+    if (currentPage && currentPage.id !== 'page-'+name) {
+      currentPage.querySelectorAll('video').forEach(function(v){
+        try { v.pause(); } catch(e) {}
+      });
+    }
+  } catch(e) {}
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   var el = document.getElementById('nav-'+name);
   if (el) el.classList.add('active');
   window.scrollTo(0,0);
+  // Шинэ page-н autoplay видеог дахин эхлүүлнэ (зөвхөн muted autoplay видеонууд)
+  try {
+    var newPage = document.getElementById('page-'+name);
+    if (newPage) {
+      newPage.querySelectorAll('video[autoplay]').forEach(function(v){
+        if (v.muted) { try { v.play().catch(function(){}); } catch(e) {} }
+      });
+    }
+  } catch(e) {}
   if (name === 'chats') { loadMyChats(); clearChatBadge(); }
   if (name === 'admin') loadAdmin();
   if (name === 'deliveries') loadDeliveriesPage();
