@@ -3187,8 +3187,8 @@ function goStep(n) {
 }
 
 var KHOROO = {
-  'Баянгол': 12, 'Баянзүрх': 24, 'Сүхбаатар': 12, 'Хан-Уул': 12,
-  'Чингэлтэй': 12, 'Сонгинохайрхан': 32, 'Налайх': 5, 'Багануур': 5, 'Багахангай': 3
+  'Баянгол': 25, 'Баянзүрх': 28, 'Сүхбаатар': 20, 'Хан-Уул': 25,
+  'Чингэлтэй': 19, 'Сонгинохайрхан': 43, 'Налайх': 8, 'Багануур': 5, 'Багахангай': 3
 };
 
 var CAR_MODELS = {
@@ -4820,7 +4820,7 @@ function updateShopRegProvince() {
 function updateShopKhoroo() {
   var district = document.getElementById('shopDistrict').value;
   var khorooSelect = document.getElementById('shopKhoroo');
-  var khorooCounts = {'Баянгол':23,'Баянзүрх':28,'Сүхбаатар':20,'Хан-Уул':18,'Чингэлтэй':19,'Сонгинохайрхан':32,'Налайх':8,'Багануур':5,'Багахангай':2};
+  var khorooCounts = {'Баянгол':25,'Баянзүрх':28,'Сүхбаатар':20,'Хан-Уул':25,'Чингэлтэй':19,'Сонгинохайрхан':43,'Налайх':8,'Багануур':5,'Багахангай':3};
   var count = khorooCounts[district] || 0;
   khorooSelect.innerHTML = '<option value="">Хороо</option>';
   for (var i = 1; i <= count; i++) {
