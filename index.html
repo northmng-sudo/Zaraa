@@ -1210,7 +1210,7 @@ select.form-input{cursor:pointer}
 <!-- END postModal -->
 
 <!-- MESSAGE ACTION SHEET -->
-<div class="modal-overlay" id="msgActionSheet" style="display:none;align-items:flex-end" onclick="if(event.target===this)closeModal('msgActionSheet')">
+<div class="modal-overlay" id="msgActionSheet" style="display:none;align-items:flex-end;z-index:500;background:rgba(0,0,0,0.4)" onclick="if(event.target===this)closeModal('msgActionSheet')">
   <div style="background:white;width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:8px;padding-bottom:max(20px,env(safe-area-inset-bottom))">
     <div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:8px auto 12px"></div>
     <button id="msgActReply" onclick="doReplyToMessage()" style="display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;padding:14px 16px;font-size:15px;cursor:pointer;border-radius:10px"><span style="font-size:20px">↩️</span> Хариулах</button>
@@ -3623,25 +3623,30 @@ function doCopyMessage() {
 }
 
 function doDeleteMessage() {
+  var msgId = window._actionMsgId;
   closeModal('msgActionSheet');
-  if (confirm('Энэ мессежийг устгах уу?')) {
-    deleteMessage(window._actionMsgId);
-  }
+  setTimeout(function() {
+    if (confirm('Энэ мессежийг устгах уу?')) {
+      deleteMessage(msgId);
+    }
+  }, 50);
 }
 
 async function doEditMessage() {
   var m = window._chatMsgsCache && window._chatMsgsCache[window._actionMsgId];
   if (!m) return;
   closeModal('msgActionSheet');
-  var newText = prompt('Мессежийг засах:', m.content||'');
-  if (newText === null) return;
-  newText = newText.trim();
-  if (!newText) { showToast('Хоосон байж болохгүй', true); return; }
-  if (newText === m.content) return;
-  var r = await sb.from('messages').update({content: newText, edited_at: new Date().toISOString()}).eq('id', m.id);
-  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
-  showToast('Засагдлаа');
-  loadChat(window._chatListingId, window._chatSellerId);
+  setTimeout(async function() {
+    var newText = prompt('Мессежийг засах:', m.content||'');
+    if (newText === null) return;
+    newText = newText.trim();
+    if (!newText) { showToast('Хоосон байж болохгүй', true); return; }
+    if (newText === m.content) return;
+    var r = await sb.from('messages').update({content: newText, edited_at: new Date().toISOString()}).eq('id', m.id);
+    if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+    showToast('Засагдлаа');
+    loadChat(window._chatListingId, window._chatSellerId);
+  }, 50);
 }
 
 async function deleteMessage(msgId) {
@@ -6050,6 +6055,13 @@ function closeModal(id) {
   if (id === 'chatModal' && window._chatChannel) {
     sb.removeChannel(window._chatChannel);
     window._chatChannel = null;
+  }
+  // msgActionSheet хаагдах үед chat нээгдсэн байсан бол хэвээр харагдуулна
+  if (id === 'msgActionSheet') {
+    var chatModal = document.getElementById('chatModal');
+    if (chatModal && chatModal.classList.contains('open')) {
+      chatModal.style.display = 'flex';
+    }
   }
 }
 
