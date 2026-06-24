@@ -1234,6 +1234,17 @@ select.form-input{cursor:pointer}
 </div><!-- FIX: missing closing div for postModal overlay -->
 <!-- END postModal -->
 
+<!-- LISTING STATS MODAL -->
+<div class="modal-overlay" id="statsModal" style="display:none" onclick="if(event.target===this)closeModal('statsModal')">
+  <div class="modal" style="max-width:600px;width:95%;max-height:85vh;overflow-y:auto;border-radius:16px;margin:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 16px 8px">
+      <div style="font-weight:800;font-size:16px">📊 Зарын статистик</div>
+      <button onclick="closeModal('statsModal')" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--m)">×</button>
+    </div>
+    <div id="statsModalBody" style="padding:8px 16px 20px"></div>
+  </div>
+</div>
+
 <!-- SHARE SHEET -->
 <div class="modal-overlay" id="shareSheet" style="display:none;align-items:flex-end" onclick="if(event.target===this)closeModal('shareSheet')">
   <div style="background:white;width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:8px;padding-bottom:max(20px,env(safe-area-inset-bottom))">
@@ -2474,6 +2485,7 @@ async function init() {
     loadNotifications(); 
     loadUnreadChatBadge();
     await loadFavorites();
+    checkPriceDrops();
   }
   loadListings();
   loadStats();
@@ -2585,6 +2597,32 @@ var LISTINGS_PAGE_SIZE = 60;
 var listingsOffset = 0;
 var listingsHasMore = true;
 
+async function checkPriceDrops() {
+  if (!CU) return;
+  var r = await sb.from('favorites').select('listing_id, saved_price, price_drop_notified').eq('user_id', CU.id);
+  if (r.error || !r.data || !r.data.length) return;
+  var withSavedPrice = r.data.filter(function(f){ return f.saved_price != null && !f.price_drop_notified; });
+  if (!withSavedPrice.length) return;
+  var ids = withSavedPrice.map(function(f){ return f.listing_id; });
+  var lr = await sb.from('listings').select('id,title,price').in('id', ids);
+  if (lr.error || !lr.data) return;
+  var priceMap = {};
+  lr.data.forEach(function(l){ priceMap[l.id] = l; });
+  for (var i = 0; i < withSavedPrice.length; i++) {
+    var f = withSavedPrice[i];
+    var current = priceMap[f.listing_id];
+    if (current && current.price < f.saved_price) {
+      var diff = f.saved_price - current.price;
+      await sb.from('notifications').insert({
+        user_id: CU.id,
+        title: '💰 Үнэ буурсан!',
+        body: escapeHtml(current.title)+' - ₮'+diff.toLocaleString()+'-р буурсан (одоо ₮'+current.price.toLocaleString()+')'
+      });
+      await sb.from('favorites').update({price_drop_notified: true, saved_price: current.price}).eq('user_id', CU.id).eq('listing_id', f.listing_id);
+    }
+  }
+}
+
 async function loadFavorites() {
   if (!CU) { FAVORITES = new Set(); return; }
   var r = await sb.from('favorites').select('listing_id').eq('user_id', CU.id);
@@ -2601,7 +2639,10 @@ async function toggleFavorite(listingId, btn) {
       showToast('Хадгалснаас хасагдлаа');
     }
   } else {
-    var r = await sb.from('favorites').insert({user_id: CU.id, listing_id: listingId});
+    // Хадгалах мөч дэх үнийг хамт хадгална — дараа үнэ буурсныг харьцуулахад хэрэгтэй
+    var curListing = (AL || []).find(function(x){ return x.id === listingId; });
+    var priceNow = curListing ? curListing.price : null;
+    var r = await sb.from('favorites').insert({user_id: CU.id, listing_id: listingId, saved_price: priceNow});
     if (!r.error) {
       FAVORITES.add(listingId);
       showToast('❤️ Хадгалагдлаа');
@@ -5212,6 +5253,40 @@ async function orderDelivery() {
   showToast('Хүргэлт захиалагдлаа! 🚚 Хүргэгч удахгүй хүлээн авна.');
 }
 
+async function bumpListing(listingId) {
+  if (!confirm('Энэ зарыг шинэчилж, жагсаалтын дээд тал руу гаргах уу?')) return;
+  var now = new Date().toISOString();
+  var r = await sb.from('listings').update({created_at: now, bumped_at: now}).eq('id', listingId).eq('user_id', CU.id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('🔄 Зар шинэчлэгдлээ');
+  loadProfile();
+}
+
+function showListingStats() {
+  var listings = window._myListingsCache || [];
+  var favCounts = window._myListingsFavCounts || {};
+  if (!listings.length) return;
+  var totalViews = listings.reduce(function(s,l){ return s+(l.view_count||0); }, 0);
+  var totalFavs = listings.reduce(function(s,l){ return s+(favCounts[l.id]||0); }, 0);
+  var sorted = listings.slice().sort(function(a,b){ return (b.view_count||0)-(a.view_count||0); });
+  var maxViews = Math.max.apply(null, listings.map(function(l){ return l.view_count||0; }).concat([1]));
+  var html = '<div class="stats" style="margin:0 0 16px"><div class="stat"><div class="stat-num">'+listings.length+'</div><div class="stat-label">Нийт зар</div></div>'+
+    '<div class="stat"><div class="stat-num">👁️ '+totalViews+'</div><div class="stat-label">Нийт үзсэн</div></div>'+
+    '<div class="stat"><div class="stat-num">❤️ '+totalFavs+'</div><div class="stat-label">Нийт хадгалсан</div></div></div>'+
+    '<div style="font-size:12px;font-weight:700;color:var(--m);margin-bottom:10px;text-transform:uppercase">Зар тус бүрээр (үзсэн тоогоор)</div>';
+  html += sorted.map(function(l) {
+    var pct = Math.round(((l.view_count||0)/maxViews)*100);
+    var statusTag = l.is_active ? (l.status==='active'?'<span style="color:var(--g);font-size:10px;font-weight:700">● Идэвхтэй</span>':'<span style="color:var(--m);font-size:10px">● '+(l.status||'')+'</span>') : '<span style="color:#e53e3e;font-size:10px;font-weight:700">● Идэвхгүй</span>';
+    return '<div style="margin-bottom:12px;cursor:pointer" onclick="closeModal(\'statsModal\');showDetail(\''+l.id+'\')">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%">'+escapeHtml(l.title)+'</span>'+statusTag+'</div>'+
+      '<div style="background:var(--s2);border-radius:6px;height:8px;overflow:hidden;margin-bottom:4px"><div style="background:linear-gradient(90deg,#FF8C00,#FFD700);height:100%;width:'+pct+'%;border-radius:6px"></div></div>'+
+      '<div style="display:flex;gap:12px;font-size:11px;color:var(--m)"><span>👁️ '+(l.view_count||0)+' үзсэн</span><span>❤️ '+(favCounts[l.id]||0)+' хадгалсан</span><span>🕐 '+timeAgo(l.created_at)+'</span></div>'+
+      '</div>';
+  }).join('');
+  document.getElementById('statsModalBody').innerHTML = html;
+  openModal('statsModal');
+}
+
 async function loadProfile() {
   if (!CU) return;
   var u = await sb.from('users').select('*').eq('id',CU.id).single();
@@ -5242,10 +5317,22 @@ async function loadProfile() {
     (user.is_admin?'<div class="menu-item" onclick="showPage(\'admin\')"><div class="menu-left"><div class="menu-icon">🛡️</div>Admin Panel</div></div>':'')+
     '<div class="menu-item" onclick="logout()"><div class="menu-left"><div class="menu-icon">🚪</div>Гарах</div></div>';
   if (ls.data&&ls.data.length) {
+    var listingIds = ls.data.map(function(l){ return l.id; });
+    var favCountR = await sb.from('favorites').select('listing_id').in('listing_id', listingIds);
+    var favCounts = {};
+    (favCountR.data||[]).forEach(function(f){ favCounts[f.listing_id] = (favCounts[f.listing_id]||0)+1; });
     document.getElementById('myListings').innerHTML = '<div class="grid">'+ls.data.map(function(l){
-      return '<div class="card" onclick="showDetail(\''+l.id+'\')"><div class="card-img">'+(EMOJIS[l.category]||'📦')+(l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+'</div>'+
-        '<div class="card-body"><div class="card-title">'+escapeHtml(l.title)+'</div><div class="card-price">₮'+Number(l.price).toLocaleString()+'</div></div></div>';
-    }).join('')+'</div>';
+      var canBump = !l.bumped_at || (Date.now() - new Date(l.bumped_at).getTime()) > 24*60*60*1000;
+      return '<div class="card"><div onclick="showDetail(\''+l.id+'\')" style="cursor:pointer"><div class="card-img">'+(EMOJIS[l.category]||'📦')+(l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+'</div>'+
+        '<div class="card-body"><div class="card-title">'+escapeHtml(l.title)+'</div><div class="card-price">₮'+Number(l.price).toLocaleString()+'</div>'+
+        '<div style="display:flex;gap:10px;margin-top:5px;font-size:11px;color:var(--m)"><span>👁️ '+(l.view_count||0)+'</span><span>❤️ '+(favCounts[l.id]||0)+'</span></div>'+
+        '</div></div>'+
+        '<button onclick="event.stopPropagation();bumpListing(\''+l.id+'\')" '+(canBump?'':'disabled')+' style="width:100%;margin-top:6px;background:'+(canBump?'var(--s2)':'transparent')+';border:1px solid var(--b);color:'+(canBump?'var(--t)':'var(--m)')+';border-radius:0 0 12px 12px;padding:7px;font-size:11px;font-weight:700;cursor:'+(canBump?'pointer':'not-allowed')+'">'+(canBump?'🔄 Шинэчлэх':'⏳ 24ц дотор шинэчилсэн')+'</button>'+
+        '</div>';
+    }).join('')+'</div>'+
+    '<button onclick="showListingStats()" style="width:100%;margin-top:14px;background:var(--s2);border:1px solid var(--b);color:var(--t);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer">📊 Дэлгэрэнгүй статистик</button>';
+    window._myListingsCache = ls.data;
+    window._myListingsFavCounts = favCounts;
   }
   if (ds.data&&ds.data.length) {
     var sl = {pending:'⏳ Хүлээгдэж байна',accepted:'✅ Хүлээн авсан',delivered:'🎉 Хүргэгдсэн'};
