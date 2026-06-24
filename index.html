@@ -444,6 +444,7 @@ select.form-input{cursor:pointer}
 </div>
 
 <div class="page" id="page-deliveries">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <!-- BUYER VIEW -->
   <div id="buyerDeliveries">
     <div style="padding:20px 16px 10px"><div class="section-title">📦 Миний захиалгууд</div></div>
@@ -596,11 +597,13 @@ select.form-input{cursor:pointer}
 </div>
 
 <div class="page" id="page-listings">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px"><div class="section-title">Миний зарууд</div></div>
   <div class="section"><div id="myListings"><div class="empty"><div class="empty-icon">📋</div><p>Зар байхгүй<br><br><button class="btn btn-primary" onclick="showPostModal()">+ Зар байршуулах</button></p></div></div></div>
 </div>
 
 <div class="page" id="page-favorites">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px;display:flex;justify-content:space-between;align-items:center">
     <div class="section-title">❤️ Хадгалсан зарууд</div>
     <button id="compareModeBtn" onclick="toggleCompareMode()" style="background:var(--s2);border:1px solid var(--b);color:var(--t);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600">⚖️ Харьцуулах</button>
@@ -621,11 +624,13 @@ select.form-input{cursor:pointer}
 </div>
 
 <div class="page" id="page-savedSearches">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px"><div class="section-title">🔔 Хадгалсан хайлтууд</div></div>
   <div class="section"><div id="savedSearchesList"><div class="loading"><div class="spinner"></div></div></div></div>
 </div>
 
 <div class="page" id="page-recentlyViewed">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px;display:flex;justify-content:space-between;align-items:center">
     <div class="section-title">🕐 Сүүлд үзсэн зарууд</div>
     <button onclick="clearRecentlyViewed()" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer">🗑️ Цэвэрлэх</button>
@@ -635,6 +640,7 @@ select.form-input{cursor:pointer}
 
 <!-- TERMS OF SERVICE PAGE -->
 <div class="page" id="page-terms">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px"><div class="section-title">📋 Үйлчилгээний нөхцөл</div></div>
   <div class="section" style="padding:0 16px 40px;font-size:14px;line-height:1.7;color:var(--t)">
 
@@ -720,6 +726,7 @@ select.form-input{cursor:pointer}
 
 <!-- PRIVACY POLICY PAGE -->
 <div class="page" id="page-privacy">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px"><div class="section-title">🔒 Нууцлалын бодлого</div></div>
   <div class="section" style="padding:0 16px 40px;font-size:14px;line-height:1.7;color:var(--t)">
 
@@ -809,6 +816,7 @@ select.form-input{cursor:pointer}
 
 <!-- SAFETY GUIDE PAGE -->
 <div class="page" id="page-safety">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px"><div class="section-title">🛡️ Аюулгүй ажиллагаа</div></div>
   <div class="section" style="padding:0 16px 40px;font-size:14px;line-height:1.7;color:var(--t)">
 
@@ -861,6 +869,7 @@ select.form-input{cursor:pointer}
 
 <!-- ADMIN PAGE -->
 <div class="page" id="page-notifications">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px;display:flex;align-items:center;justify-content:space-between">
     <div class="section-title">🔔 Мэдэгдлүүд</div>
     <button class="btn btn-ghost" style="font-size:12px" onclick="markAllRead()">Бүгдийг уншсан</button>
@@ -869,6 +878,7 @@ select.form-input{cursor:pointer}
 </div>
 
 <div class="page" id="page-admin">
+  <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px;display:flex;align-items:center;justify-content:space-between">
     <div class="section-title">🛡️ Admin Panel</div>
   </div>
@@ -4279,6 +4289,7 @@ function toggleAdSound(i) {
   var btn = document.getElementById('adMuteBtn_'+i);
   if (!video) return;
   video.muted = !video.muted;
+  if (!video.muted) video.volume = 1.0;
   if (btn) btn.textContent = video.muted ? '🔇' : '🔊';
 }
 
@@ -4744,8 +4755,8 @@ async function updateAdSpace(isCourier, targetBoxId) {
         var ad = ads[i];
         var content = '';
         if (ad.video_url) {
-          content = '<video id="adVideo_'+i+'" src="'+ad.video_url+'" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;background:#000" onended="goToNextAdGlobal()"></video>'+
-            '<div id="adMuteBtn_'+i+'" style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,0.6);color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px" onclick="event.stopPropagation();toggleAdSound(\''+i+'\')">🔇</div>';
+          content = '<video id="adVideo_'+i+'" src="'+ad.video_url+'" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;background:#000;position:relative;z-index:1" onended="goToNextAdGlobal()"></video>'+
+            '<div id="adMuteBtn_'+i+'" style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,0.6);color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;z-index:20;pointer-events:auto" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();event.preventDefault();toggleAdSound(\''+i+'\')">🔇</div>';
         } else if (ad.image_url) {
           content = '<img src="'+ad.image_url+'" style="width:100%;height:100%;object-fit:cover">';
         }
