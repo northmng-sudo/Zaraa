@@ -259,35 +259,9 @@ select.form-input{cursor:pointer}
 
 <div class="page active" id="page-home">
   <!-- BANNER SLIDER - ҮЛДДЭГ -->
-  <div style="position:relative;overflow:hidden;background:#f5f5f5" id="bannerSlider">
-    <div style="display:flex;transition:transform 0.5s;height:80px" id="bannerInner">
-      <div style="min-width:100%;background:linear-gradient(135deg,#E62B05,#ff6b35);display:flex;align-items:center;padding:0 20px;color:white;justify-content:space-between">
-        <div>
-          <div style="font-size:16px;font-weight:800;line-height:1.2">Зар, хүргэлт нэг дор</div>
-          <div style="font-size:11px;opacity:0.85;margin-top:2px">ЗАРАА ПЛАТФОРМ</div>
-        </div>
-        <button onclick="showPostModal()" style="background:white;color:#E62B05;border:none;border-radius:4px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">+ Зар нэмэх</button>
-      </div>
-      <div style="min-width:100%;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:flex;align-items:center;padding:0 20px;color:white;justify-content:space-between">
-        <div>
-          <div style="font-size:16px;font-weight:800;line-height:1.2">30 минутын дотор хүргэнэ</div>
-          <div style="font-size:11px;opacity:0.85;margin-top:2px">ХҮРГЭЛТ</div>
-        </div>
-        <button onclick="showPage('deliveries')" style="background:white;color:#1a73e8;border:none;border-radius:4px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">Захиалах →</button>
-      </div>
-      <div style="min-width:100%;background:linear-gradient(135deg,#00875a,#006644);display:flex;align-items:center;padding:0 20px;color:white;justify-content:space-between">
-        <div>
-          <div style="font-size:16px;font-weight:800;line-height:1.2">Чөлөөт цагтаа мөнгө ол</div>
-          <div style="font-size:11px;opacity:0.85;margin-top:2px">ХҮРГЭГЧ БОЛОХ</div>
-        </div>
-        <button onclick="openAuth('register');selectRole('courier')" style="background:white;color:#00875a;border:none;border-radius:4px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">Бүртгүүлэх →</button>
-      </div>
-    </div>
-    <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px">
-      <div onclick="slideBanner(0)" id="bd0" style="width:20px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:1"></div>
-      <div onclick="slideBanner(1)" id="bd1" style="width:6px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:0.4"></div>
-      <div onclick="slideBanner(2)" id="bd2" style="width:6px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:0.4"></div>
-    </div>
+  <div style="position:relative;overflow:hidden;background:#f5f5f5;display:none" id="bannerSlider">
+    <div style="display:flex;transition:transform 0.5s;height:80px" id="bannerInner"></div>
+    <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px" id="bannerDots"></div>
   </div>
 
   <!-- CATEGORY TABS - PILL NAV -->
@@ -893,10 +867,15 @@ select.form-input{cursor:pointer}
       <input class="form-input" id="bannerSub" placeholder="Дэд гарчиг" style="margin-bottom:8px">
       <input class="form-input" id="bannerBtn" placeholder="Товчны текст" style="margin-bottom:8px">
       <input class="form-input" id="bannerLink" placeholder="Товчны линк (showPostModal, showPage('deliveries')...)" style="margin-bottom:8px">
+      <div style="margin-bottom:8px">
+        <label class="form-label" style="font-size:12px">🖼️ Дэвсгэр зураг (заавал биш, gradient-ийн оронд)</label>
+        <input type="file" id="bannerImageFile" accept="image/*" onchange="previewBannerImage(this)" style="margin-top:4px">
+        <div id="bannerImagePreview" style="margin-top:6px"></div>
+      </div>
       <div style="display:flex;gap:8px;margin-bottom:8px">
         <input class="form-input" id="bannerColor1" type="color" value="#E62B05" style="width:48px;padding:2px">
         <input class="form-input" id="bannerColor2" type="color" value="#ff6b35" style="width:48px;padding:2px">
-        <span style="font-size:12px;color:var(--m);align-self:center">Gradient өнгө</span>
+        <span style="font-size:12px;color:var(--m);align-self:center">Gradient өнгө (зураг байхгvй бол)</span>
       </div>
       <button onclick="addBanner()" class="btn btn-primary btn-full">Баннер нэмэх</button>
     </div>
@@ -2657,7 +2636,8 @@ async function checkPriceDrops() {
       await sb.from('notifications').insert({
         user_id: CU.id,
         title: '💰 Үнэ буурсан!',
-        body: escapeHtml(current.title)+' - ₮'+diff.toLocaleString()+'-р буурсан (одоо ₮'+current.price.toLocaleString()+')'
+        body: escapeHtml(current.title)+' - ₮'+diff.toLocaleString()+'-р буурсан (одоо ₮'+current.price.toLocaleString()+')',
+        listing_id: f.listing_id
       });
       await sb.from('favorites').update({price_drop_notified: true, saved_price: current.price}).eq('user_id', CU.id).eq('listing_id', f.listing_id);
     }
@@ -3363,113 +3343,180 @@ function slideBanner(n) {
   }
 }
 
-// BANNER MANAGEMENT
-var BANNERS = JSON.parse(localStorage.getItem('zaraa_banners') || 'null') || [
-  {title:'Зар, хүргэлт нэг дор', sub:'ЗАРАА ПЛАТФОРМ', btn:'+ Зар нэмэх', link:"showPostModal()", c1:'#E62B05', c2:'#ff6b35'},
-  {title:'30 минутын дотор хүргэнэ', sub:'ХҮРГЭЛТ', btn:'Захиалах →', link:"showPage('deliveries')", c1:'#1a73e8', c2:'#0d47a1'},
-  {title:'Чөлөөт цагтаа мөнгө ол', sub:'ХҮРГЭГЧ БОЛОХ', btn:'Бүртгүүлэх →', link:"openAuth('register');selectRole('courier')", c1:'#00875a', c2:'#006644'}
-];
+// BANNER MANAGEMENT - Supabase database-д хадгалагдана (бvх хэрэглэгчид адил харагдана)
+var BANNERS = [];
 
-function saveBanners() {
-  localStorage.setItem('zaraa_banners', JSON.stringify(BANNERS));
+async function loadBanners() {
+  var r = await sb.from('banners').select('*').eq('is_active', true).order('sort_order', {ascending:true});
+  BANNERS = r.data || [];
   renderBanners();
 }
 
 function renderBanners() {
+  var slider = document.getElementById('bannerSlider');
   var inner = document.getElementById('bannerInner');
-  if (!inner) return;
+  if (!inner || !slider) return;
+  if (!BANNERS.length) {
+    slider.style.display = 'none';
+    window._bannerTotal = 0;
+    return;
+  }
+  slider.style.display = 'block';
   window._bannerTotal = BANNERS.length;
   inner.innerHTML = BANNERS.map(function(b) {
-    return '<div style="min-width:100%;background:linear-gradient(135deg,'+b.c1+','+b.c2+');display:flex;align-items:center;padding:0 20px;color:white;justify-content:space-between">'+
-      '<div><div style="font-size:16px;font-weight:800;line-height:1.2">'+b.title+'</div>'+
-      '<div style="font-size:11px;opacity:0.85;margin-top:2px">'+b.sub+'</div></div>'+
-      '<button onclick="'+b.link+'" style="background:white;color:'+b.c1+';border:none;border-radius:4px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">'+b.btn+'</button>'+
+    var bg = b.image_url ? 'background-image:url(\''+b.image_url+'\');background-size:cover;background-position:center' : 'background:linear-gradient(135deg,'+b.c1+','+b.c2+')';
+    return '<div style="min-width:100%;'+bg+';display:flex;align-items:center;padding:0 20px;color:white;justify-content:space-between;position:relative">'+
+      (b.image_url ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.25)"></div>' : '')+
+      '<div style="position:relative;z-index:1"><div style="font-size:16px;font-weight:800;line-height:1.2">'+escapeHtml(b.title)+'</div>'+
+      '<div style="font-size:11px;opacity:0.85;margin-top:2px">'+escapeHtml(b.sub||'')+'</div></div>'+
+      (b.btn ? '<button onclick="'+b.link+'" style="position:relative;z-index:1;background:white;color:'+b.c1+';border:none;border-radius:4px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">'+escapeHtml(b.btn)+'</button>' : '')+
       '</div>';
   }).join('');
-  // Update dots
-  var dotsHtml = BANNERS.map(function(_,i){
-    return '<div onclick="slideBanner('+i+')" id="bd'+i+'" style="width:'+(i===0?'20':'6')+'px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:'+(i===0?'1':'0.4')+'"></div>';
-  }).join('');
-  var dotsEl = document.querySelector('#bannerSlider > div:last-child');
-  if (dotsEl) dotsEl.innerHTML = dotsHtml;
+  var dotsEl = document.getElementById('bannerDots');
+  if (dotsEl) {
+    dotsEl.innerHTML = BANNERS.map(function(_,i){
+      return '<div onclick="slideBanner('+i+')" id="bd'+i+'" style="width:'+(i===0?'20':'6')+'px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:'+(i===0?'1':'0.4')+'"></div>';
+    }).join('');
+  }
+  slideBanner(0);
 }
 
-function loadAdminBanners() {
+var bannerImageUrl = null;
+function previewBannerImage(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var preview = document.getElementById('bannerImagePreview');
+  preview.innerHTML = '<div style="font-size:12px;color:var(--m)">Зураг бэлэн байна: '+file.name+'</div>';
+}
+
+async function loadAdminBanners() {
   var box = document.getElementById('adminBanners');
   if (!box) return;
-  box.innerHTML = BANNERS.map(function(b, i) {
-    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px">'+
+  var r = await sb.from('banners').select('*').order('sort_order', {ascending:true});
+  var allBanners = r.data || [];
+  if (!allBanners.length) { box.innerHTML = '<div style="color:var(--m);font-size:13px">Баннер байхгvй</div>'; return; }
+  box.innerHTML = allBanners.map(function(b, i) {
+    var thumb = b.image_url ? '<img src="'+b.image_url+'" style="width:32px;height:32px;border-radius:6px;object-fit:cover;flex-shrink:0">' : '<div style="width:32px;height:32px;border-radius:6px;background:linear-gradient(135deg,'+b.c1+','+b.c2+');flex-shrink:0"></div>';
+    return '<div style="background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px;'+(b.is_active?'':'opacity:0.5')+'">'+
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
-      '<div style="width:32px;height:32px;border-radius:6px;background:linear-gradient(135deg,'+b.c1+','+b.c2+');flex-shrink:0"></div>'+
-      '<div style="flex:1;font-size:13px;font-weight:600">'+b.title+'</div>'+
-      '<button onclick="toggleBannerEdit('+i+')" style="background:var(--s2);border:1px solid var(--b);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">✏️</button>'+
-      '<button onclick="deleteBanner('+i+')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
+      thumb+
+      '<div style="flex:1;font-size:13px;font-weight:600">'+escapeHtml(b.title)+(b.is_active?'':' <span style="color:var(--m);font-weight:400">(идэвхгvй)</span>')+'</div>'+
+      '<button onclick="moveBanner(\''+b.id+'\',-1)" style="background:var(--s2);border:1px solid var(--b);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">↑</button>'+
+      '<button onclick="moveBanner(\''+b.id+'\',1)" style="background:var(--s2);border:1px solid var(--b);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">↓</button>'+
+      '<button onclick="toggleBannerActive(\''+b.id+'\','+b.is_active+')" style="background:var(--s2);border:1px solid var(--b);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">'+(b.is_active?'⏸️':'▶️')+'</button>'+
+      '<button onclick="toggleBannerEdit(\''+b.id+'\')" style="background:var(--s2);border:1px solid var(--b);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">✏️</button>'+
+      '<button onclick="deleteBanner(\''+b.id+'\')" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">🗑️</button>'+
       '</div>'+
-      '<div id="bannerEdit_'+i+'" style="display:none;border-top:1px solid var(--b);padding-top:10px">'+
-      '<input class="form-input" id="be_title_'+i+'" value="'+b.title+'" placeholder="Гарчиг" style="margin-bottom:6px">'+
-      '<input class="form-input" id="be_sub_'+i+'" value="'+b.sub+'" placeholder="Дэд гарчиг" style="margin-bottom:6px">'+
-      '<input class="form-input" id="be_btn_'+i+'" value="'+b.btn+'" placeholder="Товчны текст" style="margin-bottom:6px">'+
-      '<input class="form-input" id="be_link_'+i+'" value="'+b.link+'" placeholder="Линк" style="margin-bottom:6px">'+
+      '<div id="bannerEdit_'+b.id+'" style="display:none;border-top:1px solid var(--b);padding-top:10px">'+
+      '<input class="form-input" id="be_title_'+b.id+'" value="'+escapeHtml(b.title)+'" placeholder="Гарчиг" style="margin-bottom:6px">'+
+      '<input class="form-input" id="be_sub_'+b.id+'" value="'+escapeHtml(b.sub||'')+'" placeholder="Дэд гарчиг" style="margin-bottom:6px">'+
+      '<input class="form-input" id="be_btn_'+b.id+'" value="'+escapeHtml(b.btn||'')+'" placeholder="Товчны текст" style="margin-bottom:6px">'+
+      '<input class="form-input" id="be_link_'+b.id+'" value="'+escapeHtml(b.link||'')+'" placeholder="Линк" style="margin-bottom:6px">'+
       '<div style="display:flex;gap:8px;margin-bottom:8px">'+
-      '<input type="color" id="be_c1_'+i+'" value="'+b.c1+'" style="width:40px;height:36px;border:1px solid var(--b);border-radius:6px;cursor:pointer">'+
-      '<input type="color" id="be_c2_'+i+'" value="'+b.c2+'" style="width:40px;height:36px;border:1px solid var(--b);border-radius:6px;cursor:pointer">'+
+      '<input type="color" id="be_c1_'+b.id+'" value="'+b.c1+'" style="width:40px;height:36px;border:1px solid var(--b);border-radius:6px;cursor:pointer">'+
+      '<input type="color" id="be_c2_'+b.id+'" value="'+b.c2+'" style="width:40px;height:36px;border:1px solid var(--b);border-radius:6px;cursor:pointer">'+
       '<span style="font-size:11px;color:var(--m);align-self:center">Gradient өнгө</span>'+
       '</div>'+
-      '<button onclick="saveBannerEdit('+i+')" style="background:var(--a);color:white;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;width:100%">Хадгалах</button>'+
+      '<button onclick="saveBannerEdit(\''+b.id+'\')" style="background:var(--a);color:white;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;width:100%">Хадгалах</button>'+
       '</div>'+
       '</div>';
   }).join('');
 }
 
-function toggleBannerEdit(i) {
-  var box = document.getElementById('bannerEdit_'+i);
+function toggleBannerEdit(id) {
+  var box = document.getElementById('bannerEdit_'+id);
   if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
 }
 
-function saveBannerEdit(i) {
-  BANNERS[i] = {
-    title: document.getElementById('be_title_'+i).value,
-    sub: document.getElementById('be_sub_'+i).value,
-    btn: document.getElementById('be_btn_'+i).value,
-    link: document.getElementById('be_link_'+i).value,
-    c1: document.getElementById('be_c1_'+i).value,
-    c2: document.getElementById('be_c2_'+i).value
+async function saveBannerEdit(id) {
+  var data = {
+    title: document.getElementById('be_title_'+id).value,
+    sub: document.getElementById('be_sub_'+id).value,
+    btn: document.getElementById('be_btn_'+id).value,
+    link: document.getElementById('be_link_'+id).value,
+    c1: document.getElementById('be_c1_'+id).value,
+    c2: document.getElementById('be_c2_'+id).value
   };
-  saveBanners();
-  loadAdminBanners();
+  var r = await sb.from('banners').update(data).eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
   showToast('Баннер хадгалагдлаа! ✅');
+  loadAdminBanners();
+  loadBanners();
 }
 
-function addBanner() {
+async function toggleBannerActive(id, currentlyActive) {
+  var r = await sb.from('banners').update({is_active: !currentlyActive}).eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  loadAdminBanners();
+  loadBanners();
+}
+
+async function moveBanner(id, direction) {
+  var r = await sb.from('banners').select('*').order('sort_order', {ascending:true});
+  var all = r.data || [];
+  var idx = all.findIndex(function(b){ return b.id === id; });
+  var swapIdx = idx + direction;
+  if (idx === -1 || swapIdx < 0 || swapIdx >= all.length) return;
+  var a = all[idx], b = all[swapIdx];
+  var aOrder = a.sort_order, bOrder = b.sort_order;
+  await sb.from('banners').update({sort_order: bOrder}).eq('id', a.id);
+  await sb.from('banners').update({sort_order: aOrder}).eq('id', b.id);
+  loadAdminBanners();
+  loadBanners();
+}
+
+async function addBanner() {
   var title = document.getElementById('bannerTitle').value;
   var sub = document.getElementById('bannerSub').value;
   var btn = document.getElementById('bannerBtn').value;
   var link = document.getElementById('bannerLink').value;
   var c1 = document.getElementById('bannerColor1').value;
   var c2 = document.getElementById('bannerColor2').value;
+  var imageFile = document.getElementById('bannerImageFile').files[0];
   if (!title) { showToast('Гарчиг оруулна уу', true); return; }
-  BANNERS.push({title, sub, btn, link, c1, c2});
-  saveBanners();
+  showToast('Нэмж байна...');
+  var imageUrl = null;
+  if (imageFile) {
+    var ext = imageFile.name.split('.').pop();
+    var path = 'banners/'+Date.now()+'.'+ext;
+    var up = await sb.storage.from('listings').upload(path, imageFile, {cacheControl:'3600', upsert:true});
+    if (up.error) { showToast('Зураг илгээхэд алдаа гарлаа', true); return; }
+    imageUrl = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
+  }
+  var existing = await sb.from('banners').select('sort_order').order('sort_order', {ascending:false}).limit(1);
+  var nextOrder = existing.data && existing.data.length ? existing.data[0].sort_order + 1 : 0;
+  var r = await sb.from('banners').insert({
+    title: title, sub: sub, btn: btn, link: link, c1: c1, c2: c2,
+    image_url: imageUrl, is_active: true, sort_order: nextOrder
+  });
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
   loadAdminBanners();
+  loadBanners();
   showToast('Баннер нэмэгдлээ!');
   document.getElementById('bannerTitle').value = '';
   document.getElementById('bannerSub').value = '';
   document.getElementById('bannerBtn').value = '';
   document.getElementById('bannerLink').value = '';
+  document.getElementById('bannerImageFile').value = '';
+  document.getElementById('bannerImagePreview').innerHTML = '';
 }
 
-function deleteBanner(i) {
-  BANNERS.splice(i, 1);
-  saveBanners();
+async function deleteBanner(id) {
+  if (!confirm('Энэ баннерыг устгах уу?')) return;
+  var r = await sb.from('banners').delete().eq('id', id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
   loadAdminBanners();
+  loadBanners();
   showToast('Баннер устгагдлаа');
 }
 
 function startBannerSlider() {
-  renderBanners();
+  loadBanners();
   if (_bannerTimer) clearInterval(_bannerTimer);
   _bannerTimer = setInterval(function() {
-    _bannerIdx = (_bannerIdx+1) % (BANNERS.length||3);
+    var total = window._bannerTotal || 0;
+    if (!total) return;
+    _bannerIdx = (_bannerIdx+1) % total;
     slideBanner(_bannerIdx);
   }, 4000);
 }
@@ -4236,7 +4283,8 @@ async function toggleVip(id, current) {
     await sb.from('notifications').insert({
       user_id: listing.data.user_id,
       title: '⭐ Таны зар ВИП болгогдлоо!',
-      body: days+' хоногийн турш ВИП статустай байна'
+      body: days+' хоногийн турш ВИП статустай байна',
+      listing_id: id
     });
   }
   loadAdmin(); loadListings();
@@ -4261,7 +4309,8 @@ async function toggleFeatured(id, current) {
     await sb.from('notifications').insert({
       user_id: listing.data.user_id,
       title: '🌟 Таны зар Онцлох болгогдлоо!',
-      body: days+' хоногийн турш онцлогдоно'
+      body: days+' хоногийн турш онцлогдоно',
+      listing_id: id
     });
   }
   loadAdmin(); loadListings();
@@ -4275,11 +4324,18 @@ async function adminDeleteUser(id) {
   loadAdmin();
 }
 
-function goToNextAdGlobal() {
-  if (window._goToNextAd) window._goToNextAd();
+function goToNextAdGlobal_adSpace() {
+  if (window._goToNextAd_adSpace) window._goToNextAd_adSpace();
   else {
-    // Зөвхөн 1 реклам байгаа бол video-г дахин тоглуул
     var v = document.querySelector('#adSpace video');
+    if (v) { v.currentTime = 0; v.play(); }
+  }
+}
+
+function goToNextAdGlobal_detailAdSpace() {
+  if (window._goToNextAd_detailAdSpace) window._goToNextAd_detailAdSpace();
+  else {
+    var v = document.querySelector('#detailAdSpace video');
     if (v) { v.currentTime = 0; v.play(); }
   }
 }
@@ -4437,7 +4493,8 @@ async function approveVipOrder(orderId, listingId, durationDays) {
     await sb.from('notifications').insert({
       user_id: order.data.user_id,
       title: '⭐ ВИП зар баталгаажлаа!',
-      body: 'Таны зар одоо ВИП статустай, '+durationDays+' хоногийн турш онцлогдоно'
+      body: 'Таны зар одоо ВИП статустай, '+durationDays+' хоногийн турш онцлогдоно',
+      listing_id: listingId
     });
   }
   showToast('✅ ВИП захиалга баталгаажлаа');
@@ -4452,7 +4509,8 @@ async function rejectVipOrder(orderId, listingId) {
     await sb.from('notifications').insert({
       user_id: order.data.user_id,
       title: '❌ ВИП захиалга цуцлагдлаа',
-      body: 'Гүйлгээний мэдээллийг шалгаад дахин оролдоно уу'
+      body: 'Гүйлгээний мэдээллийг шалгаад дахин оролдоно уу',
+      listing_id: listingId
     });
   }
   showToast('Захиалга цуцлагдлаа');
@@ -4486,7 +4544,8 @@ async function approveBumpOrder(orderId, listingId) {
     await sb.from('notifications').insert({
       user_id: order.data.user_id,
       title: '🔄 Зар шинэчлэгдлээ!',
-      body: 'Таны зар жагсаалтын дээд тал руу гарлаа'
+      body: 'Таны зар жагсаалтын дээд тал руу гарлаа',
+      listing_id: listingId
     });
   }
   showToast('✅ Шинэчлэх захиалга баталгаажлаа');
@@ -4501,7 +4560,8 @@ async function rejectBumpOrder(orderId, listingId) {
     await sb.from('notifications').insert({
       user_id: order.data.user_id,
       title: '❌ Шинэчлэх захиалга цуцлагдлаа',
-      body: 'Гүйлгээний мэдээллийг шалгаад дахин оролдоно уу'
+      body: 'Гүйлгээний мэдээллийг шалгаад дахин оролдоно уу',
+      listing_id: listingId
     });
   }
   showToast('Захиалга цуцлагдлаа');
@@ -4535,7 +4595,8 @@ async function approveFeaturedOrder(orderId, listingId, durationDays) {
     await sb.from('notifications').insert({
       user_id: order.data.user_id,
       title: '🌟 Онцлох зар баталгаажлаа!',
-      body: 'Таны зар одоо Онцлох статустай, '+durationDays+' хоногийн турш онцлогдоно'
+      body: 'Таны зар одоо Онцлох статустай, '+durationDays+' хоногийн турш онцлогдоно',
+      listing_id: listingId
     });
   }
   showToast('✅ Онцлох захиалга баталгаажлаа');
@@ -4550,7 +4611,8 @@ async function rejectFeaturedOrder(orderId, listingId) {
     await sb.from('notifications').insert({
       user_id: order.data.user_id,
       title: '❌ Онцлох захиалга цуцлагдлаа',
-      body: 'Гүйлгээний мэдээллийг шалгаад дахин оролдоно уу'
+      body: 'Гүйлгээний мэдээллийг шалгаад дахин оролдоно уу',
+      listing_id: listingId
     });
   }
   showToast('Захиалга цуцлагдлаа');
@@ -4750,13 +4812,15 @@ async function updateAdSpace(isCourier, targetBoxId) {
         idx = (idx + 1) % ads.length;
         showAd(idx);
       }
+      var boxIdSafe = (targetBoxId || 'adSpace');
       function showAd(i) {
         if (window._adTimer) { clearTimeout(window._adTimer); window._adTimer = null; }
         var ad = ads[i];
         var content = '';
+        var uid = boxIdSafe+'_'+i;
         if (ad.video_url) {
-          content = '<video id="adVideo_'+i+'" src="'+ad.video_url+'" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;background:#000;position:relative;z-index:1" onended="goToNextAdGlobal()"></video>'+
-            '<div id="adMuteBtn_'+i+'" style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,0.6);color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;z-index:20;pointer-events:auto" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();event.preventDefault();toggleAdSound(\''+i+'\')">🔇</div>';
+          content = '<video id="adVideo_'+uid+'" src="'+ad.video_url+'" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;background:#000;position:relative;z-index:1" onended="goToNextAdGlobal_'+boxIdSafe+'()"></video>'+
+            '<div id="adMuteBtn_'+uid+'" style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,0.6);color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;z-index:20;pointer-events:auto" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();event.preventDefault();toggleAdSound(\''+uid+'\')">🔇</div>';
         } else if (ad.image_url) {
           content = '<img src="'+ad.image_url+'" style="width:100%;height:100%;object-fit:cover">';
         }
@@ -4770,7 +4834,7 @@ async function updateAdSpace(isCourier, targetBoxId) {
           window._adTimer = setTimeout(goToNextAd, 5000);
         }
       }
-      window._goToNextAd = ads.length > 1 ? goToNextAd : null;
+      window['_goToNextAd_'+boxIdSafe] = ads.length > 1 ? goToNextAd : null;
       showAd(0);
     } else {
       box.innerHTML = '<div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#2a2a3e);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:6px;cursor:pointer" onclick="showToast(\'Реклам байршуулах: admin@zaraa.mn\')">'+
@@ -5552,10 +5616,9 @@ async function loadNotifications() {
   box.innerHTML = notifs.map(function(n) {
     var nav = '';
     if (n.listing_id) nav = 'showDetail(\''+n.listing_id+'\')';
-    else if (n.title.includes('📋') || n.title.includes('✏️') || n.title.includes('🗑️') || n.title.includes('🚩') || n.title.includes('👤') || n.title.includes('🪪')) nav = 'showPage(\'admin\')';
     else if (n.title.includes('💬') || n.title.includes('мессеж')) nav = 'showPage(\'chats\')';
     else if (n.title.includes('🚚') || n.title.includes('📦') || n.title.includes('захиалга')) nav = 'showPage(\'deliveries\')';
-    else if (n.title.includes('✅') || n.title.includes('⭐')) nav = n.listing_id ? 'showDetail(\''+n.listing_id+'\')' : 'showPage(\'home\')';
+    else if (n.title.includes('📋') || n.title.includes('✏️') || n.title.includes('🗑️') || n.title.includes('🚩') || n.title.includes('👤') || n.title.includes('🪪')) nav = 'showPage(\'admin\')';
     return '<div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:8px;'+(n.is_read?'':'border-left:3px solid var(--a)')+';display:flex;align-items:flex-start;gap:8px">'+
       '<div style="flex:1;cursor:'+(nav?'pointer':'default')+'" onclick="markRead(\''+n.id+'\');'+(nav?nav+';':'')+'">'+
       '<div style="font-weight:600;font-size:13px;margin-bottom:4px">'+(n.is_read?'':'🔴 ')+n.title+'</div>'+
