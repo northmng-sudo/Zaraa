@@ -893,6 +893,8 @@ select.form-input{cursor:pointer}
 
     <div style="font-weight:700;margin:16px 0 12px">⭐ ВИП захиалгууд</div>
     <div id="adminVipOrders"><div style="color:var(--m);font-size:13px">Захиалга байхгүй</div></div>
+    <div style="font-weight:700;margin:16px 0 12px">🔄 Зар шинэчлэх захиалгууд</div>
+    <div id="adminBumpOrders"><div style="color:var(--m);font-size:13px">Захиалга байхгүй</div></div>
     <div style="font-weight:700;margin:16px 0 12px">🌟 Онцлох захиалгууд</div>
     <div id="adminFeaturedOrders"><div style="color:var(--m);font-size:13px">Захиалга байхгүй</div></div>
     <div style="font-weight:700;margin:16px 0 12px">⏳ Хүлээгдэж буй зарууд</div>
@@ -1432,6 +1434,35 @@ select.form-input{cursor:pointer}
 
     <button class="btn btn-primary btn-full" onclick="submitVipOrder()">Захиалга илгээх</button>
     <p style="font-size:11px;color:var(--m);margin-top:10px;text-align:center">Захиалга илгээсний дараа админ шалгаад 24 цагийн дотор баталгаажуулна</p>
+  </div>
+</div>
+
+<!-- BUMP ORDER MODAL -->
+<div class="modal-overlay" id="bumpModal">
+  <div class="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal('bumpModal')">×</button>
+    <div class="modal-title">🔄 Зар шинэчлэх</div>
+    <input type="hidden" id="bumpListingId">
+    <p style="font-size:13px;color:var(--m);margin-bottom:16px">Зарыг жагсаалтын дээд тал руу гаргаж, шинэ зар мэт харагдуулна</p>
+
+    <div style="background:var(--s2);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px">💳 Шилжүүлэх дансны мэдээлэл</div>
+      <div style="font-size:13px;line-height:1.6">
+        <b>Банк:</b> Хаан банк<br>
+        <b>Дансны дугаар:</b> 5025726380<br>
+        <b>Эзэмшигч:</b> Энхболд Тэмүжин<br>
+        <b>Дүн:</b> <span id="bumpPriceDisplay" style="color:var(--a);font-weight:800">8,000₮</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">📷 Гүйлгээний нотолгоо (screenshot)</label>
+      <input type="file" id="bumpProofFile" accept="image/*" onchange="previewBumpProof(this)">
+      <div id="bumpProofPreview" style="margin-top:8px"></div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="submitBumpOrder()">Захиалга илгээх</button>
+    <p style="font-size:11px;color:var(--m);margin-top:10px;text-align:center">Захиалга илгээсний дараа админ шалгаад баталгаажуулна</p>
   </div>
 </div>
 
@@ -4083,6 +4114,7 @@ async function loadAdmin() {
   loadAdminAds();
   loadAdminBanners();
   loadAdminVipOrders();
+  loadAdminBumpOrders();
   loadAdminFeaturedOrders();
 
   // Pending listings
@@ -4410,6 +4442,55 @@ async function rejectVipOrder(orderId, listingId) {
   }
   showToast('Захиалга цуцлагдлаа');
   loadAdminVipOrders();
+}
+
+async function loadAdminBumpOrders() {
+  var box = document.getElementById('adminBumpOrders');
+  if (!box) return;
+  var r = await sb.from('bump_orders').select('*, listings(title)').eq('status','pending').order('created_at',{ascending:false});
+  var orders = r.data || [];
+  box.innerHTML = orders.length ? orders.map(function(o) {
+    return '<div style="background:var(--s);border:2px solid #1a73e8;border-radius:10px;padding:12px;margin-bottom:8px">'+
+      '<div style="font-weight:600;font-size:13px">'+escapeHtml(o.listings&&o.listings.title||'Зар олдсонгүй')+'</div>'+
+      '<div style="font-size:11px;color:var(--m);margin-bottom:8px">₮'+Number(o.price).toLocaleString()+' • '+timeAgo(o.created_at)+'</div>'+
+      (o.payment_proof_url?'<img src="'+o.payment_proof_url+'" onclick="window.open(\''+o.payment_proof_url+'\',\'_blank\')" style="max-width:200px;border-radius:8px;cursor:pointer;margin-bottom:8px;display:block">':'')+
+      '<div style="display:flex;gap:8px">'+
+      '<button onclick="approveBumpOrder(\''+o.id+'\',\''+o.listing_id+'\')" style="flex:1;background:#00C96B;color:white;border:none;border-radius:6px;padding:8px;font-size:12px;cursor:pointer">✓ Зөвшөөрөх</button>'+
+      '<button onclick="rejectBumpOrder(\''+o.id+'\',\''+o.listing_id+'\')" style="flex:1;background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:8px;font-size:12px;cursor:pointer">✕ Татгалзах</button>'+
+      '</div>'+
+      '</div>';
+  }).join('') : '<div style="color:var(--m);font-size:13px">Захиалга байхгүй</div>';
+}
+
+async function approveBumpOrder(orderId, listingId) {
+  var now = new Date().toISOString();
+  await sb.from('bump_orders').update({status:'approved', approved_at: now, approved_by: CU.id}).eq('id', orderId);
+  await sb.from('listings').update({created_at: now, bumped_at: now, bump_status: 'none'}).eq('id', listingId);
+  var order = await sb.from('bump_orders').select('user_id').eq('id', orderId).single();
+  if (order.data) {
+    await sb.from('notifications').insert({
+      user_id: order.data.user_id,
+      title: '🔄 Зар шинэчлэгдлээ!',
+      body: 'Таны зар жагсаалтын дээд тал руу гарлаа'
+    });
+  }
+  showToast('✅ Шинэчлэх захиалга баталгаажлаа');
+  loadAdminBumpOrders();
+}
+
+async function rejectBumpOrder(orderId, listingId) {
+  await sb.from('bump_orders').update({status:'rejected'}).eq('id', orderId);
+  await sb.from('listings').update({bump_status:'none'}).eq('id', listingId);
+  var order = await sb.from('bump_orders').select('user_id').eq('id', orderId).single();
+  if (order.data) {
+    await sb.from('notifications').insert({
+      user_id: order.data.user_id,
+      title: '❌ Шинэчлэх захиалга цуцлагдлаа',
+      body: 'Гүйлгээний мэдээллийг шалгаад дахин оролдоно уу'
+    });
+  }
+  showToast('Захиалга цуцлагдлаа');
+  loadAdminBumpOrders();
 }
 
 async function loadAdminFeaturedOrders() {
@@ -5111,6 +5192,8 @@ async function postListingInner() {
 }
 
 var VIP_PRICES = {7: 80000, 30: 250000, 90: 400000};
+var BUMP_PRICE = 8000;
+var bumpProofUrl = null;
 var vipProofUrl = null;
 
 function openVipOrder(id) {
@@ -5253,12 +5336,58 @@ async function orderDelivery() {
   showToast('Хүргэлт захиалагдлаа! 🚚 Хүргэгч удахгүй хүлээн авна.');
 }
 
-async function bumpListing(listingId) {
-  if (!confirm('Энэ зарыг шинэчилж, жагсаалтын дээд тал руу гаргах уу?')) return;
-  var now = new Date().toISOString();
-  var r = await sb.from('listings').update({created_at: now, bumped_at: now}).eq('id', listingId).eq('user_id', CU.id);
-  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
-  showToast('🔄 Зар шинэчлэгдлээ');
+function openBumpOrder(id) {
+  if (!CU) { openAuth('login'); return; }
+  document.getElementById('bumpListingId').value = id;
+  document.getElementById('bumpProofPreview').innerHTML = '';
+  bumpProofUrl = null;
+  openModal('bumpModal');
+}
+
+function previewBumpProof(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var preview = document.getElementById('bumpProofPreview');
+  preview.innerHTML = '<div style="font-size:12px;color:var(--m)">Зураг бэлэн байна: '+file.name+'</div>';
+}
+
+async function submitBumpOrder() {
+  if (!CU) { openAuth('login'); return; }
+  var listingId = document.getElementById('bumpListingId').value;
+  // 24 цагийн хязгаарыг сервер талаас давхар шалгана (UI-г тойрч дуудсан ч энд хаагдана)
+  var curL = await sb.from('listings').select('bumped_at').eq('id', listingId).single();
+  if (curL.data && curL.data.bumped_at) {
+    var elapsed = Date.now() - new Date(curL.data.bumped_at).getTime();
+    if (elapsed < 24*60*60*1000) {
+      var hoursLeft = Math.ceil((24*60*60*1000 - elapsed) / (60*60*1000));
+      showToast('Дахин '+hoursLeft+' цагийн дараа шинэчлэх боломжтой', true);
+      return;
+    }
+  }
+  var proofFile = document.getElementById('bumpProofFile').files[0];
+  if (!proofFile) { showToast('Гүйлгээний нотолгоо оруулна уу', true); return; }
+
+  showToast('Илгээж байна...');
+  var ext = proofFile.name.split('.').pop();
+  var path = CU.id+'/bump_proof_'+Date.now()+'.'+ext;
+  var up = await sb.storage.from('listings').upload(path, proofFile, {cacheControl:'3600', upsert:true});
+  if (up.error) { showToast('Зураг илгээхэд алдаа гарлаа', true); return; }
+  var proofUrl = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
+
+  var r = await sb.from('bump_orders').insert({
+    listing_id: listingId,
+    user_id: CU.id,
+    price: BUMP_PRICE,
+    payment_proof_url: proofUrl,
+    status: 'pending'
+  });
+  if (r.error) { showToast('Алдаа гарлаа: '+r.error.message, true); return; }
+
+  await sb.from('listings').update({bump_status: 'pending_payment'}).eq('id', listingId);
+
+  closeModal('bumpModal');
+  showToast('✅ Захиалга илгээгдлээ! Админ шалгаад баталгаажуулна');
+  await notifyAdmins('🔄 Шинэ шинэчлэх захиалга', 'Хэрэглэгч зар шинэчлэх захиалга илгээлээ, шалгаж баталгаажуулна уу');
   loadProfile();
 }
 
@@ -5322,12 +5451,18 @@ async function loadProfile() {
     var favCounts = {};
     (favCountR.data||[]).forEach(function(f){ favCounts[f.listing_id] = (favCounts[f.listing_id]||0)+1; });
     document.getElementById('myListings').innerHTML = '<div class="grid">'+ls.data.map(function(l){
-      var canBump = !l.bumped_at || (Date.now() - new Date(l.bumped_at).getTime()) > 24*60*60*1000;
+      var bumpBtnHtml;
+      if (l.bump_status === 'pending_payment') {
+        bumpBtnHtml = '<button disabled style="width:100%;margin-top:6px;background:transparent;border:1px solid var(--b);color:var(--m);border-radius:0 0 12px 12px;padding:7px;font-size:11px;font-weight:700;cursor:not-allowed">⏳ Хүсэлт хүлээгдэж байна</button>';
+      } else {
+        var canBump = !l.bumped_at || (Date.now() - new Date(l.bumped_at).getTime()) > 24*60*60*1000;
+        bumpBtnHtml = '<button onclick="event.stopPropagation();openBumpOrder(\''+l.id+'\')" '+(canBump?'':'disabled')+' style="width:100%;margin-top:6px;background:'+(canBump?'var(--s2)':'transparent')+';border:1px solid var(--b);color:'+(canBump?'var(--t)':'var(--m)')+';border-radius:0 0 12px 12px;padding:7px;font-size:11px;font-weight:700;cursor:'+(canBump?'pointer':'not-allowed')+'">'+(canBump?'🔄 Шинэчлэх захиалга':'⏳ 24ц дотор шинэчилсэн')+'</button>';
+      }
       return '<div class="card"><div onclick="showDetail(\''+l.id+'\')" style="cursor:pointer"><div class="card-img">'+(EMOJIS[l.category]||'📦')+(l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+'</div>'+
         '<div class="card-body"><div class="card-title">'+escapeHtml(l.title)+'</div><div class="card-price">₮'+Number(l.price).toLocaleString()+'</div>'+
         '<div style="display:flex;gap:10px;margin-top:5px;font-size:11px;color:var(--m)"><span>👁️ '+(l.view_count||0)+'</span><span>❤️ '+(favCounts[l.id]||0)+'</span></div>'+
         '</div></div>'+
-        '<button onclick="event.stopPropagation();bumpListing(\''+l.id+'\')" '+(canBump?'':'disabled')+' style="width:100%;margin-top:6px;background:'+(canBump?'var(--s2)':'transparent')+';border:1px solid var(--b);color:'+(canBump?'var(--t)':'var(--m)')+';border-radius:0 0 12px 12px;padding:7px;font-size:11px;font-weight:700;cursor:'+(canBump?'pointer':'not-allowed')+'">'+(canBump?'🔄 Шинэчлэх':'⏳ 24ц дотор шинэчилсэн')+'</button>'+
+        bumpBtnHtml+
         '</div>';
     }).join('')+'</div>'+
     '<button onclick="showListingStats()" style="width:100%;margin-top:14px;background:var(--s2);border:1px solid var(--b);color:var(--t);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer">📊 Дэлгэрэнгүй статистик</button>';
