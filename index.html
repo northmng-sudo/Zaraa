@@ -1210,7 +1210,7 @@ select.form-input{cursor:pointer}
 <!-- END postModal -->
 
 <!-- MESSAGE ACTION SHEET -->
-<div class="modal-overlay" id="msgActionSheet" style="align-items:flex-end" onclick="if(event.target===this)closeModal('msgActionSheet')">
+<div class="modal-overlay" id="msgActionSheet" style="display:none;align-items:flex-end" onclick="if(event.target===this)closeModal('msgActionSheet')">
   <div style="background:white;width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:8px;padding-bottom:max(20px,env(safe-area-inset-bottom))">
     <div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:8px auto 12px"></div>
     <button id="msgActReply" onclick="doReplyToMessage()" style="display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;padding:14px 16px;font-size:15px;cursor:pointer;border-radius:10px"><span style="font-size:20px">↩️</span> Хариулах</button>
@@ -3545,8 +3545,10 @@ async function loadChat(listingId, sellerId) {
     }
     var editedTag = m.edited_at ? ' <span style="opacity:0.6;font-size:9px">✎ засагдсан</span>' : '';
     var actionAttrs = ' oncontextmenu="event.preventDefault();openMsgActions(\''+m.id+'\')" ontouchstart="chatLongPressStart(\''+m.id+'\')" ontouchend="chatLongPressEnd()" ontouchmove="chatLongPressEnd()"';
+    var actionBtn = '<button onclick="event.stopPropagation();openMsgActions(\''+m.id+'\')" style="position:absolute;top:-6px;'+(isMine?'left:-6px':'right:-6px')+';background:white;border:1px solid #ddd;width:22px;height:22px;border-radius:50%;font-size:11px;cursor:pointer;color:#666;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.1);padding:0">⋯</button>';
     return '<div id="msg-'+m.id+'" data-search="'+escapeHtml((m.content||'').toLowerCase())+'" style="display:flex;justify-content:'+(isMine?'flex-end':'flex-start')+'">'+
-      '<div'+actionAttrs+' style="max-width:75%;background:'+(isMine&&m.message_type==='text'?'linear-gradient(135deg,#E62B05,#FF8C00)':(m.message_type!=='text'?'transparent':'white'))+';color:'+(isMine?'white':'#111')+';padding:'+(m.message_type==='text'?'10px 14px':'4px')+';border-radius:'+(isMine?'18px 18px 4px 18px':'18px 18px 18px 4px')+';font-size:13px;box-shadow:'+(m.message_type==='text'?'0 1px 4px rgba(0,0,0,0.1)':'none')+';cursor:pointer">'+
+      '<div'+actionAttrs+' style="position:relative;max-width:75%;background:'+(isMine&&m.message_type==='text'?'linear-gradient(135deg,#E62B05,#FF8C00)':(m.message_type!=='text'?'transparent':'white'))+';color:'+(isMine?'white':'#111')+';padding:'+(m.message_type==='text'?'10px 14px':'4px')+';border-radius:'+(isMine?'18px 18px 4px 18px':'18px 18px 18px 4px')+';font-size:13px;box-shadow:'+(m.message_type==='text'?'0 1px 4px rgba(0,0,0,0.1)':'none')+';cursor:pointer">'+
+      actionBtn+
       replyHtml+
       bubbleContent+
       '<div style="font-size:10px;opacity:0.7;margin-top:3px;text-align:right;color:'+(isMine&&m.message_type==='text'?'white':'#999')+'">'+time+editedTag+'</div>'+
