@@ -1209,6 +1209,17 @@ select.form-input{cursor:pointer}
 </div><!-- FIX: missing closing div for postModal overlay -->
 <!-- END postModal -->
 
+<!-- MESSAGE ACTION SHEET -->
+<div class="modal-overlay" id="msgActionSheet" style="align-items:flex-end" onclick="if(event.target===this)closeModal('msgActionSheet')">
+  <div style="background:white;width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:8px;padding-bottom:max(20px,env(safe-area-inset-bottom))">
+    <div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:8px auto 12px"></div>
+    <button id="msgActReply" onclick="doReplyToMessage()" style="display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;padding:14px 16px;font-size:15px;cursor:pointer;border-radius:10px"><span style="font-size:20px">↩️</span> Хариулах</button>
+    <button id="msgActEdit" onclick="doEditMessage()" style="display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;padding:14px 16px;font-size:15px;cursor:pointer;border-radius:10px"><span style="font-size:20px">✏️</span> Засах</button>
+    <button id="msgActCopy" onclick="doCopyMessage()" style="display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;padding:14px 16px;font-size:15px;cursor:pointer;border-radius:10px"><span style="font-size:20px">📋</span> Хуулах</button>
+    <button id="msgActDelete" onclick="doDeleteMessage()" style="display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;padding:14px 16px;font-size:15px;cursor:pointer;border-radius:10px;color:#e53e3e"><span style="font-size:20px">🗑️</span> Устгах</button>
+  </div>
+</div>
+
 <!-- CHAT MODAL -->
 <div class="modal-overlay" id="chatModal" style="align-items:flex-end">
   <div class="modal" id="chatModalInner" style="position:relative;padding:0;display:flex;flex-direction:column;width:100%;max-width:560px;height:90vh;border-radius:16px 16px 0 0;margin:0">
@@ -1217,7 +1228,14 @@ select.form-input{cursor:pointer}
       <button onclick="closeModal('chatModal')" style="background:rgba(255,255,255,0.2);color:white;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
       <div style="flex:1">
         <div style="color:white;font-weight:700;font-size:15px">💬 Чат</div>
+        <div id="chatTypingIndicator" style="display:none;color:rgba(255,255,255,0.9);font-size:11px;font-style:italic;margin-top:2px">бичиж байна...</div>
       </div>
+      <button onclick="toggleChatSearch()" style="background:rgba(255,255,255,0.2);color:white;border:none;width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">🔍</button>
+    </div>
+    <!-- Search bar (hidden by default) -->
+    <div id="chatSearchBar" style="display:none;padding:8px 12px;background:#fff8e1;border-bottom:1px solid #FFE082;flex-shrink:0">
+      <input id="chatSearchInput" type="text" placeholder="Мессеж хайх..." oninput="filterChatMessages()" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:20px;font-size:13px;outline:none">
+      <div id="chatSearchInfo" style="font-size:11px;color:#999;margin-top:4px"></div>
     </div>
     <!-- Messages -->
     <div id="chatMessages" style="flex:1;overflow-y:auto;background:#f5f5f5;padding:12px;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain"></div>
@@ -1229,6 +1247,14 @@ select.form-input{cursor:pointer}
       <span class="quick-reply-pill" onclick="sendQuickReply('Хүргэлт хийх боломжтой юу?')">Хүргэлт хийх үү?</span>
       <span class="quick-reply-pill" onclick="sendQuickReply('Баярлалаа!')">Баярлалаа!</span>
     </div>
+    <!-- Reply preview (hidden by default) -->
+    <div id="chatReplyPreview" style="display:none;padding:8px 12px;background:#f0f4ff;border-top:1px solid #e0e0ff;border-left:3px solid #1a73e8;flex-shrink:0;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:#1a73e8;font-weight:700">↩️ Хариулж байна</div>
+        <div id="chatReplyPreviewText" style="font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+      </div>
+      <button onclick="cancelReply()" style="background:none;border:none;color:#999;font-size:18px;cursor:pointer">×</button>
+    </div>
     <!-- Input -->
     <div style="padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));background:white;border-top:1px solid #f0f0f0;display:flex;gap:6px;align-items:center;flex-shrink:0">
       <input type="file" id="chatImageInput" accept="image/*" style="display:none" onchange="sendChatImage(this)">
@@ -1237,6 +1263,7 @@ select.form-input{cursor:pointer}
       <input class="form-input" id="chatInput" placeholder="Мессеж бичих..." 
         style="flex:1;border-radius:50px;padding:10px 16px;font-size:14px" 
         onkeypress="if(event.key==='Enter')sendMessage()"
+        oninput="broadcastTyping()"
         onfocus="scrollChatToBottom()"
       >
       <button onclick="sendMessage()" style="background:linear-gradient(135deg,#E62B05,#FF8C00);color:white;border:none;width:42px;height:42px;border-radius:50%;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">➤</button>
@@ -3419,12 +3446,15 @@ function openChat(listingId, sellerId) {
   if (CU.id === sellerId) { showToast('Өөрийнхөөрөө чат хийх боломжгүй', true); return; }
   window._chatListingId = listingId;
   window._chatSellerId = sellerId;
+  cancelReply();
+  document.getElementById('chatSearchBar').style.display = 'none';
+  document.getElementById('chatSearchInput').value = '';
   loadChat(listingId, sellerId);
   openModal('chatModal');
   // Realtime subscription
   if (window._chatChannel) sb.removeChannel(window._chatChannel);
   var channelName = listingId ? 'chat_'+listingId : 'chat_shop_'+sellerId+'_'+CU.id;
-  window._chatChannel = sb.channel(channelName)
+  window._chatChannel = sb.channel(channelName, {config:{broadcast:{self:false}}})
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
@@ -3436,7 +3466,48 @@ function openChat(listingId, sellerId) {
         loadChat(listingId, sellerId);
       }
     })
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'messages'
+    }, function(payload) {
+      var matches = listingId ? payload.new.listing_id === listingId :
+        (!payload.new.listing_id && ((payload.new.sender_id===sellerId&&payload.new.receiver_id===CU.id)||(payload.new.sender_id===CU.id&&payload.new.receiver_id===sellerId)));
+      if (matches) loadChat(listingId, sellerId);
+    })
+    .on('postgres_changes', {
+      event: 'DELETE',
+      schema: 'public',
+      table: 'messages'
+    }, function(payload) {
+      loadChat(listingId, sellerId);
+    })
+    .on('broadcast', {event:'typing'}, function(payload) {
+      if (payload.payload && payload.payload.user_id !== CU.id) showTypingIndicator();
+    })
     .subscribe();
+}
+
+var _typingShowTimer = null;
+var _typingSentAt = 0;
+function showTypingIndicator() {
+  var el = document.getElementById('chatTypingIndicator');
+  if (el) el.style.display = 'block';
+  clearTimeout(_typingShowTimer);
+  _typingShowTimer = setTimeout(function(){
+    if (el) el.style.display = 'none';
+  }, 2500);
+}
+
+function broadcastTyping() {
+  var now = Date.now();
+  if (now - _typingSentAt < 1500) return; // throttle 1.5 сек
+  _typingSentAt = now;
+  if (window._chatChannel) {
+    try {
+      window._chatChannel.send({type:'broadcast', event:'typing', payload:{user_id: CU.id}});
+    } catch(e) {}
+  }
 }
 
 async function loadChat(listingId, sellerId) {
@@ -3450,6 +3521,9 @@ async function loadChat(listingId, sellerId) {
   }
   var r = await q;
   var msgs = r.data || [];
+  // ID-аар нь cache хийх (reply харуулах, засах, action sheet үед хэрэгтэй)
+  window._chatMsgsCache = {};
+  msgs.forEach(function(m){ window._chatMsgsCache[m.id] = m; });
   box.innerHTML = msgs.length ? msgs.map(function(m){
     var isMine = m.sender_id === CU.id;
     var time = mTime(m.created_at);
@@ -3459,32 +3533,113 @@ async function loadChat(listingId, sellerId) {
     } else if (m.message_type === 'audio' && m.audio_url) {
       bubbleContent = '<audio src="'+m.audio_url+'" controls onclick="event.stopPropagation()" style="width:200px;height:36px"></audio>';
     } else {
-      bubbleContent = '<div>'+escapeHtml(m.content||'')+'</div>';
+      bubbleContent = '<div class="msg-text-content">'+escapeHtml(m.content||'')+'</div>';
     }
-    var longPressAttrs = isMine ? ' oncontextmenu="event.preventDefault();confirmDeleteMessage(\''+m.id+'\')" ontouchstart="chatLongPressStart(\''+m.id+'\')" ontouchend="chatLongPressEnd()" ontouchmove="chatLongPressEnd()"' : '';
-    return '<div style="display:flex;justify-content:'+(isMine?'flex-end':'flex-start')+'">'+
-      '<div'+longPressAttrs+' style="max-width:75%;background:'+(isMine&&m.message_type==='text'?'linear-gradient(135deg,#E62B05,#FF8C00)':(m.message_type!=='text'?'transparent':'white'))+';color:'+(isMine?'white':'#111')+';padding:'+(m.message_type==='text'?'10px 14px':'4px')+';border-radius:'+(isMine?'18px 18px 4px 18px':'18px 18px 18px 4px')+';font-size:13px;box-shadow:'+(m.message_type==='text'?'0 1px 4px rgba(0,0,0,0.1)':'none')+(isMine?';cursor:pointer':'')+'">'+
+    // Reply preview (хариулсан мессеж байвал дээр нь жижиг preview)
+    var replyHtml = '';
+    if (m.reply_to && window._chatMsgsCache[m.reply_to]) {
+      var rep = window._chatMsgsCache[m.reply_to];
+      var repText = rep.message_type === 'image' ? '📷 Зураг' : (rep.message_type === 'audio' ? '🎤 Дуу хоолой' : (rep.content||''));
+      if (repText.length > 60) repText = repText.substr(0,60)+'...';
+      replyHtml = '<div onclick="scrollToMessage(\''+m.reply_to+'\')" style="background:rgba(0,0,0,0.08);border-left:3px solid '+(isMine?'rgba(255,255,255,0.6)':'#1a73e8')+';padding:4px 8px;border-radius:6px;margin-bottom:6px;font-size:11px;cursor:pointer;color:'+(isMine?'rgba(255,255,255,0.9)':'#666')+'">↩️ '+escapeHtml(repText)+'</div>';
+    }
+    var editedTag = m.edited_at ? ' <span style="opacity:0.6;font-size:9px">✎ засагдсан</span>' : '';
+    var actionAttrs = ' oncontextmenu="event.preventDefault();openMsgActions(\''+m.id+'\')" ontouchstart="chatLongPressStart(\''+m.id+'\')" ontouchend="chatLongPressEnd()" ontouchmove="chatLongPressEnd()"';
+    return '<div id="msg-'+m.id+'" data-search="'+escapeHtml((m.content||'').toLowerCase())+'" style="display:flex;justify-content:'+(isMine?'flex-end':'flex-start')+'">'+
+      '<div'+actionAttrs+' style="max-width:75%;background:'+(isMine&&m.message_type==='text'?'linear-gradient(135deg,#E62B05,#FF8C00)':(m.message_type!=='text'?'transparent':'white'))+';color:'+(isMine?'white':'#111')+';padding:'+(m.message_type==='text'?'10px 14px':'4px')+';border-radius:'+(isMine?'18px 18px 4px 18px':'18px 18px 18px 4px')+';font-size:13px;box-shadow:'+(m.message_type==='text'?'0 1px 4px rgba(0,0,0,0.1)':'none')+';cursor:pointer">'+
+      replyHtml+
       bubbleContent+
-      '<div style="font-size:10px;opacity:0.7;margin-top:3px;text-align:right;color:'+(isMine&&m.message_type==='text'?'white':'#999')+'">'+time+'</div>'+
+      '<div style="font-size:10px;opacity:0.7;margin-top:3px;text-align:right;color:'+(isMine&&m.message_type==='text'?'white':'#999')+'">'+time+editedTag+'</div>'+
       '</div></div>';
   }).join('') : '<div style="text-align:center;color:#999;font-size:13px;padding:40px 20px">Чат эхлүүлэх</div>';
   box.scrollTop = box.scrollHeight;
+  // Хайлт идэвхтэй байвал дахин filter хийнэ
+  if (document.getElementById('chatSearchBar').style.display === 'block') filterChatMessages();
+}
+
+function scrollToMessage(msgId) {
+  var el = document.getElementById('msg-'+msgId);
+  if (el) {
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    el.style.transition = 'background 0.3s';
+    el.style.background = '#fff3cd';
+    setTimeout(function(){ el.style.background = ''; }, 1500);
+  }
 }
 
 var _chatLongPressTimer = null;
 function chatLongPressStart(msgId) {
   _chatLongPressTimer = setTimeout(function() {
-    confirmDeleteMessage(msgId);
+    openMsgActions(msgId);
   }, 500);
 }
 function chatLongPressEnd() {
   clearTimeout(_chatLongPressTimer);
 }
 
-function confirmDeleteMessage(msgId) {
-  if (confirm('Энэ мессежийг устгах уу?')) {
-    deleteMessage(msgId);
+function openMsgActions(msgId) {
+  var m = window._chatMsgsCache && window._chatMsgsCache[msgId];
+  if (!m) return;
+  window._actionMsgId = msgId;
+  var isMine = m.sender_id === CU.id;
+  var isText = m.message_type === 'text' || !m.message_type;
+  // Засах: зөвхөн өөрийн текст мессеж
+  document.getElementById('msgActEdit').style.display = (isMine && isText) ? 'flex' : 'none';
+  // Устгах: зөвхөн өөрийн мессеж
+  document.getElementById('msgActDelete').style.display = isMine ? 'flex' : 'none';
+  // Хуулах: текст мессежид
+  document.getElementById('msgActCopy').style.display = isText ? 'flex' : 'none';
+  openModal('msgActionSheet');
+}
+
+function doReplyToMessage() {
+  var m = window._chatMsgsCache && window._chatMsgsCache[window._actionMsgId];
+  if (!m) return;
+  closeModal('msgActionSheet');
+  window._replyingTo = m.id;
+  var preview = m.message_type === 'image' ? '📷 Зураг' : (m.message_type === 'audio' ? '🎤 Дуу хоолой' : (m.content||''));
+  if (preview.length > 80) preview = preview.substr(0,80)+'...';
+  document.getElementById('chatReplyPreviewText').textContent = preview;
+  document.getElementById('chatReplyPreview').style.display = 'flex';
+  document.getElementById('chatInput').focus();
+}
+
+function cancelReply() {
+  window._replyingTo = null;
+  document.getElementById('chatReplyPreview').style.display = 'none';
+}
+
+function doCopyMessage() {
+  var m = window._chatMsgsCache && window._chatMsgsCache[window._actionMsgId];
+  if (!m) return;
+  closeModal('msgActionSheet');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(m.content||'').then(function(){ showToast('Хуулагдлаа'); });
+  } else {
+    showToast('Хуулагдлаа');
   }
+}
+
+function doDeleteMessage() {
+  closeModal('msgActionSheet');
+  if (confirm('Энэ мессежийг устгах уу?')) {
+    deleteMessage(window._actionMsgId);
+  }
+}
+
+async function doEditMessage() {
+  var m = window._chatMsgsCache && window._chatMsgsCache[window._actionMsgId];
+  if (!m) return;
+  closeModal('msgActionSheet');
+  var newText = prompt('Мессежийг засах:', m.content||'');
+  if (newText === null) return;
+  newText = newText.trim();
+  if (!newText) { showToast('Хоосон байж болохгүй', true); return; }
+  if (newText === m.content) return;
+  var r = await sb.from('messages').update({content: newText, edited_at: new Date().toISOString()}).eq('id', m.id);
+  if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
+  showToast('Засагдлаа');
+  loadChat(window._chatListingId, window._chatSellerId);
 }
 
 async function deleteMessage(msgId) {
@@ -3492,6 +3647,40 @@ async function deleteMessage(msgId) {
   if (r.error) { showToast('Алдаа: '+r.error.message, true); return; }
   showToast('Мессеж устгагдлаа');
   loadChat(window._chatListingId, window._chatSellerId);
+}
+
+function toggleChatSearch() {
+  var bar = document.getElementById('chatSearchBar');
+  if (bar.style.display === 'block') {
+    bar.style.display = 'none';
+    document.getElementById('chatSearchInput').value = '';
+    filterChatMessages();
+  } else {
+    bar.style.display = 'block';
+    setTimeout(function(){ document.getElementById('chatSearchInput').focus(); }, 100);
+  }
+}
+
+function filterChatMessages() {
+  var q = (document.getElementById('chatSearchInput').value || '').toLowerCase().trim();
+  var all = document.querySelectorAll('#chatMessages > div[id^="msg-"]');
+  var info = document.getElementById('chatSearchInfo');
+  if (!q) {
+    all.forEach(function(el){ el.style.display = ''; });
+    if (info) info.textContent = '';
+    return;
+  }
+  var found = 0;
+  all.forEach(function(el) {
+    var txt = el.getAttribute('data-search') || '';
+    if (txt.indexOf(q) !== -1) {
+      el.style.display = '';
+      found++;
+    } else {
+      el.style.display = 'none';
+    }
+  });
+  if (info) info.textContent = found + ' үр дүн';
 }
 
 function viewChatImage(url) {
@@ -3634,15 +3823,18 @@ async function sendMessage() {
   var content = input.value.trim();
   if (!content) return;
   window._sendingMessage = true;
-  var r = await sb.from('messages').insert({
+  var payload = {
     listing_id: window._chatListingId,
     sender_id: CU.id,
     receiver_id: window._chatSellerId,
     content: content
-  });
+  };
+  if (window._replyingTo) payload.reply_to = window._replyingTo;
+  var r = await sb.from('messages').insert(payload);
   window._sendingMessage = false;
   if (!r.error) {
     input.value = '';
+    cancelReply();
     loadChat(window._chatListingId, window._chatSellerId);
     // Нөгөө хэрэглэгчид мэдэгдэл
     var me = await sb.from('users').select('name').eq('id', CU.id).single();
