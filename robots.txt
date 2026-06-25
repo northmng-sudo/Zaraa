@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zar-aa.mn/sitemap.xml
