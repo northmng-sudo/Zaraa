@@ -308,10 +308,13 @@ select.form-input{cursor:pointer}
 </nav>
 
 <div class="page active" id="page-home">
-  <!-- BANNER SLIDER - ҮЛДДЭГ -->
-  <div style="position:relative;overflow:hidden;background:#f5f5f5;display:none" id="bannerSlider">
-    <div style="display:flex;transition:transform 0.5s;height:80px" id="bannerInner"></div>
-    <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px" id="bannerDots"></div>
+  <!-- BANNER SLIDER - ONDO загвартай том hero -->
+  <div style="position:relative;overflow:hidden;background:#111;display:none;margin:12px;border-radius:18px;box-shadow:0 4px 20px rgba(0,0,0,0.12)" id="bannerSlider">
+    <div style="display:flex;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);height:clamp(170px,30vw,340px)" id="bannerInner"></div>
+    <button onclick="bannerPrev()" aria-label="Өмнөх" style="position:absolute;top:50%;left:12px;transform:translateY(-50%);background:rgba(0,0,0,0.4);color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;z-index:4;transition:background 0.2s" onmouseover="this.style.background='rgba(0,0,0,0.65)'" onmouseout="this.style.background='rgba(0,0,0,0.4)'">‹</button>
+    <button onclick="bannerNext()" aria-label="Дараах" style="position:absolute;top:50%;right:12px;transform:translateY(-50%);background:rgba(0,0,0,0.4);color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;z-index:4;transition:background 0.2s" onmouseover="this.style.background='rgba(0,0,0,0.65)'" onmouseout="this.style.background='rgba(0,0,0,0.4)'">›</button>
+    <div id="bannerCounter" style="position:absolute;bottom:14px;right:16px;background:rgba(0,0,0,0.45);color:white;font-size:12px;font-weight:600;padding:4px 11px;border-radius:50px;z-index:4">1/1</div>
+    <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:4" id="bannerDots"></div>
   </div>
 
   <!-- CATEGORY TABS - PILL NAV -->
@@ -3424,13 +3427,27 @@ var _bannerIdx = 0;
 var _bannerTimer = null;
 
 function slideBanner(n) {
+  var total = window._bannerTotal || 0;
+  if (total > 0) { n = ((n % total) + total) % total; }
   _bannerIdx = n;
   var inner = document.getElementById('bannerInner');
   if (inner) inner.style.transform = 'translateX(-'+n*100+'%)';
-  for (var i=0; i<3; i++) {
+  for (var i=0; i<total; i++) {
     var d = document.getElementById('bd'+i);
-    if (d) { d.style.width = i===n?'20px':'6px'; d.style.opacity = i===n?'1':'0.4'; }
+    if (d) { d.style.width = i===n?'22px':'7px'; d.style.opacity = i===n?'1':'0.5'; }
   }
+  var counter = document.getElementById('bannerCounter');
+  if (counter && total) counter.textContent = (n+1)+'/'+total;
+}
+
+function bannerNext() { slideBanner(_bannerIdx + 1); _resetBannerTimer(); }
+function bannerPrev() { slideBanner(_bannerIdx - 1); _resetBannerTimer(); }
+function _resetBannerTimer() {
+  if (_bannerTimer) clearInterval(_bannerTimer);
+  _bannerTimer = setInterval(function() {
+    if (!(window._bannerTotal > 0)) return;
+    slideBanner(_bannerIdx + 1);
+  }, 4500);
 }
 
 // BANNER MANAGEMENT - Supabase database-д хадгалагдана (бvх хэрэглэгчид адил харагдана)
@@ -3455,17 +3472,18 @@ function renderBanners() {
   window._bannerTotal = BANNERS.length;
   inner.innerHTML = BANNERS.map(function(b) {
     var bg = b.image_url ? 'background-image:url(\''+b.image_url+'\');background-size:cover;background-position:center' : 'background:linear-gradient(135deg,'+b.c1+','+b.c2+')';
-    return '<div style="min-width:100%;'+bg+';display:flex;align-items:center;padding:0 20px;color:white;justify-content:space-between;position:relative">'+
-      (b.image_url ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.25)"></div>' : '')+
-      '<div style="position:relative;z-index:1"><div style="font-size:16px;font-weight:800;line-height:1.2">'+escapeHtml(b.title)+'</div>'+
-      '<div style="font-size:11px;opacity:0.85;margin-top:2px">'+escapeHtml(b.sub||'')+'</div></div>'+
-      (b.btn ? '<button onclick="'+b.link+'" style="position:relative;z-index:1;background:white;color:'+b.c1+';border:none;border-radius:4px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">'+escapeHtml(b.btn)+'</button>' : '')+
+    return '<div style="min-width:100%;'+bg+';display:flex;align-items:center;padding:0 clamp(20px,5vw,52px);color:white;justify-content:space-between;position:relative">'+
+      (b.image_url ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(0,0,0,0.55),rgba(0,0,0,0.15))"></div>' : '')+
+      '<div style="position:relative;z-index:1;max-width:70%"><div style="font-size:clamp(20px,4vw,40px);font-weight:900;line-height:1.1;letter-spacing:-0.5px">'+escapeHtml(b.title)+'</div>'+
+      '<div style="font-size:clamp(12px,2vw,18px);opacity:0.9;margin-top:8px;line-height:1.3">'+escapeHtml(b.sub||'')+'</div>'+
+      (b.btn ? '<button onclick="'+b.link+'" style="margin-top:16px;background:white;color:'+b.c1+';border:none;border-radius:10px;padding:11px 24px;font-size:clamp(13px,1.6vw,15px);font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,0.2)">'+escapeHtml(b.btn)+'</button>' : '')+
+      '</div>'+
       '</div>';
   }).join('');
   var dotsEl = document.getElementById('bannerDots');
   if (dotsEl) {
     dotsEl.innerHTML = BANNERS.map(function(_,i){
-      return '<div onclick="slideBanner('+i+')" id="bd'+i+'" style="width:'+(i===0?'20':'6')+'px;height:3px;border-radius:2px;background:white;cursor:pointer;opacity:'+(i===0?'1':'0.4')+'"></div>';
+      return '<div onclick="slideBanner('+i+');_resetBannerTimer()" id="bd'+i+'" style="width:'+(i===0?'22':'7')+'px;height:7px;border-radius:50px;background:white;cursor:pointer;opacity:'+(i===0?'1':'0.5')+';transition:width 0.3s,opacity 0.3s"></div>';
     }).join('');
   }
   slideBanner(0);
@@ -3602,13 +3620,7 @@ async function deleteBanner(id) {
 
 function startBannerSlider() {
   loadBanners();
-  if (_bannerTimer) clearInterval(_bannerTimer);
-  _bannerTimer = setInterval(function() {
-    var total = window._bannerTotal || 0;
-    if (!total) return;
-    _bannerIdx = (_bannerIdx+1) % total;
-    slideBanner(_bannerIdx);
-  }, 4000);
+  _resetBannerTimer();
 }
 
 function updatePillIndicator(el) {
