@@ -2799,9 +2799,8 @@ function buildVipCardHtml(l) {
     '<div style="color:#E62B05;font-size:15px;font-weight:800;margin-bottom:3px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.is_negotiable?' · Тохирно':'')+'</div>'+
     '<div class="card-title" style="margin-top:2px">'+escapeHtml(l.title)+'</div>'+
     (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+(l.users.shop_is_ereen?' <span style="background:linear-gradient(135deg,#DE2910,#FFDE00);color:white;font-weight:700;padding:1px 5px;border-radius:6px;font-size:9px">🇨🇳 Эрээн</span>':'')+'</div>':'')+
-    '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-top:3px">'+
-    '<div style="font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0">📍 '+(l.location||'УБ')+'</div>'+
-    '<div style="font-size:10px;color:#bbb;flex-shrink:0">'+timeAgo(l.created_at)+'</div>'+
+    '<div style="margin-top:6px;font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 '+(l.location||'УБ')+'</div>'+
+    '<div style="margin-top:2px;font-size:10px;color:#bbb">🕐 '+timeAgo(l.created_at)+'</div>'+
     '</div></div></div></div>';
 }
 
@@ -2866,9 +2865,8 @@ function renderListings(arr) {
         '<div style="color:#E62B05;font-size:15px;font-weight:800;margin-bottom:3px">'+(l.price?'₮'+Number(l.price).toLocaleString():'')+(l.is_negotiable?' · Тохирно':'')+'</div>'+
         '<div class="card-title" style="margin-top:2px">'+escapeHtml(l.title)+'</div>'+
         (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+(l.users.shop_is_ereen?' <span style="background:linear-gradient(135deg,#DE2910,#FFDE00);color:white;font-weight:700;padding:1px 5px;border-radius:6px;font-size:9px">🇨🇳 Эрээн</span>':'')+'</div>':'')+
-        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-top:3px">'+
-        '<div style="font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0">📍 '+(l.location||'УБ')+'</div>'+
-        '<div style="font-size:10px;color:#bbb;flex-shrink:0">'+timeAgo(l.created_at)+'</div>'+
+        '<div style="margin-top:6px;font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 '+(l.location||'УБ')+'</div>'+
+        '<div style="margin-top:2px;font-size:10px;color:#bbb">🕐 '+timeAgo(l.created_at)+'</div>'+
         '</div></div></div></div>';
     }
     if (!CC) {
@@ -2957,10 +2955,8 @@ function renderListings(arr) {
       '<div class="card-title" style="margin-top:5px">'+escapeHtml(l.title)+'</div>'+
       (l.description?'<div style="font-size:12px;color:#666;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4">'+escapeHtml(l.description)+'</div>':'')+
       (l.users&&l.users.is_shop?'<div style="font-size:11px;color:#1a73e8;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+(l.users.shop_is_ereen?' 🇨🇳':'')+'</div>':'')+
-      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-top:5px">'+
-      '<div style="font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0">📍 '+(l.location||'УБ')+'</div>'+
-      '<div style="font-size:11px;color:#aaa;flex-shrink:0">'+timeAgo(l.created_at)+'</div>'+
-      '</div>'+
+      '<div style="margin-top:6px;font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 '+(l.location||'УБ')+'</div>'+
+      '<div style="margin-top:2px;font-size:11px;color:#aaa">🕐 '+timeAgo(l.created_at)+'</div>'+
       '</div></div></div>';
   });
 
