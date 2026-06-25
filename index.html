@@ -2781,7 +2781,7 @@ function buildCardImageHtml(l) {
       '</div></div>';
   }
   return '<div class="card-img" '+(l.video_url?'onmouseenter="cardVideoPlay(this,\''+l.video_url+'\')" onmouseleave="cardVideoStop(this)" ':'')+'>'+
-    (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+    (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
     (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
     (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
     '<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this)" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button>'+
@@ -2800,8 +2800,33 @@ function buildVipCardHtml(l) {
     (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+(l.users.shop_is_ereen?' <span style="background:linear-gradient(135deg,#DE2910,#FFDE00);color:white;font-weight:700;padding:1px 5px;border-radius:6px;font-size:9px">🇨🇳 Эрээн</span>':'')+'</div>':'')+
     '<div style="margin-top:6px;font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 '+(l.location||'УБ')+'</div>'+
     '<div style="margin-top:2px;font-size:10px;color:#bbb">🕐 '+timeAgo(l.created_at)+'</div>'+
-    '</div></div></div></div>';
+    '</div></div></div>';
 }
+
+function fixCardImgSquares(container) {
+  // CSS aspect-ratio:1 доторхи grid-ийн ховор layout bug-аас сэргийлж,
+  // зургийн хайрцгийн өндрийг JS-ээр шууд тогтооно (width-тэй тэнцvv)
+  if (!container) return;
+  requestAnimationFrame(function() {
+    var boxes = container.querySelectorAll('.card-img, .stack-img-wrap');
+    boxes.forEach(function(box) {
+      var w = box.offsetWidth;
+      if (w > 0) {
+        box.style.height = w + 'px';
+        box.style.aspectRatio = 'auto';
+      }
+    });
+  });
+}
+
+window.addEventListener('resize', function() {
+  clearTimeout(window._cardImgResizeTimer);
+  window._cardImgResizeTimer = setTimeout(function() {
+    document.querySelectorAll('.grid, .vip-grid, .vip-feat-grid').forEach(function(g) {
+      fixCardImgSquares(g);
+    });
+  }, 150);
+});
 
 function renderListings(arr) {
   var grid = document.getElementById('listingsGrid');
@@ -2866,7 +2891,7 @@ function renderListings(arr) {
         (l.users&&l.users.is_shop?'<div style="font-size:10px;color:#1a73e8;font-weight:700;margin-top:3px">🏪 '+escapeHtml(l.users.shop_name||'Дэлгүүр')+(l.users.shop_is_ereen?' <span style="background:linear-gradient(135deg,#DE2910,#FFDE00);color:white;font-weight:700;padding:1px 5px;border-radius:6px;font-size:9px">🇨🇳 Эрээн</span>':'')+'</div>':'')+
         '<div style="margin-top:6px;font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 '+(l.location||'УБ')+'</div>'+
         '<div style="margin-top:2px;font-size:10px;color:#bbb">🕐 '+timeAgo(l.created_at)+'</div>'+
-        '</div></div></div></div>';
+        '</div></div></div>';
     }
     if (!CC) {
       // Бүх ангилал харагдаж байгаа үед Онцлох заруудыг ангилал бүрээр тусдаа бүлэг болгож харуулна
@@ -2939,7 +2964,7 @@ function renderListings(arr) {
       imgs.map(function(_,i){ return '<div style="width:5px;height:5px;border-radius:50%;background:'+(i===0?'white':'rgba(255,255,255,0.5)')+'"></div>'; }).join('')+
       '</div></div>' :
       '<div class="card-img" '+(l.video_url?'onmouseenter="cardVideoPlay(this,\''+l.video_url+'\')" onmouseleave="cardVideoStop(this)" ':'')+'>'+
-      (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+      (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
       '<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this)" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button>'+
@@ -2960,6 +2985,7 @@ function renderListings(arr) {
   });
 
   grid.innerHTML = html;
+  fixCardImgSquares(grid);
 
   // "Илүү ачаалах" товч — зөвхөн шүүлтүүргүй vед, ачаалах боломжтой бол
   var noFilterActive = !CC && !window._subCat && !window._subCat2 && !window._subCat3 &&
@@ -6097,7 +6123,7 @@ function renderFavoritesGrid(arr) {
     return '<div class="card" style="position:relative" onclick="'+(_compareMode?'':'showDetail(\''+l.id+'\')')+'">'+
       '<div class="card-inner">'+
       '<div class="card-img">'+
-      (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+      (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       checkbox+
       (!_compareMode?'<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this);loadFavoritesPage()" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">❤️</button>':'')+
       '</div>'+
