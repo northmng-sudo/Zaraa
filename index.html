@@ -3471,6 +3471,12 @@ function renderBanners() {
   slider.style.display = 'block';
   window._bannerTotal = BANNERS.length;
   inner.innerHTML = BANNERS.map(function(b) {
+    var hasText = (b.title && b.title.trim()) || (b.sub && b.sub.trim());
+    // Бүтэн дизайн хийсэн зурагтай баннер (гарчиггүй) — давхарлалт, текст байхгүй, цэвэр
+    if (b.image_url && !hasText) {
+      var clickable = b.link ? ' onclick="'+b.link+'" ' : '';
+      return '<div'+clickable+'style="min-width:100%;background-image:url(\''+b.image_url+'\');background-size:cover;background-position:center;'+(b.link?'cursor:pointer':'')+'"></div>';
+    }
     var bg = b.image_url ? 'background-image:url(\''+b.image_url+'\');background-size:cover;background-position:center' : 'background:linear-gradient(135deg,'+b.c1+','+b.c2+')';
     return '<div style="min-width:100%;'+bg+';display:flex;align-items:center;padding:0 clamp(20px,5vw,52px);color:white;justify-content:space-between;position:relative">'+
       (b.image_url ? '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(0,0,0,0.55),rgba(0,0,0,0.15))"></div>' : '')+
