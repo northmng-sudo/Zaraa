@@ -2360,7 +2360,7 @@ function renderMapView() {
       var icon = l.vip_status === 'active' ? '👑' : (l.is_featured ? '⭐' : '📍');
       var marker = L.marker(coords).addTo(map);
       var popupHtml = '<div style="min-width:160px">'+
-        (l.images && l.images[0] ? '<img src="'+l.images[0]+'" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:6px">' : '')+
+        (l.images && l.images[0] ? '<img loading="lazy" src="'+l.images[0]+'" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:6px">' : '')+
         '<div style="font-weight:700;font-size:13px">'+icon+' '+escapeHtml(l.title)+'</div>'+
         '<div style="color:#E62B05;font-weight:800;font-size:14px">₮'+Number(l.price||0).toLocaleString()+'</div>'+
         '<button onclick="showDetail(\''+l.id+'\')" style="margin-top:6px;width:100%;background:#E62B05;color:white;border:none;border-radius:6px;padding:6px;font-size:12px;cursor:pointer">Дэлгэрэнгүй</button>'+
@@ -2850,7 +2850,7 @@ function buildCardImageHtml(l) {
       '</div></div>';
   }
   return '<div class="card-img" '+(l.video_url?'onmouseenter="cardVideoPlay(this,\''+l.video_url+'\')" onmouseleave="cardVideoStop(this)" ':'')+'>'+
-    (imgs?'<img src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+    (imgs?'<img loading="lazy" src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
     (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
     (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
     '<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this)" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button>'+
@@ -3010,7 +3010,7 @@ function renderListings(arr) {
       imgs.map(function(_,i){ return '<div style="width:5px;height:5px;border-radius:50%;background:'+(i===0?'white':'rgba(255,255,255,0.5)')+'"></div>'; }).join('')+
       '</div></div>' :
       '<div class="card-img" '+(l.video_url?'onmouseenter="cardVideoPlay(this,\''+l.video_url+'\')" onmouseleave="cardVideoStop(this)" ':'')+'>'+
-      (imgs?'<img src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+      (imgs?'<img loading="lazy" src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
       '<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this)" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button>'+
@@ -3227,7 +3227,7 @@ async function loadRelatedListings(category, currentId) {
     items.map(function(l) {
       return '<div onclick="showDetail(\''+l.id+'\')" style="background:white;cursor:pointer">'+
         '<div style="aspect-ratio:1;position:relative;overflow:hidden;background:#f5f5f5">'+
-        (l.images&&l.images[0]?'<img src="'+l.images[0]+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:28px">'+(EMOJIS[l.category]||'📦')+'</div>')+
+        (l.images&&l.images[0]?'<img loading="lazy" src="'+l.images[0]+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:28px">'+(EMOJIS[l.category]||'📦')+'</div>')+
         '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.6));padding:12px 6px 4px">'+
         '<div style="color:white;font-size:11px;font-weight:700">'+(l.is_negotiable&&!l.price?'Тохирно':'₮'+Number(l.price||0).toLocaleString())+'</div>'+
         '</div>'+
@@ -3492,8 +3492,8 @@ function renderBanners() {
     var hasText = (b.title && b.title.trim()) || (b.sub && b.sub.trim());
     // Бүтэн дизайн хийсэн зурагтай баннер (гарчиггүй) — давхарлалт, текст байхгүй, цэвэр
     if (b.image_url && !hasText) {
-      var clickable = b.link ? ' onclick="'+b.link+'" ' : '';
-      return '<div'+clickable+'style="min-width:100%;background-image:url(\''+b.image_url+'\');background-size:cover;background-position:center;'+(b.link?'cursor:pointer':'')+'"></div>';
+      var clickable = b.link ? ' onclick="'+b.link+'"' : '';
+      return '<div'+clickable+' style="min-width:100%;background-image:url(\''+b.image_url+'\');background-size:cover;background-position:center;'+(b.link?'cursor:pointer':'')+'"></div>';
     }
     var bg = b.image_url ? 'background-image:url(\''+b.image_url+'\');background-size:cover;background-position:center' : 'background:linear-gradient(135deg,'+b.c1+','+b.c2+')';
     return '<div style="min-width:100%;'+bg+';display:flex;align-items:center;padding:0 clamp(20px,5vw,52px);color:white;justify-content:space-between;position:relative">'+
@@ -6147,7 +6147,7 @@ function openCompareModal() {
     var imgs = l.images && l.images.length ? l.images : null;
     return '<td style="padding:8px;text-align:center;vertical-align:top">'+
       '<div style="width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer" onclick="closeModal(\'compareModal\');showDetail(\''+l.id+'\')">'+
-      (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover">':(EMOJIS[l.category]||'📦'))+
+      (imgs?'<img loading="lazy" src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover">':(EMOJIS[l.category]||'📦'))+
       '</div></td>';
   }).join('')+'</tr>';
   // Title row
@@ -6185,7 +6185,7 @@ function renderFavoritesGrid(arr) {
     return '<div class="card" style="position:relative" onclick="'+(_compareMode?'':'showDetail(\''+l.id+'\')')+'">'+
       '<div class="card-inner">'+
       '<div class="card-img">'+
-      (imgs?'<img src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+      (imgs?'<img loading="lazy" src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       checkbox+
       (!_compareMode?'<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this);loadFavoritesPage()" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">❤️</button>':'')+
       '</div>'+
@@ -6413,7 +6413,7 @@ async function showShopDetail(shopId) {
     (CU?'<button class="btn btn-primary btn-full" onclick="startChatWithShop(\''+shopId+'\')" style="margin-bottom:16px">💬 Дэлгүүртэй чатлах</button>':'')+
     '<div style="font-weight:700;margin-bottom:10px">Бараанууд ('+listings.length+')</div>'+
     (listings.length?'<div class="grid" style="padding:0">'+listings.map(function(l) {
-      return '<div class="card" onclick="showDetail(\''+l.id+'\')"><div class="card-img">'+(l.images&&l.images[0]?'<img src="'+l.images[0]+'">':(EMOJIS[l.category]||'📦'))+'</div>'+
+      return '<div class="card" onclick="showDetail(\''+l.id+'\')"><div class="card-img">'+(l.images&&l.images[0]?'<img loading="lazy" src="'+l.images[0]+'">':(EMOJIS[l.category]||'📦'))+'</div>'+
         '<div style="padding:6px 8px"><div style="font-size:13px;font-weight:700">₮'+Number(l.price||0).toLocaleString()+'</div>'+
         '<div class="card-title">'+escapeHtml(l.title)+'</div></div></div>';
     }).join('')+'</div>':'<div class="empty"><p>Одоогоор бараа байхгүй</p></div>')+
@@ -6462,7 +6462,7 @@ async function loadShopManage() {
       var statusLabel = l.status === 'active' ? '<span style="color:#00875a">✅ Идэвхтэй</span>' : '<span style="color:#e53e3e">⏳ Хүлээгдэж байна</span>';
       return '<div style="display:flex;gap:10px;align-items:center;background:white;border:1px solid #eee;border-radius:12px;padding:10px;margin-bottom:8px">'+
         '<div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+
-        (l.images&&l.images[0]?'<img src="'+l.images[0]+'" style="width:100%;height:100%;object-fit:cover">':'📦')+'</div>'+
+        (l.images&&l.images[0]?'<img loading="lazy" src="'+l.images[0]+'" style="width:100%;height:100%;object-fit:cover">':'📦')+'</div>'+
         '<div style="flex:1;min-width:0" onclick="showDetail(\''+l.id+'\')">'+
         '<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtml(l.title)+'</div>'+
         '<div style="font-size:12px;color:#999">₮'+Number(l.price||0).toLocaleString()+' • '+statusLabel+'</div>'+
