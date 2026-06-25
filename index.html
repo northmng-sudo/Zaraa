@@ -2782,7 +2782,7 @@ function buildCardImageHtml(l) {
       '</div></div>';
   }
   return '<div class="card-img" '+(l.video_url?'onmouseenter="cardVideoPlay(this,\''+l.video_url+'\')" onmouseleave="cardVideoStop(this)" ':'')+'>'+
-    (imgs?'<img src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+    (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
     (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
     (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
     '<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this)" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button>'+
@@ -2940,7 +2940,7 @@ function renderListings(arr) {
       imgs.map(function(_,i){ return '<div style="width:5px;height:5px;border-radius:50%;background:'+(i===0?'white':'rgba(255,255,255,0.5)')+'"></div>'; }).join('')+
       '</div></div>' :
       '<div class="card-img" '+(l.video_url?'onmouseenter="cardVideoPlay(this,\''+l.video_url+'\')" onmouseleave="cardVideoStop(this)" ':'')+'>'+
-      (imgs?'<img src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+      (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       (l.has_delivery?'<div class="delivery-badge">Хүргэнэ</div>':'')+
       (l.video_url?'<div class="video-badge">▶ Бичлэг</div>':'')+
       '<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this)" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">'+(FAVORITES.has(l.id)?'❤️':'🤍')+'</button>'+
@@ -6098,7 +6098,7 @@ function renderFavoritesGrid(arr) {
     return '<div class="card" style="position:relative" onclick="'+(_compareMode?'':'showDetail(\''+l.id+'\')')+'">'+
       '<div class="card-inner">'+
       '<div class="card-img">'+
-      (imgs?'<img src="'+imgs[0]+'" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
+      (imgs?'<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\''+(EMOJIS[l.category]||'📦')+'\'">':(EMOJIS[l.category]||'📦'))+
       checkbox+
       (!_compareMode?'<button class="fav-btn" data-listing-id="'+l.id+'" onclick="event.stopPropagation();toggleFavorite(\''+l.id+'\',this);loadFavoritesPage()" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:5">❤️</button>':'')+
       '</div>'+
@@ -6326,7 +6326,7 @@ async function showShopDetail(shopId) {
     (CU?'<button class="btn btn-primary btn-full" onclick="startChatWithShop(\''+shopId+'\')" style="margin-bottom:16px">💬 Дэлгүүртэй чатлах</button>':'')+
     '<div style="font-weight:700;margin-bottom:10px">Бараанууд ('+listings.length+')</div>'+
     (listings.length?'<div class="grid" style="padding:0">'+listings.map(function(l) {
-      return '<div class="card" onclick="showDetail(\''+l.id+'\')"><div class="card-img">'+(l.images&&l.images[0]?'<img src="'+l.images[0]+'">':(EMOJIS[l.category]||'📦'))+'</div>'+
+      return '<div class="card" onclick="showDetail(\''+l.id+'\')"><div class="card-img">'+(l.images&&l.images[0]?'<img src="'+l.images[0]+'" style="width:100%;height:100%;object-fit:cover">':(EMOJIS[l.category]||'📦'))+'</div>'+
         '<div style="padding:6px 8px"><div style="font-size:13px;font-weight:700">₮'+Number(l.price||0).toLocaleString()+'</div>'+
         '<div class="card-title">'+escapeHtml(l.title)+'</div></div></div>';
     }).join('')+'</div>':'<div class="empty"><p>Одоогоор бараа байхгүй</p></div>')+
