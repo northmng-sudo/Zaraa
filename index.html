@@ -16,7 +16,41 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#E62B05">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23E62B05'/><stop offset='100%25' stop-color='%23FF8C00'/></linearGradient></defs><polygon points='50,5 95,27 95,73 50,95 5,73 5,27' fill='url(%23g)'/><text x='50' y='68' text-anchor='middle' font-family='Arial Black' font-size='52' font-weight='900' fill='white'>З</text></svg>">
-<title>Зараа</title>
+<title>Зараа — Монголын зарын сайт | Зар, Үл хөдлөх, Автомашин, Ажлын байр</title>
+<meta name="description" content="Зараа (zar-aa.mn) — Монголын үнэгүй зарын сайт. Үл хөдлөх, автомашин, ажлын байр, гар утас, эд хогшил болон үйлчилгээний зар. Эрээнээс бараа захиалах, дэлгүүрүүдтэй холбогдох.">
+<meta name="keywords" content="зар, зарын сайт, үнэгүй зар, монгол зар, үл хөдлөх, автомашин зарна, ажлын байр, эрээн, zar, zaraa, zar-aa">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://zar-aa.mn/">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Зараа">
+<meta property="og:title" content="Зараа — Монголын зарын сайт">
+<meta property="og:description" content="Монголын үнэгүй зарын сайт. Үл хөдлөх, автомашин, ажлын байр, эд хогшил, үйлчилгээний зар. Эрээнээс бараа захиалах боломжтой.">
+<meta property="og:url" content="https://zar-aa.mn/">
+<meta property="og:image" content="https://zar-aa.mn/og-image.png">
+<meta property="og:locale" content="mn_MN">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Зараа — Монголын зарын сайт">
+<meta name="twitter:description" content="Монголын үнэгүй зарын сайт. Үл хөдлөх, автомашин, ажлын байр, эд хогшил, үйлчилгээний зар.">
+<meta name="twitter:image" content="https://zar-aa.mn/og-image.png">
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Зараа",
+  "alternateName": "zar-aa.mn",
+  "url": "https://zar-aa.mn/",
+  "description": "Монголын үнэгүй зарын сайт — үл хөдлөх, автомашин, ажлын байр, эд хогшил, үйлчилгээний зар.",
+  "inLanguage": "mn",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": { "@type": "EntryPoint", "urlTemplate": "https://zar-aa.mn/?q={search_term_string}" },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -223,6 +257,22 @@ select.form-input{cursor:pointer}
 </style>
 </head>
 <body>
+<noscript>
+  <div style="max-width:800px;margin:0 auto;padding:24px;font-family:sans-serif">
+    <h1>Зараа — Монголын зарын сайт</h1>
+    <p>Зараа (zar-aa.mn) бол Монголын үнэгүй зарын сайт. Та манай сайтаар дамжуулан үл хөдлөх хөрөнгө, автомашин, ажлын байр, гар утас, эд хогшил, гэр ахуйн бараа болон бүх төрлийн үйлчилгээний зар байршуулах, хайх боломжтой.</p>
+    <h2>Үндсэн ангилал</h2>
+    <ul>
+      <li>Үл хөдлөх хөрөнгө — байр, газар, оффис</li>
+      <li>Автомашин — машин зарна, авна, сэлбэг</li>
+      <li>Ажлын байр — ажил хайх, ажилтан авах</li>
+      <li>Электрон бараа — гар утас, компьютер, ноутбук</li>
+      <li>Гэр ахуйн бараа, тавилга, хувцас</li>
+      <li>Үйлчилгээ болон Эрээнээс бараа захиалга</li>
+    </ul>
+    <p>Сайтыг бүрэн ашиглахын тулд JavaScript-ийг идэвхжүүлнэ үү.</p>
+  </div>
+</noscript>
 <div class="toast" id="toast"></div>
 <div id="postLoadingOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;flex-direction:column;color:white">
   <div class="spinner" style="width:48px;height:48px;border-width:4px;margin-bottom:16px"></div>
