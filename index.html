@@ -4008,7 +4008,13 @@ function shareVia(platform) {
   } else if (platform === 'telegram') {
     window.open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text), '_blank');
   } else if (platform === 'messenger') {
-    window.open('fb-messenger://share/?link=' + encodeURIComponent(url), '_blank');
+    if (navigator.share) {
+      navigator.share({ title: text, text: fullText, url: url }).catch(function(){});
+    } else {
+      if (navigator.clipboard) { navigator.clipboard.writeText(url).catch(function(){}); }
+      window.open('https://www.messenger.com/', '_blank');
+      showToast('Холбоос хуулагдлаа — Messenger-т буулгана уу');
+    }
   } else if (platform === 'copy') {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url).then(function(){ showToast('Холбоос хуулагдлаа'); });
