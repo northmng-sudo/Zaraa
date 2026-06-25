@@ -132,6 +132,9 @@ nav{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#1a1a2e,#
 @media(min-width:768px){.grid{grid-template-columns:repeat(4,minmax(0,1fr));padding:0 80px}.vip-feat-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 @media(min-width:1024px){.grid{grid-template-columns:repeat(6,minmax(0,1fr));padding:0 150px}.vip-feat-grid{grid-template-columns:repeat(6,minmax(0,1fr))!important}}
 .card{background:white;border:2px solid #ddd;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s,transform 0.2s;position:relative;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+.card-featured .card-inner{overflow:hidden!important}
+.card-featured .stack-img-wrap{overflow:hidden!important;margin:0!important}
+.card-featured .stack-img-wrap .si{box-shadow:none}
 .card-img img{transition:transform 0.3s ease}
 .card:hover .card-img img{transform:scale(1.08)}
 .card:hover{transform:scale(1.02);box-shadow:0 4px 16px rgba(0,0,0,0.12);border-color:#ccc;z-index:5}
