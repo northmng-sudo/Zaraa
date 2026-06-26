@@ -397,7 +397,7 @@ select.form-input{cursor:pointer}
       <div id="searchInnerWrap" style="position:relative">
       <div id="searchInner" style="width:760px;height:100px;background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.12);border:2px solid #FF8C00;display:flex;align-items:center;overflow:hidden;padding:10px 8px 10px 14px;gap:6px">
         <svg style="flex-shrink:0;color:#999" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="searchInput" placeholder="Хайх..." oninput="doSearch()" onkeypress="if(event.key==='Enter'){saveSearchHistory();hideSearchHistory();}" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');showSearchHistory()" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:16px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
+        <input type="text" id="searchInput" placeholder="Хайх..." oninput="onSearchInput(this.value)" onkeypress="if(event.key==='Enter'){saveSearchHistory();hideSearchHistory();}" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');showSearchHistory()" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:16px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
         <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px 8px;color:#999;font-size:13px;border-radius:8px;flex-shrink:0">⚙️</button>
         <button onclick="saveSearchHistory();hideSearchHistory();doSearch()" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
       </div>
@@ -2532,6 +2532,71 @@ function selectSearchHistory(q) {
 function clearSearchHistory() {
   localStorage.removeItem('searchHistory');
   hideSearchHistory();
+}
+
+// Ухаалаг хайлт — бичиж байх үед тохирох зар/ангилал санал болгоно
+function onSearchInput(v) {
+  showSearchSuggestions(v);
+  doSearch();
+}
+
+function selectSuggestion(q) {
+  var inp = document.getElementById('searchInput');
+  inp.value = q;
+  saveSearchHistory();
+  hideSearchHistory();
+  doSearch();
+}
+
+function _hl(text, q) {
+  var esc = escapeHtml(text);
+  if (!q) return esc;
+  var idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx === -1) return esc;
+  var a = escapeHtml(text.slice(0, idx));
+  var b = escapeHtml(text.slice(idx, idx+q.length));
+  var c = escapeHtml(text.slice(idx+q.length));
+  return a + '<b style="color:#E62B05">' + b + '</b>' + c;
+}
+
+function showSearchSuggestions(raw) {
+  var dd = document.getElementById('searchHistoryDropdown');
+  if (!dd) return;
+  var q = (raw || '').trim();
+  if (!q) { showSearchHistory(); return; }
+  if (!window.AL || !AL.length) { dd.style.display = 'none'; return; }
+  var ql = q.toLowerCase();
+
+  // Ангилал тохирол
+  var catSeen = {}, cats = [];
+  // Зарын гарчгийн тохирол (давхардалгүй)
+  var titleSeen = {}, titles = [];
+  for (var i = 0; i < AL.length; i++) {
+    var l = AL[i];
+    if (l.category && l.category.toLowerCase().indexOf(ql) !== -1 && !catSeen[l.category]) {
+      catSeen[l.category] = 1; cats.push(l.category);
+    }
+    var t = l.title || '';
+    if (t.toLowerCase().indexOf(ql) !== -1) {
+      var k = t.toLowerCase();
+      if (!titleSeen[k]) { titleSeen[k] = 1; if (titles.length < 6) titles.push(t); }
+    }
+  }
+
+  if (!cats.length && !titles.length) { dd.style.display = 'none'; return; }
+
+  var html = '';
+  cats.slice(0, 3).forEach(function(c) {
+    var icon = (typeof EMOJIS !== 'undefined' && EMOJIS[c]) ? EMOJIS[c] : '📁';
+    html += '<div onclick="selectSuggestion(\''+escapeHtml(c).replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;font-size:14px;color:#333" onmouseover="this.style.background=\'#f9f9f9\'" onmouseout="this.style.background=\'white\'">'+
+      '<span>'+icon+'</span><span style="flex:1">'+_hl(c, q)+'</span><span style="font-size:11px;color:#bbb">ангилал</span></div>';
+  });
+  titles.forEach(function(t) {
+    html += '<div onclick="selectSuggestion(\''+escapeHtml(t).replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;font-size:14px;color:#333" onmouseover="this.style.background=\'#f9f9f9\'" onmouseout="this.style.background=\'white\'">'+
+      '<span style="color:#bbb">🔍</span><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_hl(t, q)+'</span></div>';
+  });
+  dd.innerHTML = html;
+  dd.style.display = 'block';
 }
 
 document.addEventListener('click', function(e) {
