@@ -14,7 +14,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Зараа">
 <meta name="theme-color" content="#E62B05">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23E62B05'/><stop offset='100%25' stop-color='%23FF8C00'/></linearGradient></defs><polygon points='50,5 95,27 95,73 50,95 5,73 5,27' fill='url(%23g)'/><text x='50' y='68' text-anchor='middle' font-family='Arial Black' font-size='52' font-weight='900' fill='white'>З</text></svg>">
 <title>Зараа — Монголын зарын сайт | Зар, Үл хөдлөх, Автомашин, Ажлын байр</title>
 <meta name="description" content="Зараа (zar-aa.mn) — Монголын үнэгүй зарын сайт. Үл хөдлөх, автомашин, ажлын байр, гар утас, эд хогшил болон үйлчилгээний зар. Эрээнээс бараа захиалах, дэлгүүрүүдтэй холбогдох.">
@@ -6779,6 +6783,16 @@ function showToast(msg, isError) {
 }
 
 init();
+</script>
+<script>
+// PWA service worker бүртгэл — апп шиг суулгах боломжийг идэвхжүүлнэ
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js').catch(function(err) {
+      console.log('SW бүртгэл амжилтгүй:', err);
+    });
+  });
+}
 </script>
 </body>
 </html>
