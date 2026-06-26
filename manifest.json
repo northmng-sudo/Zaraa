@@ -1,0 +1,32 @@
+{
+  "name": "Зараа — Монголын зарын сайт",
+  "short_name": "Зараа",
+  "description": "Монголын үнэгүй зарын сайт. Үл хөдлөх, автомашин, ажлын байр, эд хогшил, үйлчилгээний зар.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#E62B05",
+  "lang": "mn",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
