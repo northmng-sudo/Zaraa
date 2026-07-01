@@ -331,8 +331,8 @@ select.form-input{cursor:pointer}
       <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中</button>
     </div>
     <div class="nav-right" id="navRight">
-      <button class="btn btn-ghost" onclick="openAuth('login')">Нэвтрэх</button>
-      <button class="btn btn-primary" onclick="openAuth('register')">Бүртгүүлэх</button>
+      <button class="btn btn-ghost" onclick="openAuth('login')" data-i18n="tab_login">Нэвтрэх</button>
+      <button class="btn btn-primary" onclick="openAuth('register')" data-i18n="tab_register">Бүртгүүлэх</button>
     </div>
   </div>
 </nav>
@@ -422,15 +422,15 @@ select.form-input{cursor:pointer}
       </div>
     </div>
     <div id="filterPanel" style="display:none;background:white;border-radius:12px;padding:16px;margin-top:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1)">
-      <div style="font-weight:700;margin-bottom:12px;font-size:14px">🔍 Шүүлтүүр</div>
+      <div style="font-weight:700;margin-bottom:12px;font-size:14px" data-i18n="filter_title">🔍 Шүүлтүүр</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div><label class="form-label">Доод үнэ (₮)</label><input class="form-input" type="number" id="filterMinPrice" placeholder="0" oninput="doSearch()"></div>
-        <div><label class="form-label">Дээд үнэ (₮)</label><input class="form-input" type="number" id="filterMaxPrice" placeholder="∞" oninput="doSearch()"></div>
+        <div><label class="form-label" data-i18n="f_minprice">Доод үнэ (₮)</label><input class="form-input" type="number" id="filterMinPrice" placeholder="0" oninput="doSearch()"></div>
+        <div><label class="form-label" data-i18n="f_maxprice">Дээд үнэ (₮)</label><input class="form-input" type="number" id="filterMaxPrice" placeholder="∞" oninput="doSearch()"></div>
       </div>
       <div style="margin-bottom:12px">
-        <label class="form-label">Хот/Аймаг</label>
+        <label class="form-label" data-i18n="f_province">Хот/Аймаг</label>
         <select class="form-input" id="filterProvince" onchange="updateFilterProvinceFields()">
-          <option value="">Бүгд</option>
+          <option value="" data-i18n="opt_all">Бүгд</option>
           <option>Улаанбаатар</option>
           <option>Архангай</option><option>Баян-Өлгий</option><option>Баянхонгор</option>
           <option>Булган</option><option>Говь-Алтай</option><option>Говьсүмбэр</option>
@@ -443,44 +443,44 @@ select.form-input{cursor:pointer}
         </select>
       </div>
       <div id="filterUbWrap" style="margin-bottom:12px;display:none">
-        <label class="form-label">Дүүрэг</label>
+        <label class="form-label" data-i18n="f_district">Дүүрэг</label>
         <select class="form-input" id="filterDistrict" onchange="doSearch()">
-          <option value="">Бүгд</option>
+          <option value="" data-i18n="opt_all">Бүгд</option>
           <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
           <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
           <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
         </select>
       </div>
       <div id="filterSumWrap" style="margin-bottom:12px;display:none">
-        <label class="form-label">Сум</label>
+        <label class="form-label" data-i18n="f_soum">Сум</label>
         <select class="form-input" id="filterSum" onchange="doSearch()">
-          <option value="">Бүгд</option>
+          <option value="" data-i18n="opt_all">Бүгд</option>
         </select>
       </div>
       <div id="catFilters"></div>
       <div id="filterCarBrandWrap" style="margin-bottom:12px;display:none">
-        <label class="form-label">Марк</label>
+        <label class="form-label" data-i18n="f_brand">Марк</label>
         <select class="form-input" id="filterCarBrand" onchange="updateFilterCarModel()">
-          <option value="">Бүгд</option>
+          <option value="" data-i18n="opt_all">Бүгд</option>
         </select>
       </div>
       <div id="filterCarModelWrap" style="margin-bottom:12px;display:none">
-        <label class="form-label">Модель</label>
-        <input class="form-input" id="filterCarModelSearch" placeholder="Модель хайх..." oninput="filterCarModelOptions(this.value)" style="margin-bottom:6px">
+        <label class="form-label" data-i18n="f_model">Модель</label>
+        <input class="form-input" id="filterCarModelSearch" placeholder="Модель хайх..." data-i18n-ph="f_model_ph" oninput="filterCarModelOptions(this.value)" style="margin-bottom:6px">
         <select class="form-input" id="filterCarModel" onchange="window._subCat3=this.value;doSearch()" size="6" style="height:auto">
-          <option value="">Бүгд</option>
+          <option value="" data-i18n="opt_all">Бүгд</option>
         </select>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterDelivery" onchange="doSearch()"> 🚚 Хүргэлттэй</label>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterNegotiable" onchange="doSearch()"> 💬 Тохирно</label>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterVerified" onchange="doSearch()"> ✅ Баталгаажсан</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterDelivery" onchange="doSearch()"> <span data-i18n="f_delivery">🚚 Хүргэлттэй</span></label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterNegotiable" onchange="doSearch()"> <span data-i18n="f_negotiable">💬 Тохирно</span></label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="checkbox" id="filterVerified" onchange="doSearch()"> <span data-i18n="f_verified">✅ Баталгаажсан</span></label>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button class="btn btn-ghost" onclick="clearFilter()">Цэвэрлэх</button>
-        <button class="btn btn-primary" onclick="applyAndScrollToResults()">🔍 Хайх</button>
+        <button class="btn btn-ghost" onclick="clearFilter()" data-i18n="btn_clear">Цэвэрлэх</button>
+        <button class="btn btn-primary" onclick="applyAndScrollToResults()" data-i18n="btn_search2">🔍 Хайх</button>
       </div>
-      <button class="btn btn-ghost btn-full" style="margin-top:8px;color:#E62B05;border-color:#E62B05" onclick="saveCurrentSearch()">🔔 Энэ хайлтыг хадгалах</button>
+      <button class="btn btn-ghost btn-full" style="margin-top:8px;color:#E62B05;border-color:#E62B05" onclick="saveCurrentSearch()" data-i18n="btn_save_search">🔔 Энэ хайлтыг хадгалах</button>
     </div>
   </div>
 
@@ -504,7 +504,7 @@ select.form-input{cursor:pointer}
   <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <!-- BUYER VIEW -->
   <div id="buyerDeliveries">
-    <div style="padding:20px 16px 10px"><div class="section-title">📦 Миний захиалгууд</div></div>
+    <div style="padding:20px 16px 10px"><div class="section-title" data-i18n="sec_my_orders">📦 Миний захиалгууд</div></div>
     <div class="section"><div id="myDeliveries"><div class="empty"><div class="empty-icon">📦</div><p>Захиалга байхгүй</p></div></div></div>
   </div>
 
@@ -548,7 +548,7 @@ select.form-input{cursor:pointer}
     <div style="font-size:17px;font-weight:800">💬 Чатууд</div>
     <button onclick="showHiddenChats()" style="background:none;border:none;color:var(--m);font-size:12px;cursor:pointer">Нуусан харах</button>
   </div>
-  <div id="chatsList"><div class="empty" style="padding-top:80px"><div class="empty-icon">💬</div><p>Чат байхгүй байна</p></div></div>
+  <div id="chatsList"><div class="empty" style="padding-top:80px"><div class="empty-icon">💬</div><p data-i18n="empty_no_chats">Чат байхгүй байна</p></div></div>
 </div>
 
 <!-- SHOP EDIT MODAL -->
@@ -597,7 +597,7 @@ select.form-input{cursor:pointer}
 <!-- SHOP MANAGE PAGE -->
 <div class="page" id="page-shopManage">
   <div class="back-btn" onclick="showPage('profile')">←</div>
-  <div style="padding:20px 16px 10px"><div class="section-title">🏪 Дэлгүүрээ удирдах</div></div>
+  <div style="padding:20px 16px 10px"><div class="section-title" data-i18n="sec_manage_shop">🏪 Дэлгүүрээ удирдах</div></div>
   <div class="section" id="shopManageContent"><div class="loading"><div class="spinner"></div></div></div>
 </div>
 
@@ -655,14 +655,14 @@ select.form-input{cursor:pointer}
 
 <div class="page" id="page-listings">
   <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
-  <div style="padding:20px 16px 10px"><div class="section-title">Миний зарууд</div></div>
-  <div class="section"><div id="myListings"><div class="empty"><div class="empty-icon">📋</div><p>Зар байхгүй<br><br><button class="btn btn-primary" onclick="showPostModal()">+ Зар байршуулах</button></p></div></div></div>
+  <div style="padding:20px 16px 10px"><div class="section-title" data-i18n="sec_my_listings">Миний зарууд</div></div>
+  <div class="section"><div id="myListings"><div class="empty"><div class="empty-icon">📋</div><p><span data-i18n="empty_no_listings">Зар байхгүй</span><br><br><button class="btn btn-primary" onclick="showPostModal()" data-i18n="btn_post_listing">+ Зар байршуулах</button></p></div></div></div>
 </div>
 
 <div class="page" id="page-favorites">
   <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px;display:flex;justify-content:space-between;align-items:center">
-    <div class="section-title">❤️ Хадгалсан зарууд</div>
+    <div class="section-title" data-i18n="sec_saved">❤️ Хадгалсан зарууд</div>
     <button id="compareModeBtn" onclick="toggleCompareMode()" style="background:var(--s2);border:1px solid var(--b);color:var(--t);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600">⚖️ Харьцуулах</button>
   </div>
   <div id="compareBar" style="display:none;padding:0 16px 12px;align-items:center;gap:8px"></div>
@@ -682,14 +682,14 @@ select.form-input{cursor:pointer}
 
 <div class="page" id="page-savedSearches">
   <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
-  <div style="padding:20px 16px 10px"><div class="section-title">🔔 Хадгалсан хайлтууд</div></div>
+  <div style="padding:20px 16px 10px"><div class="section-title" data-i18n="sec_saved_search">🔔 Хадгалсан хайлтууд</div></div>
   <div class="section"><div id="savedSearchesList"><div class="loading"><div class="spinner"></div></div></div></div>
 </div>
 
 <div class="page" id="page-recentlyViewed">
   <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px;display:flex;justify-content:space-between;align-items:center">
-    <div class="section-title">🕐 Сүүлд үзсэн зарууд</div>
+    <div class="section-title" data-i18n="sec_recent">🕐 Сүүлд үзсэн зарууд</div>
     <button onclick="clearRecentlyViewed()" style="background:none;border:1px solid #e53e3e;color:#e53e3e;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer">🗑️ Цэвэрлэх</button>
   </div>
   <div class="grid" id="recentlyViewedGrid"><div class="loading"><div class="spinner"></div></div></div>
@@ -968,7 +968,7 @@ select.form-input{cursor:pointer}
 <div class="page" id="page-notifications">
   <div class="back-btn" onclick="showPage('profile')">← Буцах</div>
   <div style="padding:20px 16px 10px;display:flex;align-items:center;justify-content:space-between">
-    <div class="section-title">🔔 Мэдэгдлүүд</div>
+    <div class="section-title" data-i18n="sec_notifs">🔔 Мэдэгдлүүд</div>
     <button class="btn btn-ghost" style="font-size:12px" onclick="markAllRead()">Бүгдийг уншсан</button>
   </div>
   <div class="section"><div id="notifList"><div class="empty"><div class="empty-icon">🔔</div><p>Мэдэгдэл байхгүй</p></div></div></div>
@@ -1038,7 +1038,7 @@ select.form-input{cursor:pointer}
 
 <div class="page" id="page-profile">
   <div id="profileContent">
-    <div class="empty" style="padding-top:80px"><div class="empty-icon">👤</div><p>Нэвтэрч профайлаа харна уу</p><br><button class="btn btn-primary" onclick="openAuth('login')">Нэвтрэх</button></div>
+    <div class="empty" style="padding-top:80px"><div class="empty-icon">👤</div><p data-i18n="empty_login_profile">Нэвтэрч профайлаа харна уу</p><br><button class="btn btn-primary" onclick="openAuth('login')" data-i18n="tab_login">Нэвтрэх</button></div>
   </div>
 </div>
 
@@ -1080,37 +1080,37 @@ select.form-input{cursor:pointer}
 <div class="modal-overlay" id="authModal">
   <div class="modal" style="position:relative">
     <button class="close-btn" onclick="closeModal('authModal')">×</button>
-    <div class="modal-title">Тавтай морил 👋</div>
+    <div class="modal-title" data-i18n="auth_welcome">Тавтай морил 👋</div>
     <div class="auth-tabs">
-      <button class="auth-tab active" id="loginTab" onclick="switchAuth('login')">Нэвтрэх</button>
-      <button class="auth-tab" id="registerTab" onclick="switchAuth('register')">Бүртгүүлэх</button>
+      <button class="auth-tab active" id="loginTab" onclick="switchAuth('login')" data-i18n="tab_login">Нэвтрэх</button>
+      <button class="auth-tab" id="registerTab" onclick="switchAuth('register')" data-i18n="tab_register">Бүртгүүлэх</button>
     </div>
     <div id="loginForm">
-      <div class="form-group"><label class="form-label">Имэйл</label><input class="form-input" type="email" id="loginEmail" placeholder="email@example.com"></div>
-      <div class="form-group"><label class="form-label">Нууц үг</label><input class="form-input" type="password" id="loginPassword" placeholder="••••••••"></div>
-      <button class="btn btn-primary btn-full" onclick="login()">Нэвтрэх</button>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_email">Имэйл</label><input class="form-input" type="email" id="loginEmail" placeholder="email@example.com"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_password">Нууц үг</label><input class="form-input" type="password" id="loginPassword" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-full" onclick="login()" data-i18n="tab_login">Нэвтрэх</button>
     </div>
     <div id="registerForm" style="display:none">
       <!-- ROLE SELECTION -->
       <div class="form-group">
-        <label class="form-label">Та хэн бэ?</label>
+        <label class="form-label" data-i18n="lbl_whoareyou">Та хэн бэ?</label>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px">
           <div id="roleUser" onclick="selectRole('user')" style="border:2px solid var(--a);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;background:rgba(255,92,0,0.08)">
             <div style="font-size:28px">🛍️</div>
-            <div style="font-size:12px;font-weight:700;margin-top:6px">Худалдан авагч</div>
+            <div style="font-size:12px;font-weight:700;margin-top:6px" data-i18n="role_buyer">Худалдан авагч</div>
           </div>
           <div id="roleCourier" onclick="selectRole('courier')" style="border:2px solid var(--b);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer">
             <div style="font-size:28px">🚚</div>
-            <div style="font-size:12px;font-weight:700;margin-top:6px">Хүргэгч</div>
+            <div style="font-size:12px;font-weight:700;margin-top:6px" data-i18n="role_courier">Хүргэгч</div>
           </div>
           <div id="roleShop" onclick="selectRole('shop')" style="border:2px solid var(--b);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer">
             <div style="font-size:28px">🏪</div>
-            <div style="font-size:12px;font-weight:700;margin-top:6px">Дэлгүүр</div>
+            <div style="font-size:12px;font-weight:700;margin-top:6px" data-i18n="role_shop">Дэлгүүр</div>
           </div>
         </div>
         <input type="hidden" id="regRole" value="user">
       </div>
-      <div class="form-group"><label class="form-label">Нэр</label><input class="form-input" type="text" id="regName" placeholder="Таны нэр"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_name">Нэр</label><input class="form-input" type="text" id="regName" placeholder="Таны нэр" data-i18n-ph="ph_name"></div>
 
       <!-- ДЭЛГҮҮРИЙН НЭМЭЛТ МЭДЭЭЛЭЛ -->
       <div id="shopFields" style="display:none">
@@ -1176,15 +1176,15 @@ select.form-input{cursor:pointer}
         </div>
       </div>
 
-      <div class="form-group"><label class="form-label">Регистрийн дугаар</label><input class="form-input" type="text" id="regNumber" placeholder="АА00000000" maxlength="10" oninput="this.value=this.value.toUpperCase()"></div>
-      <div class="form-group"><label class="form-label">Имэйл</label><input class="form-input" type="email" id="regEmail" placeholder="email@example.com"></div>
-      <div class="form-group"><label class="form-label">Утас</label><input class="form-input" type="tel" id="regPhone" placeholder="99xxxxxx"></div>
-      <div class="form-group"><label class="form-label">Нууц үг</label><input class="form-input" type="password" id="regPassword" placeholder="••••••••"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_regnum">Регистрийн дугаар</label><input class="form-input" type="text" id="regNumber" placeholder="АА00000000" maxlength="10" oninput="this.value=this.value.toUpperCase()"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_email">Имэйл</label><input class="form-input" type="email" id="regEmail" placeholder="email@example.com"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_phone">Утас</label><input class="form-input" type="tel" id="regPhone" placeholder="99xxxxxx"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_password">Нууц үг</label><input class="form-input" type="password" id="regPassword" placeholder="••••••••"></div>
       <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--m);margin-bottom:14px;cursor:pointer">
         <input type="checkbox" id="regTermsAccept" style="margin-top:2px;flex-shrink:0">
-        <span>Би <a href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();closeModal('authModal');showPage('terms')" style="color:var(--a);text-decoration:underline">Үйлчилгээний нөхцөл</a> болон <a href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();closeModal('authModal');showPage('privacy')" style="color:var(--a);text-decoration:underline">Нууцлалын бодлого</a>-г хүлээн зөвшөөрч байна</span>
+        <span>Би <a href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();closeModal('authModal');showPage('terms')" style="color:var(--a);text-decoration:underline" data-i18n="terms_link">Үйлчилгээний нөхцөл</a> болон <a href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();closeModal('authModal');showPage('privacy')" style="color:var(--a);text-decoration:underline" data-i18n="privacy_link">Нууцлалын бодлого</a>-г хүлээн зөвшөөрч байна</span>
       </label>
-      <button class="btn btn-primary btn-full" onclick="register()">Бүртгүүлэх</button>
+      <button class="btn btn-primary btn-full" onclick="register()" data-i18n="tab_register">Бүртгүүлэх</button>
     </div>
   </div>
 </div>
@@ -1195,7 +1195,7 @@ select.form-input{cursor:pointer}
     <!-- Header -->
     <div style="position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#E62B05,#FF8C00);padding:14px 16px;display:flex;align-items:center;gap:12px">
       <button onclick="closeModal('postModal')" style="background:rgba(255,255,255,0.2);color:white;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
-      <div style="color:white;font-weight:700;font-size:16px" id="postModalTitle">Зар нэмэх</div>
+      <div style="color:white;font-weight:700;font-size:16px" id="postModalTitle" data-i18n="post_modal">Зар нэмэх</div>
       <!-- STEP INDICATOR -->
       <div style="flex:1;display:flex;gap:4px;margin-left:8px">
         <div style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.9)" id="step1bar"></div>
@@ -1254,19 +1254,19 @@ select.form-input{cursor:pointer}
         <div style="height:1px;background:#f0f0f0;margin:8px 0 16px"></div>
 
         <div class="form-group">
-          <label class="form-label">📝 Гарчиг *</label>
-          <input class="form-input" id="postTitle" placeholder="Барааны нэрийг бичнэ үү">
+          <label class="form-label" data-i18n="p_title">📝 Гарчиг *</label>
+          <input class="form-input" id="postTitle" placeholder="Барааны нэрийг бичнэ үү" data-i18n-ph="ph_title">
         </div>
 
         <div class="form-group">
-          <label class="form-label">📄 Тайлбар</label>
-          <textarea class="form-input" id="postDesc" placeholder="Барааны нөхцөл байдал, онцлог..." style="min-height:80px"></textarea>
+          <label class="form-label" data-i18n="p_desc">📄 Тайлбар</label>
+          <textarea class="form-input" id="postDesc" placeholder="Барааны нөхцөл байдал, онцлог..." data-i18n-ph="ph_desc" style="min-height:80px"></textarea>
         </div>
 
         <div id="dynamicFields"></div>
 
         <div class="form-group">
-          <label class="form-label">📍 Байршил *</label>
+          <label class="form-label" data-i18n="p_location">📍 Байршил *</label>
           <select class="form-input" id="postProvince" onchange="updateProvinceFields()" style="margin-bottom:8px">
             <option value="Улаанбаатар">Улаанбаатар хот</option>
             <option>Архангай</option><option>Баян-Өлгий</option><option>Баянхонгор</option>
@@ -1294,15 +1294,15 @@ select.form-input{cursor:pointer}
               <option value="">Сум сонгох</option>
             </select>
           </div>
-          <input class="form-input" id="postAddress" placeholder="Дэлгэрэнгүй хаяг" style="margin-top:8px">
+          <input class="form-input" id="postAddress" placeholder="Дэлгэрэнгүй хаяг" data-i18n-ph="ph_address" style="margin-top:8px">
         </div>
 
         <div class="form-group">
-          <label class="form-label">💰 Үнэ (₮)</label>
+          <label class="form-label" data-i18n="p_price">💰 Үнэ (₮)</label>
           <div style="display:flex;gap:10px;align-items:center">
             <input class="form-input" type="number" id="postPrice" placeholder="0" style="flex:1">
             <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;font-size:13px">
-              <input type="checkbox" id="postNegotiable"> Тохирно
+              <input type="checkbox" id="postNegotiable"> <span data-i18n="p_negotiable">Тохирно</span>
             </label>
           </div>
         </div>
@@ -1314,10 +1314,10 @@ select.form-input{cursor:pointer}
         </div>
 
         <div class="form-group">
-          <label class="form-label">📷 Зурагнууд (макс 10)</label>
+          <label class="form-label" data-i18n="p_images">📷 Зурагнууд (макс 10)</label>
           <div id="imgPreview" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"></div>
           <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:2px dashed var(--b);border-radius:12px;padding:20px;cursor:pointer;color:var(--m);font-size:14px">
-            📷 Зураг сонгох
+            <span data-i18n="p_choose_img">📷 Зураг сонгох</span>
             <input type="file" id="postImages" accept="image/*" multiple style="display:none" onchange="previewImages(this)">
           </label>
         </div>
@@ -1662,7 +1662,66 @@ var I18N = {
   search_ph:    {mn:'Хайх...',     en:'Search...',   zh:'搜索...'},
   search_btn:   {mn:'Хайх',        en:'Search',      zh:'搜索'},
   sec_new:      {mn:'Шинэ зарууд', en:'New listings',zh:'最新商品'},
-  sec_featured: {mn:'Онцлох зарууд',en:'Featured',   zh:'精选商品'}
+  sec_featured: {mn:'Онцлох зарууд',en:'Featured',   zh:'精选商品'},
+  filter_title: {mn:'🔍 Шүүлтүүр',  en:'🔍 Filters',  zh:'🔍 筛选'},
+  f_minprice:   {mn:'Доод үнэ (₮)', en:'Min price (₮)',zh:'最低价 (₮)'},
+  f_maxprice:   {mn:'Дээд үнэ (₮)', en:'Max price (₮)',zh:'最高价 (₮)'},
+  f_province:   {mn:'Хот/Аймаг',    en:'City/Province',zh:'城市/省'},
+  f_district:   {mn:'Дүүрэг',       en:'District',    zh:'区'},
+  f_soum:       {mn:'Сум',          en:'Soum',        zh:'苏木'},
+  f_brand:      {mn:'Марк',         en:'Brand',       zh:'品牌'},
+  f_model:      {mn:'Модель',       en:'Model',       zh:'型号'},
+  f_model_ph:   {mn:'Модель хайх...',en:'Search model...',zh:'搜索型号...'},
+  f_delivery:   {mn:'🚚 Хүргэлттэй', en:'🚚 Delivery', zh:'🚚 包配送'},
+  f_negotiable: {mn:'💬 Тохирно',    en:'💬 Negotiable',zh:'💬 可议价'},
+  f_verified:   {mn:'✅ Баталгаажсан',en:'✅ Verified', zh:'✅ 已认证'},
+  btn_clear:    {mn:'Цэвэрлэх',      en:'Clear',       zh:'清除'},
+  btn_search2:  {mn:'🔍 Хайх',       en:'🔍 Search',   zh:'🔍 搜索'},
+  btn_save_search:{mn:'🔔 Энэ хайлтыг хадгалах',en:'🔔 Save this search',zh:'🔔 保存此搜索'},
+  opt_all:      {mn:'Бүгд',         en:'All',         zh:'全部'},
+  auth_welcome: {mn:'Тавтай морил 👋',en:'Welcome 👋', zh:'欢迎 👋'},
+  tab_login:    {mn:'Нэвтрэх',      en:'Log in',      zh:'登录'},
+  tab_register: {mn:'Бүртгүүлэх',   en:'Sign up',     zh:'注册'},
+  lbl_email:    {mn:'Имэйл',        en:'Email',       zh:'邮箱'},
+  lbl_password: {mn:'Нууц үг',      en:'Password',    zh:'密码'},
+  lbl_whoareyou:{mn:'Та хэн бэ?',   en:'Who are you?',zh:'您是?'},
+  role_buyer:   {mn:'Худалдан авагч',en:'Buyer',      zh:'买家'},
+  role_courier: {mn:'Хүргэгч',      en:'Courier',     zh:'配送员'},
+  role_shop:    {mn:'Дэлгүүр',      en:'Shop',        zh:'商店'},
+  lbl_name:     {mn:'Нэр',          en:'Name',        zh:'姓名'},
+  ph_name:      {mn:'Таны нэр',     en:'Your name',   zh:'您的姓名'},
+  lbl_regnum:   {mn:'Регистрийн дугаар',en:'Registration number',zh:'登记号'},
+  lbl_phone:    {mn:'Утас',         en:'Phone',       zh:'电话'},
+  terms_link:   {mn:'Үйлчилгээний нөхцөл',en:'Terms of Service',zh:'服务条款'},
+  privacy_link: {mn:'Нууцлалын бодлого',en:'Privacy Policy',zh:'隐私政策'},
+  shop_name:    {mn:'Дэлгүүрийн нэр',en:'Shop name',  zh:'商店名称'},
+  shop_cat:     {mn:'Ангилал',      en:'Category',    zh:'类别'},
+  shop_loc:     {mn:'Байршил',      en:'Location',    zh:'位置'},
+  shop_addr:    {mn:'Дэлгэрэнгүй хаяг',en:'Full address',zh:'详细地址'},
+  shop_hours:   {mn:'Ажиллах цаг',  en:'Working hours',zh:'营业时间'},
+  shop_delivery:{mn:'🚚 Хүргэлт хийдэг',en:'🚚 Offers delivery',zh:'🚚 提供配送'},
+  post_modal:   {mn:'Зар нэмэх',     en:'Post an ad',  zh:'发布广告'},
+  p_title:      {mn:'📝 Гарчиг *',   en:'📝 Title *',  zh:'📝 标题 *'},
+  ph_title:     {mn:'Барааны нэрийг бичнэ үү',en:'Enter product name',zh:'请输入商品名称'},
+  p_desc:       {mn:'📄 Тайлбар',    en:'📄 Description',zh:'📄 描述'},
+  ph_desc:      {mn:'Барааны нөхцөл байдал, онцлог...',en:'Condition, features...',zh:'商品状况、特点...'},
+  p_location:   {mn:'📍 Байршил *',  en:'📍 Location *',zh:'📍 位置 *'},
+  ph_address:   {mn:'Дэлгэрэнгүй хаяг',en:'Full address',zh:'详细地址'},
+  p_price:      {mn:'💰 Үнэ (₮)',    en:'💰 Price (₮)',zh:'💰 价格 (₮)'},
+  p_negotiable: {mn:'Тохирно',       en:'Negotiable',  zh:'可议价'},
+  p_images:     {mn:'📷 Зурагнууд (макс 10)',en:'📷 Images (max 10)',zh:'📷 图片 (最多10张)'},
+  p_choose_img: {mn:'📷 Зураг сонгох',en:'📷 Choose images',zh:'📷 选择图片'},
+  sec_my_orders:{mn:'📦 Миний захиалгууд',en:'📦 My orders',zh:'📦 我的订单'},
+  sec_manage_shop:{mn:'🏪 Дэлгүүрээ удирдах',en:'🏪 Manage shop',zh:'🏪 管理商店'},
+  sec_my_listings:{mn:'Миний зарууд',en:'My listings',zh:'我的商品'},
+  sec_saved:    {mn:'❤️ Хадгалсан зарууд',en:'❤️ Saved listings',zh:'❤️ 收藏的商品'},
+  sec_saved_search:{mn:'🔔 Хадгалсан хайлтууд',en:'🔔 Saved searches',zh:'🔔 保存的搜索'},
+  sec_recent:   {mn:'🕐 Сүүлд үзсэн зарууд',en:'🕐 Recently viewed',zh:'🕐 最近浏览'},
+  sec_notifs:   {mn:'🔔 Мэдэгдлүүд', en:'🔔 Notifications',zh:'🔔 通知'},
+  empty_no_listings:{mn:'Зар байхгүй',en:'No listings',zh:'暂无商品'},
+  btn_post_listing:{mn:'+ Зар байршуулах',en:'+ Post a listing',zh:'+ 发布商品'},
+  empty_no_chats:{mn:'Чат байхгүй байна',en:'No chats',zh:'暂无聊天'},
+  empty_login_profile:{mn:'Нэвтэрч профайлаа харна уу',en:'Log in to view your profile',zh:'登录查看个人资料'}
 };
 // Ангилалын орчуулга (mn нь түлхүүр)
 var CAT_I18N = {
