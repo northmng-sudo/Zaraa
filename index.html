@@ -270,6 +270,11 @@ select.form-input{cursor:pointer}
 /* Дээш буцах товч */
 .scroll-top-btn{position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;background:var(--a);color:#fff;border:none;box-shadow:0 4px 14px rgba(0,0,0,0.25);font-size:22px;line-height:1;cursor:pointer;z-index:99;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity 0.25s,transform 0.25s,visibility 0.25s}
 .scroll-top-btn.show{opacity:1;visibility:visible;transform:translateY(0)}
+/* Хэл солих товч */
+.lang-switch{display:flex;gap:2px;background:#f0f0f0;border-radius:50px;padding:3px;flex-shrink:0}
+.lang-btn{border:none;background:none;padding:5px 9px;border-radius:50px;font-size:12px;font-weight:800;color:#999;cursor:pointer;line-height:1}
+.lang-btn.active{background:var(--a);color:#fff}
+[data-theme="dark"] .lang-switch{background:var(--s)}
 .back-btn{display:flex;align-items:center;gap:8px;padding:14px 16px;font-size:14px;font-weight:600;cursor:pointer;color:var(--m)}
 .back-btn:hover{color:var(--t)}
 </style>
@@ -319,9 +324,16 @@ select.form-input{cursor:pointer}
       <rect x="75" y="55" width="230" height="4" rx="2" fill="url(#ul)"/>
     </svg>
   </div>
-  <div class="nav-right" id="navRight">
-    <button class="btn btn-ghost" onclick="openAuth('login')">Нэвтрэх</button>
-    <button class="btn btn-primary" onclick="openAuth('register')">Бүртгүүлэх</button>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="lang-switch">
+      <button class="lang-btn active" data-lang="mn" onclick="setLang('mn')">MN</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中</button>
+    </div>
+    <div class="nav-right" id="navRight">
+      <button class="btn btn-ghost" onclick="openAuth('login')">Нэвтрэх</button>
+      <button class="btn btn-primary" onclick="openAuth('register')">Бүртгүүлэх</button>
+    </div>
   </div>
 </nav>
 
@@ -397,9 +409,9 @@ select.form-input{cursor:pointer}
       <div id="searchInnerWrap" style="position:relative">
       <div id="searchInner" style="width:760px;height:100px;background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.12);border:2px solid #FF8C00;display:flex;align-items:center;overflow:hidden;padding:10px 8px 10px 14px;gap:6px">
         <svg style="flex-shrink:0;color:#999" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="searchInput" placeholder="Хайх..." oninput="onSearchInput(this.value)" onkeypress="if(event.key==='Enter'){saveSearchHistory();hideSearchHistory();}" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');showSearchHistory()" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:16px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
+        <input type="text" id="searchInput" placeholder="Хайх..." data-i18n-ph="search_ph" oninput="onSearchInput(this.value)" onkeypress="if(event.key==='Enter'){saveSearchHistory();hideSearchHistory();}" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');showSearchHistory()" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1;background:none;border:none;outline:none;color:#333;font-size:16px;font-family:'Inter',sans-serif;padding:4px 4px;min-width:0">
         <button onclick="toggleFilter()" style="background:none;border:none;cursor:pointer;padding:6px 8px;color:#999;font-size:13px;border-radius:8px;flex-shrink:0">⚙️</button>
-        <button onclick="saveSearchHistory();hideSearchHistory();doSearch()" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
+        <button onclick="saveSearchHistory();hideSearchHistory();doSearch()" data-i18n="search_btn" style="background:#FF8C00;color:white;border:none;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;flex-shrink:0">Хайх</button>
       </div>
       <div id="searchHistoryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);margin-top:6px;z-index:95;overflow:hidden;max-height:280px;overflow-y:auto"></div>
       </div>
@@ -475,7 +487,7 @@ select.form-input{cursor:pointer}
   <!-- LISTINGS -->
   <div style="background:#f5f5f5;padding:8px 0">
     <div style="font-size:13px;font-weight:600;padding:8px 12px;background:white;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">
-      <span>Шинэ зарууд</span>
+      <span data-i18n="sec_new">Шинэ зарууд</span>
       <div style="display:flex;gap:4px;background:#f0f0f0;border-radius:50px;padding:3px">
         <button id="viewModeListBtn" onclick="setViewMode('list')" style="background:white;border:none;border-radius:50px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.1)">📋 Жагсаалт</button>
         <button id="viewModeMapBtn" onclick="setViewMode('map')" style="background:none;border:none;border-radius:50px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;color:#666">🗺️ Газрын зураг</button>
@@ -1043,24 +1055,24 @@ select.form-input{cursor:pointer}
 
 <div class="bottom-nav">
   <div class="nav-item active" id="nav-home" onclick="showPage('home')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Нүүр
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span data-i18n="nav_home">Нүүр</span>
   </div>
   <div class="nav-item" id="nav-shops" onclick="showPage('shops')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l1-6h16l1 6"/><path d="M3 9a2 2 0 002 2h0a2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2h0a2 2 0 002-2"/><path d="M5 11v9h14v-9"/></svg>Дэлгүүр
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l1-6h16l1 6"/><path d="M3 9a2 2 0 002 2h0a2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2 2 2 0 002-2 2 2 0 002 2h0a2 2 0 002-2"/><path d="M5 11v9h14v-9"/></svg><span data-i18n="nav_shops">Дэлгүүр</span>
   </div>
   <div class="nav-item post-btn" onclick="showPostModal()">
-    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Зар
+    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span data-i18n="nav_post">Зар</span>
   </div>
   <div class="nav-item" id="nav-deliveries" onclick="showPage('deliveries')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Хүргэлт
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg><span data-i18n="nav_delivery">Хүргэлт</span>
   </div>
   <div class="nav-item" id="nav-chats" onclick="showPage('chats')" style="position:relative">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-    Чат
+    <span data-i18n="nav_chat">Чат</span>
     <span id="chatBadge" style="display:none;position:absolute;top:4px;right:12px;background:#e53e3e;color:white;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;align-items:center;justify-content:center">0</span>
   </div>
   <div class="nav-item" id="nav-profile" onclick="showPage('profile')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профайл
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span data-i18n="nav_profile">Профайл</span>
   </div>
 </div>
 
@@ -1639,6 +1651,58 @@ var CU = null;
 var AL = [];
 var FAVORITES = new Set();
 var CC = '';
+// ===== Олон хэл (i18n) — MN / EN / 中文 =====
+var I18N = {
+  nav_home:     {mn:'Нүүр',        en:'Home',        zh:'首页'},
+  nav_shops:    {mn:'Дэлгүүр',     en:'Shops',       zh:'商店'},
+  nav_post:     {mn:'Зар',         en:'Post',        zh:'发布'},
+  nav_delivery: {mn:'Хүргэлт',     en:'Delivery',    zh:'配送'},
+  nav_chat:     {mn:'Чат',         en:'Chat',        zh:'聊天'},
+  nav_profile:  {mn:'Профайл',     en:'Profile',     zh:'我的'},
+  search_ph:    {mn:'Хайх...',     en:'Search...',   zh:'搜索...'},
+  search_btn:   {mn:'Хайх',        en:'Search',      zh:'搜索'},
+  sec_new:      {mn:'Шинэ зарууд', en:'New listings',zh:'最新商品'},
+  sec_featured: {mn:'Онцлох зарууд',en:'Featured',   zh:'精选商品'}
+};
+// Ангилалын орчуулга (mn нь түлхүүр)
+var CAT_I18N = {
+  'Авто':{en:'Cars',zh:'汽车'},
+  'Үл хөдлөх':{en:'Real estate',zh:'房产'},
+  'Ажлын байр':{en:'Jobs',zh:'招聘'},
+  'Гар утас':{en:'Phones',zh:'手机'},
+  'Компьютер':{en:'Computers',zh:'电脑'},
+  'Цахилгаан бараа':{en:'Electronics',zh:'电器'},
+  'Хувцас':{en:'Clothing',zh:'服装'},
+  'Гутал':{en:'Shoes',zh:'鞋子'},
+  'Эрүүл мэнд, гоо сайхан, хүнс':{en:'Health & beauty',zh:'健康美容'},
+  'Гэр ахуйн бараа':{en:'Home goods',zh:'家居用品'},
+  'Барилгын төхөөрөмж, материал, түлш':{en:'Construction',zh:'建材工具'},
+  'Амралт, спорт, хобби':{en:'Sports & hobby',zh:'运动爱好'},
+  'Хүүхдийн бараа':{en:'Kids',zh:'儿童用品'},
+  'Эрүүл мэнд':{en:'Health',zh:'健康'},
+  'Хоол хүнс':{en:'Food',zh:'食品'},
+  'Мал амьтан, ургамал':{en:'Animals & plants',zh:'动植物'},
+  'Ном':{en:'Books',zh:'图书'},
+  'Үйлчилгээ':{en:'Services',zh:'服务'},
+  'Техник':{en:'Tech',zh:'设备'},
+  'Бусад':{en:'Other',zh:'其他'}
+};
+function getLang(){ try{ return localStorage.getItem('lang') || 'mn'; }catch(e){ return 'mn'; } }
+function t(key){ var e = I18N[key]; var l = getLang(); return e ? (e[l] || e.mn) : key; }
+function tCat(name){ var l = getLang(); if(l==='mn') return name; var c = CAT_I18N[name]; return c ? (c[l]||name) : name; }
+function setLang(lang){
+  try{ localStorage.setItem('lang', lang); }catch(e){}
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var k = el.getAttribute('data-i18n'); if(I18N[k]) el.textContent = I18N[k][lang] || I18N[k].mn;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+    var k = el.getAttribute('data-i18n-ph'); if(I18N[k]) el.setAttribute('placeholder', I18N[k][lang] || I18N[k].mn);
+  });
+  document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-lang')===lang); });
+}
+function applyLang(){ setLang(getLang()); }
+
 var EMOJIS = {'Авто':'🚗','Үл хөдлөх':'🏠','Ажлын байр':'💼','Гар утас':'📱','Компьютер':'💻','Цахилгаан бараа':'🔌','Хувцас':'👗','Гутал':'👟','Эрүүл мэнд, гоо сайхан, хүнс':'💄','Гэр ахуйн бараа':'🪑','Барилгын төхөөрөмж, материал, түлш':'🏗️','Амралт, спорт, хобби':'⚽','Хүүхдийн бараа':'🧸','Эрүүл мэнд':'💊','Хоол хүнс':'🍎','Мал амьтан, ургамал':'🐾','Ном':'📚','Үйлчилгээ':'🔧','Техник':'📱','Бусад':'📦'};
 
 // Дээш буцах товч — доош гүйлгэхэд гарч ирнэ
@@ -6873,6 +6937,7 @@ function showToast(msg, isError) {
   setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 
+applyLang();
 init();
 </script>
 <script>
