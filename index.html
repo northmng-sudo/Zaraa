@@ -1690,6 +1690,21 @@ var CAT_I18N = {
 function getLang(){ try{ return localStorage.getItem('lang') || 'mn'; }catch(e){ return 'mn'; } }
 function t(key){ var e = I18N[key]; var l = getLang(); return e ? (e[l] || e.mn) : key; }
 function tCat(name){ var l = getLang(); if(l==='mn') return name; var c = CAT_I18N[name]; return c ? (c[l]||name) : name; }
+function applyCatLang(){
+  var lang = getLang();
+  document.querySelectorAll('#catList .cat').forEach(function(el){
+    if(el.getAttribute('data-mn')===null){ el.setAttribute('data-mn', el.textContent.trim()); }
+    var mnText = el.getAttribute('data-mn');
+    var emoji = mnText.split(' ')[0];
+    var cat = el.getAttribute('data-cat');
+    if(lang==='mn'){ el.textContent = mnText; return; }
+    if(cat===''){ el.textContent = emoji + ' ' + (lang==='en'?'All':'全部'); return; }
+    var tr = CAT_I18N[cat];
+    el.textContent = emoji + ' ' + (tr ? (tr[lang]||mnText.slice(emoji.length).trim()) : mnText.slice(emoji.length).trim());
+  });
+  var act = document.querySelector('#catList .cat.active');
+  if(act && typeof updatePillIndicator==='function'){ try{ updatePillIndicator(act); }catch(e){} }
+}
 function setLang(lang){
   try{ localStorage.setItem('lang', lang); }catch(e){}
   document.documentElement.lang = lang;
@@ -1700,6 +1715,7 @@ function setLang(lang){
     var k = el.getAttribute('data-i18n-ph'); if(I18N[k]) el.setAttribute('placeholder', I18N[k][lang] || I18N[k].mn);
   });
   document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-lang')===lang); });
+  applyCatLang();
 }
 function applyLang(){ setLang(getLang()); }
 
