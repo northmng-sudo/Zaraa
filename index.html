@@ -577,7 +577,7 @@ select.form-input{cursor:pointer}
     </div>
     <div class="form-group"><label class="form-label">Дэлгэрэнгүй хаяг</label><input class="form-input" type="text" id="shopEditAddress"></div>
     <div class="form-group">
-      <label class="form-label">Ажиллах цаг</label>
+      <label class="form-label" data-i18n="shop_hours">Ажиллах цаг</label>
       <div style="display:flex;gap:8px;align-items:center">
         <input class="form-input" type="time" id="shopEditOpen" style="flex:1">
         <span style="color:var(--m)">—</span>
@@ -586,7 +586,7 @@ select.form-input{cursor:pointer}
     </div>
     <div class="form-group">
       <div class="toggle-row">
-        <span class="toggle-label">🚚 Хүргэлт хийдэг</span>
+        <span class="toggle-label" data-i18n="shop_delivery">🚚 Хүргэлт хийдэг</span>
         <label class="toggle"><input type="checkbox" id="shopEditDelivery"><span class="toggle-slider"></span></label>
       </div>
     </div>
@@ -1115,19 +1115,19 @@ select.form-input{cursor:pointer}
       <!-- ДЭЛГҮҮРИЙН НЭМЭЛТ МЭДЭЭЛЭЛ -->
       <div id="shopFields" style="display:none">
         <div style="height:1px;background:#f0f0f0;margin:12px 0"></div>
-        <div style="font-size:12px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:10px">🏪 ДЭЛГҮҮРИЙН МЭДЭЭЛЭЛ</div>
-        <div class="form-group"><label class="form-label">Дэлгүүрийн нэр</label><input class="form-input" type="text" id="shopName" placeholder="Жишээ: Алтан мах"></div>
+        <div style="font-size:12px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:10px" data-i18n="shop_info_hdr">🏪 ДЭЛГҮҮРИЙН МЭДЭЭЛЭЛ</div>
+        <div class="form-group"><label class="form-label" data-i18n="shop_name">Дэлгүүрийн нэр</label><input class="form-input" type="text" id="shopName" placeholder="Жишээ: Алтан мах" data-i18n-ph="ph_shop_name"></div>
         <div class="form-group">
-          <label class="form-label">Ангилал</label>
+          <label class="form-label" data-i18n="shop_cat">Ангилал</label>
           <select class="form-input" id="shopCategory">
-            <option value="">Сонгох</option>
+            <option value="" data-i18n="opt_select">Сонгох</option>
             <option>Хүнс</option><option>Мах</option><option>Хүнсний бараа</option>
             <option>Хувцас</option><option>Гоо сайхан</option><option>Эм</option>
             <option>Электроник</option><option>Бусад</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Байршил</label>
+          <label class="form-label" data-i18n="shop_loc">Байршил</label>
           <select class="form-input" id="shopProvince" onchange="updateShopRegProvince()" style="margin-bottom:8px">
             <option value="Улаанбаатар">Улаанбаатар хот</option>
             <option>Архангай</option><option>Баян-Өлгий</option><option>Баянхонгор</option>
@@ -1141,25 +1141,25 @@ select.form-input{cursor:pointer}
           </select>
           <div id="shopUbFields" style="display:flex;gap:8px">
             <select class="form-input" id="shopDistrict" onchange="updateShopKhoroo()" style="flex:1">
-              <option value="">Дүүрэг</option>
+              <option value="" data-i18n="opt_district">Дүүрэг</option>
               <option>Баянгол</option><option>Баянзүрх</option><option>Сүхбаатар</option>
               <option>Хан-Уул</option><option>Чингэлтэй</option><option>Сонгинохайрхан</option>
               <option>Налайх</option><option>Багануур</option><option>Багахангай</option>
             </select>
             <select class="form-input" id="shopKhoroo" style="flex:1">
-              <option value="">Хороо</option>
+              <option value="" data-i18n="opt_khoroo">Хороо</option>
             </select>
           </div>
           <div id="shopAimagFields" style="display:none">
             <select class="form-input" id="shopSum">
-              <option value="">Сум сонгох</option>
+              <option value="" data-i18n="opt_sum">Сум сонгох</option>
             </select>
           </div>
           <div id="shopEreenFields" style="display:none">
             <input class="form-input" id="shopEreenMarket" placeholder="Зах/Маркетийн нэр (жишээ: Дунд зах, Жинхуа)">
           </div>
         </div>
-        <div class="form-group"><label class="form-label">Дэлгэрэнгүй хаяг</label><input class="form-input" type="text" id="shopAddress" placeholder="Гудамж, байр, давхар..."></div>
+        <div class="form-group"><label class="form-label" data-i18n="shop_addr">Дэлгэрэнгүй хаяг</label><input class="form-input" type="text" id="shopAddress" placeholder="Гудамж, байр, давхар..." data-i18n-ph="ph_shop_addr"></div>
         <div class="form-group">
           <label class="form-label">Ажиллах цаг</label>
           <div style="display:flex;gap:8px;align-items:center">
@@ -1721,7 +1721,14 @@ var I18N = {
   empty_no_listings:{mn:'Зар байхгүй',en:'No listings',zh:'暂无商品'},
   btn_post_listing:{mn:'+ Зар байршуулах',en:'+ Post a listing',zh:'+ 发布商品'},
   empty_no_chats:{mn:'Чат байхгүй байна',en:'No chats',zh:'暂无聊天'},
-  empty_login_profile:{mn:'Нэвтэрч профайлаа харна уу',en:'Log in to view your profile',zh:'登录查看个人资料'}
+  empty_login_profile:{mn:'Нэвтэрч профайлаа харна уу',en:'Log in to view your profile',zh:'登录查看个人资料'},
+  shop_info_hdr:{mn:'🏪 ДЭЛГҮҮРИЙН МЭДЭЭЛЭЛ',en:'🏪 SHOP INFO',zh:'🏪 商店信息'},
+  opt_select:   {mn:'Сонгох',       en:'Select',      zh:'请选择'},
+  ph_shop_name: {mn:'Жишээ: Алтан мах',en:'e.g. Golden Meat',zh:'例如：金牌肉店'},
+  ph_shop_addr: {mn:'Гудамж, байр, давхар...',en:'Street, building, floor...',zh:'街道、楼、层...'},
+  opt_district: {mn:'Дүүрэг',        en:'District',    zh:'区'},
+  opt_khoroo:   {mn:'Хороо',         en:'Khoroo',      zh:'社区'},
+  opt_sum:      {mn:'Сум сонгох',    en:'Select soum', zh:'选择苏木'}
 };
 // Ангилалын орчуулга (mn нь түлхүүр)
 var CAT_I18N = {
@@ -1749,6 +1756,46 @@ var CAT_I18N = {
 function getLang(){ try{ return localStorage.getItem('lang') || 'mn'; }catch(e){ return 'mn'; } }
 function t(key){ var e = I18N[key]; var l = getLang(); return e ? (e[l] || e.mn) : key; }
 function tCat(name){ var l = getLang(); if(l==='mn') return name; var c = CAT_I18N[name]; return c ? (c[l]||name) : name; }
+// Дэд ангилал / төрлийн орчуулга (бараа бүтээгдэхүүний гол хэсэг)
+var SUB_I18N = {
+  'Зарна':{en:'For sale',zh:'出售'},'Түрээслүүлнэ':{en:'For rent',zh:'出租'},
+  'Автомашин зарна':{en:'Cars for sale',zh:'汽车出售'},'Ачааны машин, автобус, хүнд механизм':{en:'Trucks, buses, machinery',zh:'货车、客车、机械'},
+  'Авто түрээслүүлнэ':{en:'Car rental',zh:'汽车租赁'},'Мотоцикл, мопед, суррон':{en:'Motorcycles, mopeds',zh:'摩托车、电动车'},
+  'Авто дугуй, обуд':{en:'Tires & rims',zh:'轮胎、轮毂'},'Авто сэлбэг, туслах хэрэгслүүд':{en:'Auto parts & accessories',zh:'汽车配件'},
+  'Гар утас ба утаснууд':{en:'Phones',zh:'手机'},'Гар утасны дугаар':{en:'Phone numbers',zh:'手机号码'},
+  'Гар утасны сэлбэг':{en:'Phone parts',zh:'手机配件'},'Ухаалаг цаг – Smart watch':{en:'Smart watches',zh:'智能手表'},
+  'Дагалдах хэрэгсэл':{en:'Accessories',zh:'配件'},'Богино долгионы радио станц':{en:'Walkie-talkies',zh:'对讲机'},
+  'Суурин компьютер':{en:'Desktop PCs',zh:'台式电脑'},'Notebook':{en:'Notebooks',zh:'笔记本电脑'},
+  'PS, XBox, Nintendo':{en:'Consoles',zh:'游戏机'},'Принтер, хувилагч, сканнер, ламинатор':{en:'Printers & scanners',zh:'打印机、扫描仪'},
+  'Сэлбэг':{en:'Parts',zh:'配件'},'iPad, tablet, kindle':{en:'Tablets',zh:'平板电脑'},
+  'Принтер, хувилагчийн хор':{en:'Printer ink',zh:'打印机墨盒'},'Чихэвч, 3D шил':{en:'Headphones, 3D glasses',zh:'耳机、3D眼镜'},
+  'Фото, видео камер':{en:'Cameras',zh:'相机'},'ТВ, Аudio + Video':{en:'TV, Audio & Video',zh:'电视、音响'},
+  'Гал тогооны цахилгаан бараа':{en:'Kitchen appliances',zh:'厨房电器'},'Тень, халаагуур':{en:'Heaters',zh:'取暖器'},
+  'Угаалгын машин':{en:'Washing machines',zh:'洗衣机'},'Тоос сорогч, хивс угаагч, индүү':{en:'Vacuums & irons',zh:'吸尘器、熨斗'},
+  'Агааржуулагч, сэнс':{en:'AC & fans',zh:'空调、风扇'},'Оёдлын машин':{en:'Sewing machines',zh:'缝纫机'},
+  'Хөргөгч, хөлдөөгч':{en:'Refrigerators',zh:'冰箱、冷柜'},'Цахилгаан барааны дагалдах хэрэгсэл':{en:'Appliance accessories',zh:'电器配件'},
+  'Эмэгтэй хувцас':{en:"Women's clothing",zh:'女装'},'Эрэгтэй хувцас':{en:"Men's clothing",zh:'男装'},
+  'Гутал, пүүз':{en:'Shoes',zh:'鞋子'},'Малгай, Цүнх, Нүдний шил':{en:'Hats, bags, glasses',zh:'帽子、包、眼镜'},
+  'Гоёл чимэглэл, бугуйн цаг':{en:'Jewelry & watches',zh:'首饰、手表'},'Ажлын хувцас, гутал':{en:'Workwear',zh:'工作服'},
+  'Бөс бараа, торго':{en:'Fabric & silk',zh:'布料、丝绸'},'Түрээсийн хувцас':{en:'Rental clothing',zh:'租赁服装'},
+  'Шүхэр':{en:'Umbrellas',zh:'雨伞'},
+  'Эрэгтэй':{en:"Men's",zh:'男款'},'Эмэгтэй':{en:"Women's",zh:'女款'},'Хүүхэд':{en:'Kids',zh:'儿童'},'Спорт':{en:'Sports',zh:'运动'},
+  'Орон сууц':{en:'Apartment',zh:'公寓'},'Монгол гэр':{en:'Ger',zh:'蒙古包'},'Хашаа байшин':{en:'House',zh:'独栋房'},
+  'Газар':{en:'Land',zh:'土地'},'Оффис':{en:'Office',zh:'办公室'},'Худалдаа үйлчилгээний талбай':{en:'Retail space',zh:'商铺'},
+  'Үйлдвэр/агуулах':{en:'Factory/warehouse',zh:'厂房/仓库'},
+  'Бусад':{en:'Other',zh:'其他'}
+};
+function tSub(name){ var l = getLang(); if(l==='mn') return name; var c = SUB_I18N[name]; return c ? (c[l]||name) : name; }
+function applySubLang(){
+  document.querySelectorAll('.subcat-pill').forEach(function(p){
+    var key = p.getAttribute('data-subcat') || p.getAttribute('data-typecat');
+    if(!key) return;
+    var full = p.textContent.trim();
+    var sp = full.indexOf(' ');
+    var icon = sp>0 ? full.slice(0,sp) : '📌';
+    p.textContent = icon + ' ' + tSub(key);
+  });
+}
 function applyCatLang(){
   var lang = getLang();
   document.querySelectorAll('#catList .cat').forEach(function(el){
@@ -1775,6 +1822,7 @@ function setLang(lang){
   });
   document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-lang')===lang); });
   applyCatLang();
+  applySubLang();
 }
 function applyLang(){ setLang(getLang()); }
 
@@ -3928,7 +3976,7 @@ function renderSubCatRow(cat) {
   var keys = Object.keys(subs);
   row.innerHTML = keys.map(function(k) {
     var icon = SUB_ICONS[k] || '📌';
-    return '<span class="subcat-pill" onclick="filterSubCat(\''+k.replace(/'/g,"\\'")+'\')" data-subcat="'+k.replace(/"/g,'&quot;')+'">'+icon+' '+k+'</span>';
+    return '<span class="subcat-pill" onclick="filterSubCat(\''+k.replace(/'/g,"\\'")+'\')" data-subcat="'+k.replace(/"/g,'&quot;')+'">'+icon+' '+tSub(k)+'</span>';
   }).join('');
   wrap.style.display = 'block';
   if (searchWrap) searchWrap.style.top = '97px';
@@ -3968,7 +4016,7 @@ function renderTypeCatRow(cat, sub) {
   }
   row.innerHTML = types.map(function(t) {
     var icon = PHONE_BRAND_ICONS[t] || NOTEBOOK_BRAND_ICONS[t] || BRAND_ICONS[t] || SUB_ICONS[t] || '📌';
-    return '<span class="subcat-pill" onclick="filterTypeCat(\''+t.replace(/'/g,"\\'")+'\')" data-typecat="'+t.replace(/"/g,'&quot;')+'">'+icon+' '+t+'</span>';
+    return '<span class="subcat-pill" onclick="filterTypeCat(\''+t.replace(/'/g,"\\'")+'\')" data-typecat="'+t.replace(/"/g,'&quot;')+'">'+icon+' '+tSub(t)+'</span>';
   }).join('');
   wrap.style.display = 'block';
   if (searchWrap) searchWrap.style.top = '144px';
