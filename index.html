@@ -3891,9 +3891,9 @@ async function addBanner() {
   showToast('Нэмж байна...');
   var imageUrl = null;
   if (imageFile) {
-    var ext = imageFile.name.split('.').pop();
-    var path = 'banners/'+Date.now()+'.'+ext;
-    var up = await sb.storage.from('listings').upload(path, imageFile, {cacheControl:'3600', upsert:true});
+    var compBanner = await compressImage(imageFile, 2000, 0.82);
+    var path = 'banners/'+Date.now()+'.jpg';
+    var up = await sb.storage.from('listings').upload(path, compBanner, {cacheControl:'3600', upsert:true, contentType:'image/jpeg'});
     if (up.error) { showToast('Зураг илгээхэд алдаа гарлаа', true); return; }
     imageUrl = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
   }
@@ -4412,9 +4412,9 @@ async function sendChatImage(input) {
   if (!file) return;
   if (file.size > 10*1024*1024) { showToast('Зураг 10MB-аас бага байх ёстой', true); return; }
   showToast('Зураг илгээж байна...');
-  var ext = file.name.split('.').pop();
-  var path = CU.id+'/chat_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.'+ext;
-  var up = await sb.storage.from('listings').upload(path, file, {cacheControl:'3600', upsert:true});
+  var compChat = await compressImage(file, 1280, 0.8);
+  var path = CU.id+'/chat_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)+'.jpg';
+  var up = await sb.storage.from('listings').upload(path, compChat, {cacheControl:'3600', upsert:true, contentType:'image/jpeg'});
   input.value = '';
   if (up.error) { showToast('Зураг илгээхэд алдаа гарлаа', true); return; }
   var url = 'https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path;
@@ -5537,13 +5537,45 @@ function previewVideo(input) {
   preview.innerHTML = '<video src="'+url+'" controls style="width:100%;border-radius:10px;max-height:180px;background:#333"></video><div style="font-size:11px;color:var(--m);margin-top:4px">'+file.name+' ('+( file.size/1024/1024).toFixed(1)+'MB)</div>';
 }
 
+// Зургийг upload-ын өмнө шахах — egress (дата урсгал) багасгана
+function compressImage(file, maxDim, quality) {
+  maxDim = maxDim || 1280;
+  quality = quality || 0.8;
+  return new Promise(function(resolve) {
+    // GIF (хөдөлгөөнт) болон жижиг файлыг шахахгүй
+    if (!file || !file.type || file.type.indexOf('image/') !== 0 || file.type === 'image/gif') {
+      return resolve(file);
+    }
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function() {
+      var w = img.width, h = img.height;
+      var scale = Math.min(1, maxDim / Math.max(w, h));
+      var nw = Math.round(w * scale), nh = Math.round(h * scale);
+      var canvas = document.createElement('canvas');
+      canvas.width = nw; canvas.height = nh;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, nw, nh);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function(blob) {
+        // Хэрэв шахсан нь эх файлаас том бол эхийг ашиглана
+        if (!blob || blob.size >= file.size) return resolve(file);
+        blob.name = (file.name || 'image').replace(/\.[^.]+$/, '') + '.jpg';
+        resolve(blob);
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
 async function uploadImages(files) {
   var urls = [];
   for (var i=0; i<Math.min(files.length,10); i++) {
     var file = files[i];
-    var ext = file.name.split('.').pop();
-    var path = CU.id+'/img_'+Date.now()+'_'+i+'_'+Math.random().toString(36).substr(2,5)+'.'+ext;
-    var r = await sb.storage.from('listings').upload(path, file, {cacheControl:'3600', upsert:true});
+    var comp = await compressImage(files[i], 1280, 0.8);
+    var path = CU.id+'/img_'+Date.now()+'_'+i+'_'+Math.random().toString(36).substr(2,5)+'.jpg';
+    var r = await sb.storage.from('listings').upload(path, comp, {cacheControl:'3600', upsert:true, contentType:'image/jpeg'});
     if (!r.error) {
       urls.push('https://xtxdktakcpscpdjdcalf.supabase.co/storage/v1/object/public/listings/'+path);
     }
